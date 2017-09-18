@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <link rel='stylesheet' href='fullcalendar.css' />
+    <script src='lib/jquery.min.js'></script>
+    <script src='lib/moment.min.js'></script>
+    <script src='fullcalendar.js'></script>
+    
+    <script>
+    $(document).ready(function() {
+
+        // page is now ready, initialize the calendar...
+        
+        function myFunction() {
+            var event = prompt("Please enter your event", "Harry Potter");
+            if (person != null) {
+                document.getElementById("demo").innerHTML =
+                "Hello " + person + "! How are you today?";
+            }
+        }
+
+        $('#calendar').fullCalendar({
+            // put your options and callbacks here
+            dayClick: function(date, jsEvent, view) {
+
+                var event = prompt("Please enter event", "Harry Potter");
+                
+                alert('Clicked on: ' + date.format());
+
+                alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+
+                alert('Current view: ' + view.name);
+
+                // change the day's background color just for fun
+                $(this).css('background-color', 'red');
+
+            }
+        });
+         
+    });
+    </script> 
+    
+    <script>
+//    $('#calendar').fullCalendar({
+//        dayClick: function(date, jsEvent, view) {
+//
+//        alert('Clicked on: ' + date.format());
+//
+//        alert('Coordinates: ' + jsEvent.pageX + ',' + jsEvent.pageY);
+//
+//        alert('Current view: ' + view.name);
+//
+//        // change the day's background color just for fun
+//        $(this).css('background-color', 'red');
+//
+//        }
+//    });
+//    var add_button = '<input type="button" value="+" />'; 
+//    $(".fc-day-number").prepend(add_button);
+        
+//        
+//    function add(start, end, allDay) {
+//    var title = prompt('Event Title:');
+//    if (title) {
+//        calendar.fullCalendar('renderEvent',
+//            {
+//                title: title,
+//                start: start,
+//                end: end,
+//                allDay: allDay
+//            },
+//            true // make the event "stick"
+//        );
+//    }
+//    calendar.fullCalendar('unselect');
+//    } 
+    
+    </script>
+    
+</head>
+    
+<body>
+    
+    <h1>FullCalendar Test</h1>
+    
+    <button onclick = "add">Add Event</button>
+    
+    <div id='calendar'>
+    
+    </div>
+    
+    
+    </body>
+    
+</html>

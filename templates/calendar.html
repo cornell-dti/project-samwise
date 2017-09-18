@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+	
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdn.rawgit.com/LeaVerou/awesomplete/gh-pages/awesomplete.css">
+	<script src="https://cdn.rawgit.com/LeaVerou/awesomplete/gh-pages/awesomplete.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
+	
+    <link rel='stylesheet' href='../static/js/fullcalendar-3.2.0/fullcalendar.css' />
+	<link rel='stylesheet' href='../static/js/fullcalendar-3.2.0/fullcalendar-custom.css?version=13' />
+	<link rel='stylesheet' href='../static/css/stylesheet.css?version=04' />
+	
+    <script src='../static/js/fullcalendar-3.2.0/lib/jquery.min.js'></script>
+    <script src='../static/js/fullcalendar-3.2.0/lib/moment.min.js'></script>
+    <script src='../static/js/fullcalendar-3.2.0/fullcalendar.js'></script>
+	
+	<script src = '../static/js/jquery-sortable.js'></script>
+	
+    <!--<script src = '../static/js/modalDialogScript.js'></script>-->
+    <!--<script src = '../static/js/toggleMenuScript.js'></script>-->
+    
+</head>
+
+    
+<body>
+		<div class="col-sm-9">
+			<h1>  Project Samwise</h1>
+		</div>
+
+		<div class="col-sm-3">
+			{% include 'toggleMenu.html' %}
+		</div>
+
+
+				<!-- The Modal -->
+		    {% include 'modalDialog.html' %}
+
+		<div class="col-sm-12">
+			<div class="topnav">
+				  <a onclick="location.href='/'">Layout Mode</a>
+				  <a class="active" onclick="location.href='calendar'">Calendar Mode</a>
+				  <a onclick="introAdd()">+</a>
+			</div>
+		</div>
+
+
+	
+		<div class="col-sm-9">
+			
+			<div id='calendar'>
+    
+			</div>
+		</div>
+		
+		<div class="col-sm-3">
+			{% include 'toDoList.html' %}
+		</div>
+		
+	
+    </body>
+<script>
+	var events = JSON.parse(localStorage.getItem("events")) == null ? [] : JSON.parse(localStorage.getItem("events"));
+	
+	function myFunction() {
+    	var eventTitle = document.getElementById("nameOne").value;
+    	if (eventTitle) {
+        	// This one adds all exams for the input
+        	$("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/exams/' + eventTitle});
+            $("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/courses/' + eventTitle});
+            events.push(eventTitle);
+        	localStorage.setItem("events", JSON.stringify(events));
+        	console.log(events);
+        }
+        var modal = document.getElementById('myModal');
+        modal.style.display = "none";
+	}
+	
+</script>
+    
+</html>

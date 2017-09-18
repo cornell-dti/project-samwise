@@ -1,0 +1,217 @@
+/* Include the padding and border in an element's total width and height */
+* {
+    box-sizing: border-box;
+}
+
+/* Remove margins and padding from the list */
+.toDoListDiv ul {
+    margin: 0;
+    padding: 0;
+}
+
+/* Style the list items */
+.toDoListDiv ul li {
+    cursor: pointer;
+    position: relative;
+    padding: 6px 4px 6px 20px;
+    background: #eee;
+    font-size: 12px;
+    transition: 0.2s;
+
+    /* make the list items unselectable */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Set all odd list items to a different color (zebra-stripes) */
+.toDoListDiv ul li:nth-child(odd) {
+    background: #f9f9f9;
+}
+
+/* Darker background-color on hover */
+.toDoListDiv ul li:hover {
+    background: #ddd;
+}
+
+/* When clicked on, add a background color and strike out text */
+.toDoListDiv ul li.checked {
+    background: #888;
+    color: #fff;
+    text-decoration: line-through;
+}
+
+/* Style the close button */
+.toDoListDiv .close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 0px 3px
+}
+
+.toDoListDiv .close:hover {
+    background-color: #f44336;
+    color: white;
+}
+
+/* Style the input */
+input {
+    border: none;
+    width: 75%;
+    padding: 10px;
+    float: left;
+    font-size: 12px;
+}
+
+/* Style the "Add" button */
+.addBtn {
+    padding: 10px;
+    width: 25%;
+    background: #d9d9d9;
+    color: #555;
+    float: left;
+    text-align: center;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.addBtn:hover {
+    background-color: #bbb;
+}
+
+body.dragging, body.dragging * {
+  cursor: move !important;
+}
+
+.dragged {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 2000;
+}
+
+.toDoListDiv ul.sortable li.placeholder {
+  position: relative;
+  /** More li styles **/
+}
+.toDoListDiv ul.sortable li.placeholder:before {
+  position: absolute;
+  /** Define arrowhead **/
+}
+
+a.fc-event {
+  /*border-radius: 15px;*/
+  /* round edges */
+  width: 0;
+  height: 0;
+  display: none;
+  /* fixed width */
+  color: transparent;
+  cursor: default;
+  border-color:  = rgba(0, 0, 0, 0);
+  /* hide text */
+}
+
+.pointer {
+  cursor: default;
+}
+
+.fc-month-view .fc-event-container{
+    display: none;
+}
+
+/* Nav Bar */
+
+.topnav {
+  overflow: hidden;
+  background-color: #333;
+}
+
+.topnav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a.active {
+    background-color: #3a87ad;
+    color: white;
+}
+
+#green-button {
+  width: 40px;
+  height: 40px;
+  float: right;
+}
+
+#green-create {
+  width: 178px;
+  height: 54px;
+  float: right;
+}
+
+#project_name {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  font-size: 30px;
+  box-sizing: border-box;
+  border: none;
+  background-color: #4a90e2;
+  border-bottom: 2px solid white;
+  color: white;
+}
+
+.myInput {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  font-size: 30px;
+  box-sizing: border-box;
+  border: none;
+  background-color: #4a90e2;
+  border-bottom: 2px solid white;
+  color: white;
+}
+
+#select_tags {
+  background-color: #4a90e2;
+  font-size: 20px;
+}
+
+.task {
+  width: 100%;
+  padding: 0px 12px;
+  margin: 8px 0;
+  font-size: 12px;
+  box-sizing: border-box;
+  border: none;
+  background-color: #4a90e2;
+  border-bottom: 2px solid white;
+  color: white;
+}
+
+.task_name {
+  width: 100%;
+  font-size: 16px;
+  box-sizing: border-box;
+  border: none;
+  background-color: #4a90e2;
+  color: white;
+}
+
+.fc-ltr .fc-basic-view .fc-day-top { float: none; text-align: center; padding-top: 7%; }
+.fc-ltr .fc-basic-view .fc-day-top .fc-day-number { float: none; text-align: center }
+.fc th, .fc td {
+  border-width: 0px;
+}

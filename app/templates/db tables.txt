@@ -1,0 +1,32 @@
+Database Tables:
+
+projects
+- id
+    - This connects the project with the subtasks
+- user
+    - NetID
+- projectname
+    - Name of project
+- tag
+    - Project category/tag
+- duedate
+    - All dates need to be of the format: YYYY-MM-DD HH:MM
+
+subtasks
+- id
+    - Connects subtasks to project
+- subtask
+    - What the subtask is
+
+tasks
+- user
+    - NetID
+- taskname
+
+events
+- user
+    - NetID
+- eventname
+    - Name of event
+- date
+    - Date of event - format YYYY-MM-DD HH:MM

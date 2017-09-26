@@ -16,7 +16,7 @@ semester = "spring"
 if (int(month) > 6):
 	semester = "fall"
 r_final = requests.get("https://registrar.cornell.edu/exams/" + semester + "-final-exam-schedule")
-r_prelim = requests.get("https://registrar.cornell.edu/exams/" + semester + "-prelim-schedule")
+r_prelim = requests.get("https://registrar.cornell.edu/exams/" + semester + "-prelim-exam-schedule")
 
 # FINALS -- stores in final_exams list
 soup = BeautifulSoup(r_final.text, "html.parser")

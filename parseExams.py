@@ -90,7 +90,8 @@ for line in lines:
 				# loc = sections[1].strip()
 
 				# Create a Prelim object with the course, date, and location
-				prelim_to_add = {"sections" : "000", "date" : date}
+				prelim_to_add = {"course": course, "sections" : "000", "date" : date}
+				print prelim_to_add
 
 				if course in courses:
 					courses[course].append(prelim_to_add)

@@ -37,9 +37,11 @@ for line in lines:
 			# Format the date to be in correct for MySQL
 			date = date.split(', ')[1]
 			datesplit = date.split('  ')
-			date = datesplit[0] + ' ' +  datesplit[1] + datesplit[2]
-			date += time.strftime("%Y")
-			dt = datetime.strptime(date, '%b %d %I:%M %p%Y')
+			date = datesplit[0] +  datesplit[1] + ' ' + datesplit[len(datesplit) - 1]
+			date += (' ' + time.strftime("%Y"))
+			# print "TESTING " + time.strftime("%Y")
+			# print "TESTING " + date
+			dt = datetime.strptime(date, '%b %d %I:%M %p %Y')
 			date = datetime.strftime(dt, '%Y-%m-%d %H:%M')
 
 			# Create a Final object with the course, date, and location

@@ -75,27 +75,17 @@ function updateProject(projectid, projectName, date, course, color) {
         xhr.send(JSON.stringify(obj));
     }
 
-    function addTaskCourse(id, task, course, date, details) {
+    function addTask(id, task, course, color, duedate, details) {
 
-        var obj = {"userid" : id, "taskname" : task, "course" : course, "date" : date, "details" : details};
+        var obj = {"userid" : id, "taskname" : task, "course" : course, "color" : color, "duedate" : duedate, "details" : details};
 
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", 'http://localhost:5000/addTaskCourse/', true);
+        xhr.open("POST", 'http://localhost:5000/addTask/', true);
         xhr.setRequestHeader("Content-Type", "application/json")
         console.log(JSON.stringify(obj));
         xhr.send(JSON.stringify(obj));
     }
 
-    function addTaskColor(id, task, color, date, details) {
-
-        var obj = {"userid" : id, "taskname" : task, "color" : color, "date" : date, "details" : details};
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", 'http://localhost:5000/addTaskColor/', true);
-        xhr.setRequestHeader("Content-Type", "application/json")
-        console.log(JSON.stringify(obj));
-        xhr.send(JSON.stringify(obj));
-    }
 
     function removeTask(taskid) {
 
@@ -108,9 +98,9 @@ function updateProject(projectid, projectName, date, course, color) {
         xhr.send(JSON.stringify(obj));
     }
 
-    function updateTask(taskid, taskname, date, course, color, details) {
+    function updateTask(taskid, taskname, duedate, course, color, details) {
 
-        var obj = {"taskid" : taskid, "taskname" : taskname, "duedate" : date, "course" : course, "color" : color, "details" : details};
+        var obj = {"taskid" : taskid, "taskname" : taskname, "duedate" : duedate, "course" : course, "color" : color, "details" : details};
 
         var xhr = new XMLHttpRequest();
         xhr.open("POST", 'http://localhost:5000/updateTask/', true);

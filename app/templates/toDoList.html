@@ -184,8 +184,8 @@
 			//console.log("here are some items: " + items);
 			for (i = 0; i < items.length; i++) {
 				//console.log("here are some items: " + items.item(i).getAttribute("taskid"));
-				updateTask(items.item(i).getAttribute("taskid"), items.item(i).innerText.substring(5, items.item(i).innerText.length-2),
-				items.item(i).getAttribute("date"), items.item(i).getAttribute("course"),
+				updateTask(items.item(i).getAttribute("taskid"), items.item(i).getAttribute("taskname"),
+				items.item(i).getAttribute("duedate"), items.item(i).getAttribute("course"),
 				items.item(i).getAttribute("color"), items.item(i).getAttribute("details"));
 			}
 		}
@@ -290,7 +290,7 @@
 			};
 		}
 
-	function newElement(text, course, color, date, details, taskid) {
+	function newElement(text, course, color, duedate, details, taskid) {
 		var li = document.createElement("li");
 		var inputValue = text;
 		var t = document.createTextNode(inputValue);
@@ -301,7 +301,7 @@
 
 		li.setAttribute("course", course);
 		li.setAttribute("color", color);
-		li.setAttribute("date", date);
+		li.setAttribute("duedate", duedate);
 		li.setAttribute("details", details);
 		li.setAttribute("taskid", taskid);
 
@@ -349,7 +349,7 @@
 
 		var txt4 = document.createTextNode(course);
 		var txt5 = document.createTextNode(color);
-		var txt6 = document.createTextNode(date);
+		var txt6 = document.createTextNode(duedate);
 		var txt7 = document.createTextNode(details);
 		var txt8 = document.createTextNode(taskid);
 
@@ -380,7 +380,7 @@
 		function prePopToDoList(list) {
 			var arr = JSON.parse(list);
 			console.log(arr);
-			arr.forEach(function(obj) { newElement(obj.task, obj.course, obj.color, obj.date, obj.details, obj.taskid); });
+			arr.forEach(function(obj) { newElement(obj.task, obj.course, obj.color, obj.duedate, obj.details, obj.taskid); });
 		}
 
 		// prePopToDoList(getTasks(userid));

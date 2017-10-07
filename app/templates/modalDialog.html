@@ -661,11 +661,11 @@
 			<div class="modal-body">
 				<h2>New Task</h2>
 
-					<input id="myInput" class = "myInput" type="text" name="Task Name" placeholder="Task Name"><br><br>
-					<input id="myInput2" class = "myInput" type="text" name="Course" placeholder="Course"><br><br>
-					<input id="myInput3" class = "myInput" type="text" name="Color" placeholder="Color"><br><br>
-					<input id="myInput4" class = "myInput" type="text" name="Date" placeholder="Date"><br><br>
-					<input id="myInput5" class = "myInput" type="text" name="Details" placeholder="Details"><br><br>
+					<input id="myInputTaskName" class = "myInput" type="text" name="Task Name" placeholder="Task Name"><br><br>
+					<input id="myInputCourse" class = "myInput" type="text" name="Course" placeholder="Course"><br><br>
+					<input id="myInputColor" class = "myInput" type="text" name="Color" placeholder="Color"><br><br>
+					<input id="myInputDate" class = "myInput" type="text" name="Date" placeholder="Date"><br><br>
+					<input id="myInputDetails" class = "myInput" type="text" name="Details" placeholder="Details"><br><br>
 					<!-- <div class="col-sm-4">
 						<h4>Tag</h4>
 						<h4>Due Date</h4>
@@ -701,13 +701,16 @@
 					</div> -->
 			  </div>
 
+
+<!-- NOTE: NEEDS TO BE FIXED. HOW DO YOU GET THE TASKID WHEN YOU ADD A NEW ITEM? -->
+
 			<div class="modal-footer">
-					<button onclick="addTaskCourse(userid, document.getElementById('myInput').value,
-					document.getElementById('myInput2').value, document.getElementById('myInput3').value,
-					document.getElementById('myInput4').value, document.getElementById('myInput5').value);
-					newElement(document.getElementById('myInput').value, document.getElementById('myInput2').value,
-					document.getElementById('myInput2').value, document.getElementById('myInput3').value,
-					document.getElementById('myInput4').value, document.getElementById('myInput5').value);
+					<button onclick="addTask(userid, document.getElementById('myInputTaskName').value,
+					document.getElementById('myInputCourse').value, document.getElementById('myInputColor').value,
+					document.getElementById('myInputDate').value, document.getElementById('myInputDetails').value);
+					newElement(document.getElementById('myInputTaskName').value, document.getElementById('myInputCourse').value,
+					document.getElementById('myInputColor').value, document.getElementById('myInputDate').value,
+					document.getElementById('myInputDetails').value, 999999);
 					goButton('taskModal');" class="w3-button w3-green w3-round-xxlarge" style="float:right;">Create</button>
 					<button class="w3-button w3-red w3-round-xxlarge" style="float:right;">Delete</button>
 			  </div>

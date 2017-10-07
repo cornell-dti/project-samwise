@@ -72,499 +72,476 @@ store = DictStore()
 
 @app.route("/")
 def index():
-	if 'netid' in session:
-		app.logger.debug('NetID: ' + session['netid'])
-		return redirect(url_for('calData', userid=session['netid']))
-  	return render_template("index.html")
+    if 'netid' in session:
+        app.logger.debug('NetID: ' + session['netid'])
+        return redirect(url_for('calData', userid=session['netid']))
+    return render_template("index.html")
 
 @app.route('/', methods=['GET'])
 def index2():
-	"""Initialize a session for the current user, and render index.html."""
-	# Create a state token to prevent request forgery.
-	# Store it in the session for later validation.
-	state = ''.join(random.choice(string.ascii_uppercase + string.digits)
-	              for x in xrange(32))
-	session['state'] = state
-	# Set the Client ID, Token State, and Application Name in the HTML while
-	# serving it.
-	response = make_response(
-		render_template('index.html',
-		              CLIENT_ID=CLIENT_ID,
-		              STATE=state,
-	                  APPLICATION_NAME=APPLICATION_NAME))
-	response.headers['Content-Type'] = 'text/html'
-	return response
+    """Initialize a session for the current user, and render index.html."""
+    # Create a state token to prevent request forgery.
+    # Store it in the session for later validation.
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                  for x in xrange(32))
+    session['state'] = state
+    # Set the Client ID, Token State, and Application Name in the HTML while
+    # serving it.
+    response = make_response(
+        render_template('index.html',
+                      CLIENT_ID=CLIENT_ID,
+                      STATE=state,
+                      APPLICATION_NAME=APPLICATION_NAME))
+    response.headers['Content-Type'] = 'text/html'
+    return response
 
 @app.route("/calendar")
 def calendar():
-	return render_template("calendar.html")
+    return render_template("calendar.html")
 
 @app.route("/cal/<userid>")
 def calData(userid):
-	if 'netid' in session:
-		app.logger.debug('User ID Data For ' + session['netid'])
-  		return render_template("index.html", netid=userid)
-  	return redirect(url_for('index'))
+    if 'netid' in session:
+        app.logger.debug('User ID Data For ' + session['netid'])
+        return render_template("index.html", netid=userid)
+    return redirect(url_for('index'))
 
 @app.route('/cal/<userid>/getExams')
 def getUserExams(userid):
-	if 'netid' in session:
-		connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    if 'netid' in session:
+        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-		cursor = connection.cursor()
+        cursor = connection.cursor()
 
-		query = "SELECT DISTINCT course FROM samwisedb.users WHERE netid = \"" + userid + "\";"
-		cursor.execute(query)
+        query = "SELECT DISTINCT course FROM samwisedb.users WHERE netid = \"" + userid + "\";"
+        cursor.execute(query)
 
-		courses = [str(item[0]) for item in cursor.fetchall()]
+        courses = [str(item[0]) for item in cursor.fetchall()]
 
-		data = []
+        data = []
 
-		for course in courses:
-			query = "SELECT time FROM samwisedb.exams WHERE course = \"" + course + "\";"
-			cursor.execute(query)
+        for course in courses:
+            query = "SELECT time FROM samwisedb.exams WHERE course = \"" + course + "\";"
+            cursor.execute(query)
 
-			newdata = [{"title" : course + " Exam", "start" : str(item[0])} for item in cursor.fetchall()]
-			data += newdata
+            newdata = [{"title" : course + " Exam", "start" : str(item[0])} for item in cursor.fetchall()]
+            data += newdata
 
-		connection.close()
+        connection.close()
 
-		return json.dumps(data)
-	else:
-		return json.dumps([])
+        return json.dumps(data)
+    else:
+        return json.dumps([])
 
 @app.route('/getAllClasses')
 def getClasses():
 
     # Open the connection to database
-	connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-	cursor = connection.cursor()
+    cursor = connection.cursor()
 
-	query = "SELECT DISTINCT course FROM samwisedb.courses ORDER BY course;"
-	cursor.execute(query)
+    query = "SELECT DISTINCT course FROM samwisedb.courses ORDER BY course;"
+    cursor.execute(query)
 
-	data = [item[0] for item in cursor.fetchall()]
+    data = [item[0] for item in cursor.fetchall()]
 
-	connection.close()
+    connection.close()
 
-	return json.dumps(data)
+    return json.dumps(data)
 
 @app.route('/cal/<userid>/<course>')
 def addCourse(userid, course):
-	if 'netid' in session:
-		connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    if 'netid' in session:
+        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-		try:
-			cursor = connection.cursor()
-			query = "insert into samwisedb.users(netid, course) values (\"" + userid + "\", \"" + course + "\");"
-			print(query)
-			cursor.execute(query)
-			connection.commit()
-		finally:
-			print ("DONE")
-			connection.close()
-	return redirect(url_for('index'))
+        try:
+            cursor = connection.cursor()
+            query = "insert into samwisedb.users(netid, course) values (\"" + userid + "\", \"" + course + "\");"
+            print(query)
+            cursor.execute(query)
+            connection.commit()
+        finally:
+            print ("DONE")
+            connection.close()
+    return redirect(url_for('index'))
 
 @app.route('/getProjects/<userid>')
 def getProjects(userid):
-	connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-	print ("connected to db to get projects")
-	cursor = connection.cursor()
+    print ("connected to db to get projects")
+    cursor = connection.cursor()
 
-	query = "SELECT DISTINCT * FROM samwisedb.projects WHERE user = \"" + userid + "\";"
-	cursor.execute(query)
+    query = "SELECT DISTINCT * FROM samwisedb.projects WHERE user = \"" + userid + "\";"
+    cursor.execute(query)
 
-	data = [{"projectname" : str(item[2]),  "date" : str(item[3]), "id" : str(item[0]), "course" : str(item[4]), "color" : str(item[5])} for item in cursor.fetchall()]
+    data = [{"projectname" : str(item[2]),  "date" : str(item[3]), "id" : str(item[0]), "course" : str(item[4]), "color" : str(item[5])} for item in cursor.fetchall()]
 
-	for d in data:
-		query = "SELECT subtask FROM samwisedb.subtasks WHERE id = \"" + d["id"] + "\";"
-		cursor.execute(query)
-		subtasks = [item[0] for item in cursor.fetchall()]
-		d["subtasks"] = subtasks
+    for d in data:
+        query = "SELECT subtask FROM samwisedb.subtasks WHERE id = \"" + d["id"] + "\";"
+        cursor.execute(query)
+        subtasks = [item[0] for item in cursor.fetchall()]
+        d["subtasks"] = subtasks
 
-	print ("DONE")
-	connection.close()
+    print ("DONE")
+    connection.close()
 
-	return json.dumps(data)
+    return json.dumps(data)
 
 @app.route('/removeProject/', methods=['POST'])
 def removeProject():
-	if request.method == 'POST':
-		data = request.get_json(force=True)
-		projectname=data['projectname']
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        projectname=data['projectname']
 
-		connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-		try:
-			cursor = connection.cursor()
-			query = "DELETE FROM samwisedb.projects WHERE projectname = \"" + projectname + "\";"
-			print(query)
-			cursor.execute(query)
-			connection.commit()
-		finally:
-			print ("DONE")
-			connection.close()
+        try:
+            cursor = connection.cursor()
+            query = "DELETE FROM samwisedb.projects WHERE projectname = \"" + projectname + "\";"
+            print(query)
+            cursor.execute(query)
+            connection.commit()
+        finally:
+            print ("DONE")
+            connection.close()
 
-	return json.dumps([])
+    return json.dumps([])
 
 @app.route('/updateProject/', methods=['POST'])
 def updateProject():
-	if request.method == 'POST':
-		data = request.get_json(force=True)
-		projectid=data['projectid']
-		projectname=data['projectname']
-		duedate=data['duedate']
-		course=data['course']
-		color=data['color']
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        projectid=data['projectid']
+        projectname=data['projectname']
+        duedate=data['duedate']
+        course=data['course']
+        color=data['color']
 
-		connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-		try:
-			cursor = connection.cursor()
-			cursor.execute ("""
-			   UPDATE samwisedb.projects
-			   SET projectname=%s, duedate=%s, course=%s, color=%s
-			   WHERE id=%s
-			""", (projectname, duedate, course, color, projectid))
-			connection.commit()
-		finally:
-			print ("DONE")
-			connection.close()
+        try:
+            cursor = connection.cursor()
+            cursor.execute ("""
+               UPDATE samwisedb.projects
+               SET projectname=%s, duedate=%s, course=%s, color=%s
+               WHERE id=%s
+            """, (projectname, duedate, course, color, projectid))
+            connection.commit()
+        finally:
+            print ("DONE")
+            connection.close()
 
-	return json.dumps([])
+    return json.dumps([])
 
 @app.route('/addProjectColor/', methods=['POST'])
 def addProjectColor():
-	proj_id = -1
-	if request.method == 'POST':
-		data = request.get_json(force=True)
-		userid=data['userid']
-		project=data['project']
-		color=data['color']
-		duedate=data['duedate']
-		subtasks = data['subtasks']
+    proj_id = -1
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        userid=data['userid']
+        project=data['project']
+        color=data['color']
+        duedate=data['duedate']
+        subtasks = data['subtasks']
 
-		connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
 
 
-		try:
-			cursor = connection.cursor()
-			query = "insert into samwisedb.projects(user, projectname, duedate, color) values (\"" + userid + "\", \"" + project + "\", \"" +  duedate + "\", \"" + color + "\");"
-			print(query)
-			cursor.execute(query)
-			connection.commit()
-			proj_id = cursor.lastrowid
-		finally:
-			for subtask in subtasks:
-				try:
-					cursor = connection.cursor()
-					query = "insert into samwisedb.subtasks(id, subtask) values (\"" + str(proj_id) + "\", \"" + subtask + "\");"
-					print(query)
-					cursor.execute(query)
-					connection.commit()
-				finally:
-					print ("DONE")
-		connection.close()
-	return json.dumps([proj_id])
+        try:
+            cursor = connection.cursor()
+            query = "insert into samwisedb.projects(user, projectname, duedate, color) values (\"" + userid + "\", \"" + project + "\", \"" +  duedate + "\", \"" + color + "\");"
+            print(query)
+            cursor.execute(query)
+            connection.commit()
+            proj_id = cursor.lastrowid
+        finally:
+            for subtask in subtasks:
+                try:
+                    cursor = connection.cursor()
+                    query = "insert into samwisedb.subtasks(id, subtask) values (\"" + str(proj_id) + "\", \"" + subtask + "\");"
+                    print(query)
+                    cursor.execute(query)
+                    connection.commit()
+                finally:
+                    print ("DONE")
+        connection.close()
+    return json.dumps([proj_id])
 
 
 @app.route('/addProjectCourse/', methods=['POST'])
 def addProjectCourse():
-	proj_id = -1
-	if request.method == 'POST':
-		data = request.get_json(force=True)
-		userid=data['userid']
-		project=data['project']
-		course=data['course']
-		duedate=data['duedate']
-		subtasks = data['subtasks']
+    proj_id = -1
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        userid=data['userid']
+        project=data['project']
+        course=data['course']
+        duedate=data['duedate']
+        subtasks = data['subtasks']
 
-		connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
 
 
-		try:
-			cursor = connection.cursor()
-			query = "insert into samwisedb.projects(user, projectname, duedate, course) values (\"" + userid + "\", \"" + project + "\", \"" + duedate + "\", \"" + course + "\");"
-			print(query)
-			cursor.execute(query)
-			connection.commit()
-			proj_id = cursor.lastrowid
-		finally:
-			for subtask in subtasks:
-				try:
-					cursor = connection.cursor()
-					query = "insert into samwisedb.subtasks(id, subtask) values (\"" + str(proj_id) + "\", \"" + subtask + "\");"
-					print(query)
-					cursor.execute(query)
-					connection.commit()
-				finally:
-					print ("DONE")
-		connection.close()
-	return json.dumps([proj_id])
+        try:
+            cursor = connection.cursor()
+            query = "insert into samwisedb.projects(user, projectname, duedate, course) values (\"" + userid + "\", \"" + project + "\", \"" + duedate + "\", \"" + course + "\");"
+            print(query)
+            cursor.execute(query)
+            connection.commit()
+            proj_id = cursor.lastrowid
+        finally:
+            for subtask in subtasks:
+                try:
+                    cursor = connection.cursor()
+                    query = "insert into samwisedb.subtasks(id, subtask) values (\"" + str(proj_id) + "\", \"" + subtask + "\");"
+                    print(query)
+                    cursor.execute(query)
+                    connection.commit()
+                finally:
+                    print ("DONE")
+        connection.close()
+    return json.dumps([proj_id])
 
 
 @app.route('/getEvents/<userid>')
 def getEvents(userid):
-	connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-	cursor = connection.cursor()
+    cursor = connection.cursor()
 
-	query = "SELECT DISTINCT * FROM samwisedb.events WHERE user = \"" + userid + "\";"
-	cursor.execute(query)
+    query = "SELECT DISTINCT * FROM samwisedb.events WHERE user = \"" + userid + "\";"
+    cursor.execute(query)
 
-	data = [{"eventname" : str(item[1]), "date" : str(item[2]), "color" : str(item[3])} for item in cursor.fetchall()]
+    data = [{"eventname" : str(item[1]), "date" : str(item[2]), "color" : str(item[3])} for item in cursor.fetchall()]
 
-	return json.dumps(data)
+    return json.dumps(data)
 
 @app.route('/removeEvent/', methods=['POST'])
 def removeEvent():
-	if request.method == 'POST':
-		data = request.get_json(force=True)
-		eventid=data['eventid']
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        eventid=data['eventid']
 
-		connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-		try:
-			cursor = connection.cursor()
-			query = "DELETE FROM samwisedb.events WHERE eventid = \"" + eventid + "\";"
-			print(query)
-			cursor.execute(query)
-			connection.commit()
-		finally:
-			print ("DONE")
-			connection.close()
+        try:
+            cursor = connection.cursor()
+            query = "DELETE FROM samwisedb.events WHERE eventid = \"" + eventid + "\";"
+            print(query)
+            cursor.execute(query)
+            connection.commit()
+        finally:
+            print ("DONE")
+            connection.close()
 
-	return json.dumps([])
+    return json.dumps([])
 
 @app.route('/addEvent/', methods=['POST'])
 def addEvent():
-	event_id = -1
-	if request.method == 'POST':
-		data = request.get_json(force=True)
-		userid=data['userid']
-		eventname=data['eventname']
-		date=data['date']
-		color=data['color']
+    event_id = -1
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        userid=data['userid']
+        eventname=data['eventname']
+        date=data['date']
+        color=data['color']
 
-		connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
 
-		try:
-			cursor = connection.cursor()
-			query = "insert into samwisedb.events(user, eventname, date, color) values (\"" + userid + "\", \"" + eventname + "\", \"" + date + "\", \"" + color + "\");"
-			print(query)
-			cursor.execute(query)
-			connection.commit()
-			event_id = cursor.lastrowid
-		finally:
-			print ("DONE")
-		connection.close()
-	return json.dumps([event_id])
+        try:
+            cursor = connection.cursor()
+            query = "insert into samwisedb.events(user, eventname, date, color) values (\"" + userid + "\", \"" + eventname + "\", \"" + date + "\", \"" + color + "\");"
+            print(query)
+            cursor.execute(query)
+            connection.commit()
+            event_id = cursor.lastrowid
+        finally:
+            print ("DONE")
+        connection.close()
+    return json.dumps([event_id])
 
 @app.route('/updateEvent/', methods=['POST'])
 def updateEvent():
-	if request.method == 'POST':
-		data = request.get_json(force=True)
-		eventid=data['eventid']
-		eventname=data['eventname']
-		date=data['date']
-		course=data['course']
-		color=data['color']
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        eventid=data['eventid']
+        eventname=data['eventname']
+        date=data['date']
+        course=data['course']
+        color=data['color']
 
-		connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-		try:
-			cursor = connection.cursor()
-			cursor.execute ("""
-			   UPDATE samwisedb.events
-			   SET eventname=%s, date=%s, course=%s, color=%s
-			   WHERE id=%s
-			""", (eventname, date, course, color, eventid))
-			connection.commit()
-		finally:
-			print ("DONE")
-			connection.close()
+        try:
+            cursor = connection.cursor()
+            cursor.execute ("""
+               UPDATE samwisedb.events
+               SET eventname=%s, date=%s, course=%s, color=%s
+               WHERE id=%s
+            """, (eventname, date, course, color, eventid))
+            connection.commit()
+        finally:
+            print ("DONE")
+            connection.close()
 
-	return json.dumps([])
+    return json.dumps([])
 
 
 @app.route('/getTasks/<userid>', methods=['GET'])
 def getTasks(userid):
-	connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-	cursor = connection.cursor()
+    cursor = connection.cursor()
 
-	query = "SELECT DISTINCT * FROM samwisedb.tasks WHERE user = \"" + userid + "\";"
-	cursor.execute(query)
+    query = "SELECT DISTINCT * FROM samwisedb.tasks WHERE user = \"" + userid + "\";"
+    cursor.execute(query)
 
-	data = [{"task" : str(item[1]), "course" : str(item[2]), "color" : str(item[3]), "date" : str(item[4]), "details" : str(item[5]), "taskid" : str(item[6])} for item in cursor.fetchall()]
+    data = [{"taskname" : str(item[1]), "course" : str(item[2]), "color" : str(item[3]), "duedate" : str(item[4]), "details" : str(item[5]), "taskid" : str(item[6])} for item in cursor.fetchall()]
 
-	return json.dumps(data)
+    return json.dumps(data)
 
 @app.route('/removeTask/', methods=['POST'])
 def removeTask():
-	if request.method == 'POST':
-		data = request.get_json(force=True)
-		taskid=data['taskid']
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        taskid=data['taskid']
 
-		connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-		try:
-			cursor = connection.cursor()
-			query = "DELETE FROM samwisedb.tasks WHERE taskid = \"" + taskid + "\";"
-			print(query)
-			cursor.execute(query)
-			connection.commit()
-		finally:
-			print ("DONE")
-			connection.close()
+        try:
+            cursor = connection.cursor()
+            query = "DELETE FROM samwisedb.tasks WHERE taskid = \"" + taskid + "\";"
+            print(query)
+            cursor.execute(query)
+            connection.commit()
+        finally:
+            print ("DONE")
+            connection.close()
 
-	return json.dumps([])
+    return json.dumps([])
 
-@app.route('/addTaskCourse/', methods=['POST'])
+@app.route('/addTask/', methods=['POST'])
 def addTaskCourse():
-	task_id = -1
-	if request.method == 'POST':
-		data = request.get_json(force=True)
-		userid=data['userid']
-		taskname=data['taskname']
-		date=data['date']
-		details=data['details']
-		course=data['course']
+    task_id = -1
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        userid=data['userid']
+        taskname=data['taskname']
+        course=data['course']
+        color=data['color']
+        duedate=data['duedate']
+        details=data['details']
 
-		connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-		try:
-			cursor = connection.cursor()
-			query = "insert into samwisedb.tasks(user, taskname, course, details, date) values (\"" + userid + "\", \"" + taskname + "\", \"" + course + "\", \"" + details + "\", \"" + date + "\");"
-			print(query)
-			cursor.execute(query)
-			connection.commit()
-			task_id = cursor.lastrowid
-		finally:
-			print ("DONE")
-			connection.close()
-	return json.dumps([task_id])
+        try:
+            cursor = connection.cursor()
+            query = "insert into samwisedb.tasks(user, taskname, course, color, duedate, details) values (\"" + userid + "\", \"" + taskname + "\", \"" + course + "\", \"" + color + "\", \"" + duedate + "\", \"" + details + "\");"
+            print(query)
+            cursor.execute(query)
+            connection.commit()
+            task_id = cursor.lastrowid
+        finally:
+            print ("DONE")
+            connection.close()
+    return json.dumps([task_id])
 
-@app.route('/addTaskColor/', methods=['POST'])
-def addTaskColor():
-	task_id = -1
-	if request.method == 'POST':
-		data = request.get_json(force=True)
-		userid=data['userid']
-		taskname=data['taskname']
-		date=data['date']
-		details=data['details']
-		color=data['color']
-
-		connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
-
-		try:
-			cursor = connection.cursor()
-			query = "insert into samwisedb.tasks(user, taskname, color, details, date) values (\"" + userid + "\", \"" + taskname + "\", \"" + color + "\", \"" + details + "\", \"" + date + "\");"
-			print(query)
-			cursor.execute(query)
-			connection.commit()
-			task_id = cursor.lastrowid
-		finally:
-			print ("DONE")
-			connection.close()
-	return json.dumps([task_id])
 
 @app.route('/updateTask/', methods=['POST'])
 def updateTask():
-	if request.method == 'POST':
-		data = request.get_json(force=True)
-		taskid=data['taskid']
-		taskname=data['taskname']
-		details=data['details']
-		date=data['date']
-		course=data['course']
-		color=data['color']
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        taskid=data['taskid']
+        taskname=data['taskname']
+        details=data['details']
+        duedate=data['duedate']
+        course=data['course']
+        color=data['color']
 
         taskid = int(taskid)
 
         connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
         try:
-			cursor = connection.cursor()
-			cursor.execute ("""
-			   UPDATE samwisedb.tasks
-			   SET taskname=%s, date=%s, course=%s, color=%s, details=%s
-			   WHERE taskid=%d
-			""", (taskname, date, course, color, details, taskid))
-			connection.commit()
+            cursor = connection.cursor()
+            cursor.execute ("""
+               UPDATE samwisedb.tasks
+               SET taskname=%s, duedate=%s, course=%s, color=%s, details=%s
+               WHERE taskid=%s
+            """, (taskname, duedate, course, color, details, taskid))
+            connection.commit()
         finally:
-			print ("DONE")
-			connection.close()
+            print ("DONE")
+            connection.close()
 
-	return json.dumps([])
+    return json.dumps([])
 
 
 @app.route('/exams/<course>')
 def getExams(course):
-	# Open the connection to database
-	connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    # Open the connection to database
+    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-	cursor = connection.cursor()
+    cursor = connection.cursor()
 
-	query = "SELECT time FROM samwisedb.exams WHERE course = \"" + course + "\";"
-	cursor.execute(query)
+    query = "SELECT time FROM samwisedb.exams WHERE course = \"" + course + "\";"
+    cursor.execute(query)
 
-	data = [{"title" : course + " Exam", "start" : str(item[0])} for item in cursor.fetchall()]
+    data = [{"title" : course + " Exam", "start" : str(item[0])} for item in cursor.fetchall()]
 
-	connection.close()
+    connection.close()
 
-	return json.dumps(data)
+    return json.dumps(data)
 
 @app.route('/courses/<course>')
 def getClassInfo(course):
     # Open the connection to database
-	connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
-	cursor = connection.cursor()
+    cursor = connection.cursor()
 
-	query = "SELECT st FROM samwisedb.courses WHERE course = \"" + course + "\";"
+    query = "SELECT st FROM samwisedb.courses WHERE course = \"" + course + "\";"
 
-	cursor.execute(query)
+    cursor.execute(query)
 
-	weekday_range()
+    weekday_range()
 
-	d = datetime.date(2011, 7, 2)
-	next_monday = next_weekday(d, 0) # 0 = Monday, 1=Tuesday, 2=Wednesday...
+    d = datetime.date(2011, 7, 2)
+    next_monday = next_weekday(d, 0) # 0 = Monday, 1=Tuesday, 2=Wednesday...
 
-	data = [{"title" : course + " Class", "start" : str(item[0])} for item in cursor.fetchall()]
+    data = [{"title" : course + " Class", "start" : str(item[0])} for item in cursor.fetchall()]
 
-	connection.close()
+    connection.close()
 
-	return json.dumps(data)
+    return json.dumps(data)
 
 def next_weekday(d, weekday):
-	days_ahead = weekday - d.weekday()
-	if days_ahead <= 0: # Target day already happened this week
-	    days_ahead += 7
-	return d + datetime.timedelta(days_ahead)
+    days_ahead = weekday - d.weekday()
+    if days_ahead <= 0: # Target day already happened this week
+        days_ahead += 7
+    return d + datetime.timedelta(days_ahead)
 
 def weekday_range(sd, ed, weekday):
-	weekday = next_weekday(sd, weekday)
-	weekday_list = [weekday]
-	delta = ed - weekday
-	for i in range(delta+1):
-		weekday += 7
-		weekday_list.append(weekday)
-		i += 7
+    weekday = next_weekday(sd, weekday)
+    weekday_list = [weekday]
+    delta = ed - weekday
+    for i in range(delta+1):
+        weekday += 7
+        weekday_list.append(weekday)
+        i += 7
 
 
 @app.route('/authorize/<provider>')
 def oauth_authorize(provider):
-	if not current_user.is_anonymous:
-		return redirect(url_for('index'))
-	oauth = OAuthSignIn.get_provider(provider)
-	return oauth.authorize()
+    if not current_user.is_anonymous:
+        return redirect(url_for('index'))
+    oauth = OAuthSignIn.get_provider(provider)
+    return oauth.authorize()
 
 class User(UserMixin):
     user_database = {}
@@ -601,23 +578,23 @@ def load_user(user_id):
 
 @app.route('/callback/<provider>')
 def oauth_callback(provider):
-	if not current_user.is_anonymous:
-		return redirect(url_for('index'))
-	oauth = OAuthSignIn.get_provider(provider)
-	name, email = oauth.callback()
-	if email is None:
-		flash('Not a valid email address')
-		return redirect(url_for('index'))
-	netid = email.split('@')[0]
-	user = User.get(netid)
-	if not user:
-		user = User(netid=netid, name=name)
+    if not current_user.is_anonymous:
+        return redirect(url_for('index'))
+    oauth = OAuthSignIn.get_provider(provider)
+    name, email = oauth.callback()
+    if email is None:
+        flash('Not a valid email address')
+        return redirect(url_for('index'))
+    netid = email.split('@')[0]
+    user = User.get(netid)
+    if not user:
+        user = User(netid=netid, name=name)
 
-	user=User(netid=netid, name=name)
+    user=User(netid=netid, name=name)
 
-	login_user(user, remember=True)
-	session['netid'] = netid
-	return redirect(url_for('index'))
+    login_user(user, remember=True)
+    session['netid'] = netid
+    return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -632,86 +609,86 @@ def logout():
 
 @app.route('/connect', methods=['POST'])
 def connect():
-	"""Exchange the one-time authorization code for a token and
-	store the token in the session."""
-	# Ensure that the request is not a forgery and that the user sending
-	# this connect request is the expected user.
-	if request.args.get('state', '') != session['state']:
-		response = make_response(json.dumps('Invalid state parameter.'), 401)
-		response.headers['Content-Type'] = 'application/json'
-		return response
-	# Normally, the state is a one-time token; however, in this example,
-	# we want the user to be able to connect and disconnect
-	# without reloading the page.  Thus, for demonstration, we don't
-	# implement this best practice.
-	# del session['state']
+    """Exchange the one-time authorization code for a token and
+    store the token in the session."""
+    # Ensure that the request is not a forgery and that the user sending
+    # this connect request is the expected user.
+    if request.args.get('state', '') != session['state']:
+        response = make_response(json.dumps('Invalid state parameter.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    # Normally, the state is a one-time token; however, in this example,
+    # we want the user to be able to connect and disconnect
+    # without reloading the page.  Thus, for demonstration, we don't
+    # implement this best practice.
+    # del session['state']
 
-	code = request.data
+    code = request.data
 
-	try:
-		# Upgrade the authorization code into a credentials object
-		oauth_flow = flow_from_clientsecrets('client_secret.json', scope='')
-		oauth_flow.redirect_uri = 'postmessage'
-		credentials = oauth_flow.step2_exchange(code)
-	except FlowExchangeError:
-		response = make_response(
-		    json.dumps('Failed to upgrade the authorization code.'), 401)
-		response.headers['Content-Type'] = 'application/json'
-	return response
+    try:
+        # Upgrade the authorization code into a credentials object
+        oauth_flow = flow_from_clientsecrets('client_secret.json', scope='')
+        oauth_flow.redirect_uri = 'postmessage'
+        credentials = oauth_flow.step2_exchange(code)
+    except FlowExchangeError:
+        response = make_response(
+            json.dumps('Failed to upgrade the authorization code.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+    return response
 
-	# An ID Token is a cryptographically-signed JSON object encoded in base 64.
-	# Normally, it is critical that you validate an ID Token before you use it,
-	# but since you are communicating directly with Google over an
-	# intermediary-free HTTPS channel and using your Client Secret to
-	# authenticate yourself to Google, you can be confident that the token you
-	# receive really comes from Google and is valid. If your server passes the
-	# ID Token to other components of your app, it is extremely important that
-	# the other components validate the token before using it.
-	gplus_id = credentials.id_token['sub']
+    # An ID Token is a cryptographically-signed JSON object encoded in base 64.
+    # Normally, it is critical that you validate an ID Token before you use it,
+    # but since you are communicating directly with Google over an
+    # intermediary-free HTTPS channel and using your Client Secret to
+    # authenticate yourself to Google, you can be confident that the token you
+    # receive really comes from Google and is valid. If your server passes the
+    # ID Token to other components of your app, it is extremely important that
+    # the other components validate the token before using it.
+    gplus_id = credentials.id_token['sub']
 
-	stored_credentials = session.get('credentials')
-	stored_gplus_id = session.get('gplus_id')
-	if stored_credentials is not None and gplus_id == stored_gplus_id:
-		response = make_response(json.dumps('Current user is already connected.'),
-		                         200)
-		response.headers['Content-Type'] = 'application/json'
-		return response
-	# Store the access token in the session for later use.
-	session['credentials'] = credentials
-	session['gplus_id'] = gplus_id
-	response = make_response(json.dumps('Successfully connected user.'), 200)
-	response.headers['Content-Type'] = 'application/json'
-	return response
+    stored_credentials = session.get('credentials')
+    stored_gplus_id = session.get('gplus_id')
+    if stored_credentials is not None and gplus_id == stored_gplus_id:
+        response = make_response(json.dumps('Current user is already connected.'),
+                                 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    # Store the access token in the session for later use.
+    session['credentials'] = credentials
+    session['gplus_id'] = gplus_id
+    response = make_response(json.dumps('Successfully connected user.'), 200)
+    response.headers['Content-Type'] = 'application/json'
+    return response
 
 @app.route('/disconnect', methods=['POST'])
 def disconnect():
-	"""Revoke current user's token and reset their session."""
+    """Revoke current user's token and reset their session."""
 
-	# Only disconnect a connected user.
-	credentials = session.get('credentials')
-	if credentials is None:
-		response = make_response(json.dumps('Current user not connected.'), 401)
-		response.headers['Content-Type'] = 'application/json'
-		return response
+    # Only disconnect a connected user.
+    credentials = session.get('credentials')
+    if credentials is None:
+        response = make_response(json.dumps('Current user not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
-	# Execute HTTP GET request to revoke current token.
-	access_token = credentials.access_token
-	url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
-	h = httplib2.Http()
-	result = h.request(url, 'GET')[0]
+    # Execute HTTP GET request to revoke current token.
+    access_token = credentials.access_token
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0]
 
-	if result['status'] == '200':
-		# Reset the user's session.
-		del session['credentials']
-		response = make_response(json.dumps('Successfully disconnected.'), 200)
-		response.headers['Content-Type'] = 'application/json'
-		return response
-	else:
-		# For whatever reason, the given token was invalid.
-		response = make_response(
-		    json.dumps('Failed to revoke token for given user.', 400))
-		response.headers['Content-Type'] = 'application/json'
-		return response
+    if result['status'] == '200':
+        # Reset the user's session.
+        del session['credentials']
+        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    else:
+        # For whatever reason, the given token was invalid.
+        response = make_response(
+            json.dumps('Failed to revoke token for given user.', 400))
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
 
 def get_credentials():
@@ -744,38 +721,38 @@ def get_credentials():
 
 @app.route('/gsync', methods=['GET'])
 def gsync():
-	"""Get Google calendar events into FullCalendar"""
-	credentials = session.get('credentials')
-	# Only fetch a list of people for connected users.
-	if credentials is None:
-		response = make_response(json.dumps('Current user not connected.'), 401)
-		response.headers['Content-Type'] = 'application/json'
-		return response
-	try:
-		# Create a new authorized API client
-		http = httplib2.Http()
-		http = credentials.authorize(http)
-		service = discovery.build('calendar', 'v3', http=http)
-		now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-		print('Getting the upcoming 10 events')
-		eventsResult = service.events().list(
-		    calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
-		    orderBy='startTime').execute()
-		events = eventsResult.get('items', [])
+    """Get Google calendar events into FullCalendar"""
+    credentials = session.get('credentials')
+    # Only fetch a list of people for connected users.
+    if credentials is None:
+        response = make_response(json.dumps('Current user not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    try:
+        # Create a new authorized API client
+        http = httplib2.Http()
+        http = credentials.authorize(http)
+        service = discovery.build('calendar', 'v3', http=http)
+        now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+        print('Getting the upcoming 10 events')
+        eventsResult = service.events().list(
+            calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
+            orderBy='startTime').execute()
+        events = eventsResult.get('items', [])
 
-		if not events:
-		    print('No upcoming events found.')
-		for event in events:
-		    start = event['start'].get('dateTime', event['start'].get('date'))
-		    print(start, event['summary'])
+        if not events:
+            print('No upcoming events found.')
+        for event in events:
+            start = event['start'].get('dateTime', event['start'].get('date'))
+            print(start, event['summary'])
 
-	except AccessTokenRefreshError:
-		response = make_response(json.dumps("Failed to refresh access token."), 500)
-		response.headers['Content-Type'] = 'application/json'
-		return response
+    except AccessTokenRefreshError:
+        response = make_response(json.dumps("Failed to refresh access token."), 500)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
 if __name__ == "__main__":
-	# db.create_all()
-	lm.init_app(app)
-	app.secret_key = open("/dev/random","rb").read(32)
-	app.run(debug=True)
+    # db.create_all()
+    lm.init_app(app)
+    app.secret_key = open("/dev/random","rb").read(32)
+    app.run(debug=True)

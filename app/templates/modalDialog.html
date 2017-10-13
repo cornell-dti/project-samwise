@@ -7,13 +7,16 @@
 				var modal = document.getElementById('myModal');
 				var modalevent = document.getElementById('eventModal');
         var desktopmodal = document.getElementById('desktopModal');
+				var displayClassModal = document.getElementById('addClassModal')
 
-        var spanintro = document.getElementsByClassName('close')[0];
-        var span = document.getElementsByClassName('close')[1];
-        var span2 = document.getElementsByClassName('close')[2];
-        var spandesktop = document.getElementsByClassName('close')[3];
-        var spanproject = document.getElementsByClassName('close')[4];
-        var spantask = document.getElementsByClassName('close')[5];
+				var spanaddclass = document.getElementsByClassName('close')[0];
+        var spanintro = document.getElementsByClassName('close')[1];
+        var span = document.getElementsByClassName('close')[2];
+        var span2 = document.getElementsByClassName('close')[3];
+        var spandesktop = document.getElementsByClassName('close')[4];
+        var spanproject = document.getElementsByClassName('close')[5];
+        var spantask = document.getElementsByClassName('close')[6];
+
 
 
         var courseAddButton = document.getElementById('courseAdd');
@@ -45,6 +48,10 @@
             desktopmodal.style.display = 'none';
         }
 
+				spanaddclass.onclick = function(){
+					displayClassModal.style.display = 'none';
+				}
+
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function(event) {
             if (event.target == modal) {
@@ -62,6 +69,10 @@
             if (event.target == desktopmodal) {
                 desktopmodal.style.display = 'none';
             }
+
+						if (event.target == displayClassModal){
+							displayClassModal.style.display = 'none';
+						}
         }
 
         {% if netid %}
@@ -275,8 +286,40 @@
 
 </script>
 
-<div id = "addClassModal" class="modal" style= "display:none;">
+	<div id = "addClassModal" class="modal" style= "display:none;">
+		<div class="modal-content">
+		 <div class="modal-header" style="background-color: #4a4a4a;">
+			 <span class="close">&times;</span>
+			 <h2>Add A Class</h2>
 
+			 <div class="col-sm-8">
+			  <h4>Pick classes to get exam dates and auto-suggest course work</h3>
+			  <div class="col-sm-8">
+			 	 <input style="background-color: #4a4a4a;" class= "task_name" type="text" name="classSearch" placeholder="Search Classes at Cornell"> <br>
+			  </div>
+
+				 <div class="col-sm-4">
+						</div>
+				 </div>
+				 <div class="col-sm-4">
+				  <br>
+				  <br>
+				  <br>
+				  <br>
+				  <br>
+				  <br>
+				  <br>
+				  <br>
+				  <br>
+				  <br>
+				  <br>
+				  <br>
+				  <br>
+				  <button class="w3-button w3-green w3-round-xxlarge" style="float:right;" onclick="goButton('addClassModal')">Add</button>
+				 </div>
+			 </div>
+		 </div>
+</div>
 </div>
 
 <div id="introModal" class="modal" style= "display:block;">

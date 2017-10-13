@@ -1,4 +1,5 @@
 import json
+import os
 import random
 import string
 import mysql.connector
@@ -751,8 +752,62 @@ def gsync():
         response.headers['Content-Type'] = 'application/json'
         return response
 
+@app.route('/addSubtask/', methods=['POST'])
+def addSubtask():
+    data = request.get_json(force=True)
+    project_id = data['id']
+    subtask = data['subtask']
+    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe',
+                                         host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    try:
+        cursor = connection.cursor()
+        query = "insert into samwisedb.subtasks(id, subtask) values (\"" + str(project_id) + "\", \"" + subtask + "\");"
+        print(query)
+        cursor.execute(query)
+        subtask_id = cursor.lastrowid
+        connection.commit()
+    finally:
+        print ("DONE")
+        connection.close()
+    return json.dumps([subtask_id])
+
+@app.route('/removeSubtask/', methods=['POST'])
+def removeSubtask():
+    data = request.get_json(force=True)
+    subtask_name = data['subtask']
+    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe',
+                                         host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    try:
+        cursor = connection.cursor()
+        query = "DELETE FROM samwisedb.subtasks WHERE subtask=%s" % subtask_name
+        print(query)
+        cursor.execute(query)
+        connection.commit()
+    finally:
+        print ("DONE")
+        connection.close()
+    return json.dumps([subtask_name])
+
+@app.route('/updateSubtask/', methods=['POST'])
+def updateSubtask():
+    data = request.get_json(force=True)
+    subtask_id = data['id']
+    subtask_name = data['subtask']
+    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe',
+                                         host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    try:
+        cursor = connection.cursor()
+        query = "UPDATE samwisedb.subtasks SET subtask=%s WHERE id = %s" % (subtask_name, subtask_id)
+        print(query)
+        cursor.execute(query)
+        connection.commit()
+    finally:
+        print ("DONE")
+        connection.close()
+    return json.dumps([subtask_name])
+
 if __name__ == "__main__":
     # db.create_all()
     lm.init_app(app)
-    app.secret_key = open("/dev/random","rb").read(32)
+    app.secret_key = os.urandom(32)
     app.run(debug=True)

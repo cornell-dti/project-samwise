@@ -226,6 +226,11 @@
         modal.style.display = 'block';
     }
 
+		function addClassModal() {
+			var modal = document.getElementById('addClassModal');
+			modal.style.display = 'block';
+		}
+
     function addingClass() {
         var modal = document.getElementById('eventModal');
         modal.style.display = 'block';
@@ -261,7 +266,6 @@
         modal.style.display = 'block';
     }
 
-
     function goButton(modalType) {
     	var modal = document.getElementById(modalType);
     	modal.style.display = 'none';
@@ -270,6 +274,10 @@
 
 
 </script>
+
+<div id = "addClassModal" class="modal" style= "display:none;">
+	
+</div>
 
 <div id="introModal" class="modal" style= "display:block;">
 

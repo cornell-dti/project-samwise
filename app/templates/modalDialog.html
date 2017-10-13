@@ -282,6 +282,14 @@
     	modal.style.display = 'none';
     }
 
+		function getExams(id) {
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", 'http://localhost:5000/cal/' + id + '/getExams', false);
+    	xhr.setRequestHeader("Content-Type", "application/json");
+			xhr.send(null);
+    	return xhr.responseText;
+    }
+
 
 
 </script>

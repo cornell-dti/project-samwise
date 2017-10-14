@@ -5,7 +5,7 @@ import httplib2
 import datetime
 import os
 import mysql.connector
-from flask import Flask, render_template, make_response, url_for, redirect, request, session, jsonify
+from flask import Flask, render_template, make_response, url_for, redirect, request, session, jsonify, g
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
 from auth import OAuthSignIn
 from oauth2client.client import AccessTokenRefreshError
@@ -17,42 +17,36 @@ from oauth2client import tools
 from oauth2client.file import Storage
 from simplekv.memory import DictStore
 
-# try:
-#     import argparse
-#     flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
-# except ImportError:
-#     flags = None
-
 app = Flask(__name__)
-
 app.config['GOOGLE_LOGIN_CLIENT_ID'] = '197302358001-s09lnod2vb7rltrkj9qn906tte1u4esp.apps.googleusercontent.com'
 app.config['GOOGLE_LOGIN_CLIENT_SECRET'] = 'USV2G6fCF122c4433-rRDNMO'
 app.config['SECRET_KEY'] = 'USV2G6fCF122c4433-rRDNMO'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['OAUTH_CREDENTIALS'] = {
     'google': {
             'id': '197302358001-s09lnod2vb7rltrkj9qn906tte1u4esp.apps.googleusercontent.com',
             'secret': 'USV2G6fCF122c4433-rRDNMO'
     }
 }
-
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
-
-# db = SQLAlchemy(app)
 lm = LoginManager()
 lm.login_view = 'index'
-
 
 # See the simplekv documentation for details
 store = DictStore()
 
+def get_db():
+    if not hasattr(g, 'db'):
+        g.db = mysql.connector.connect(user=os.getenv('SAMWISE_USERNAME'), password=os.getenv('SAMWISE_PASSWORD'),
+                                       host=os.getenv('SAMWISE_DB'))
+    return g.db
 
-# SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
-# CLIENT_SECRET_FILE = 'client_secret.json'
-# APPLICATION_NAME = 'Google Calendar API Python Quickstart'
+@app.teardown_appcontext
+def close_db(error):
+    if hasattr(g, 'db'):
+        g.db.close()
 
 @app.route("/")
 def index():
@@ -93,7 +87,7 @@ def calData(userid):
 @app.route('/cal/<netId>/getUserExams')
 def getUserExams(netId):
     if 'netid' in session:
-        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = get_db()
         cursor = connection.cursor()
         cursor.execute('SELECT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
         courses = [item[0] for item in cursor.fetchall()]
@@ -102,7 +96,6 @@ def getUserExams(netId):
             cursor.execute('SELECT time FROM samwisedb.Exam WHERE courseId = %s', (courseId,))
             exam = [{'courseId': courseId, 'start': item[0]} for item in cursor.fetchall()]
             data.append(exam)
-        connection.close()
         return jsonify(data)
     return jsonify([])
 
@@ -110,7 +103,7 @@ def getUserExams(netId):
 def getClasses():
 
     # Open the connection to database
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = get_db()
 
     cursor = connection.cursor()
 
@@ -119,19 +112,16 @@ def getClasses():
 
     data = [item[0] for item in cursor.fetchall()]
 
-    connection.close()
-
     return json.dumps(data)
 
 @app.route('/cal/<userId>/<courseId>')
 def addCourse(userId, courseId):
     if 'netid' in session:
-        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = get_db()
         cursor = connection.cursor()
         # TODO: Make sure course exists and use does not already have course
         cursor.execute('INSERT INTO samwisedb.User(netId, courseId) VALUES (%s, %s)', (userId, courseId))
         connection.commit()
-        connection.close()
     return redirect(url_for('index'))
 
 @app.route('/removeCourse/', methods=['POST'])
@@ -139,17 +129,15 @@ def removeCourse():
     data = request.get_json(force=True)
     courseId = data['courseId']
     userId = data['userId']
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe',
-                                         host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = get_db()
     cursor = connection.cursor()
     cursor.execute('DELETE FROM samwisedb.User WHERE (userId, courseId) = (%s, %s)', (userId, courseId,))
     connection.commit()
-    connection.close()
     return jsonify([])
 
 @app.route('/getProjects/<userId>')
 def getProjects(userId):
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = get_db()
     cursor = connection.cursor()
     cursor.execute('SELECT DISTINCT * FROM samwisedb.Project WHERE user = %s', (userId,))
     data = [{'projectId': item[1], 'projectName': item[2], 'date': item[3], 'courseId': item[4]} for item in
@@ -158,19 +146,17 @@ def getProjects(userId):
         cursor.execute('SELECT subtaskName FROM samwisedb.Subtask WHERE projectId = %s', (d['projectId'],))
         subtasks = [item[0] for item in cursor.fetchall()]
         d['subtasks'] = subtasks
-    connection.close()
     return jsonify(data)
 
 @app.route('/removeProject/', methods=['POST'])
 def removeProject():
     data = request.get_json(force=True)
     projectId = data['projectId']
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = get_db()
     cursor = connection.cursor()
     cursor.execute('DELETE FROM samwisedb.Project WHERE projectId = %s', (projectId,))
     cursor.execute('DELETE FROM samwisedb.Subtask WHERE projectId = %s', (projectId,))
     connection.commit()
-    connection.close()
     return jsonify([])
 
 @app.route('/updateProject/', methods=['POST'])
@@ -181,7 +167,7 @@ def updateProject():
     dueDate = data['duedate']
     courseId = data['course']
 
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = get_db()
     cursor = connection.cursor()
     cursor.execute ('''
        UPDATE samwisedb.Project
@@ -200,20 +186,19 @@ def addProject():
     dueDate = data['dueDate']
     subtasks = data['subtasks']
 
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = get_db()
     cursor = connection.cursor()
     cursor.execute('INSERT INTO samwisedb.Project(userId, projectName, dueDate, courseId) VALUES (%s, %s, %s, %s)', (userId, projectName, dueDate, courseId))
     projectId = cursor.lastrowid
     for subtask in subtasks:
         cursor.execute('INSERT INTO samwisedb.Subtask(projectId, subtaskName) VALUES (%s, %s)', (projectId, subtask))
     connection.commit()
-    connection.close()
     return jsonify([projectId])
 
 
 @app.route('/getEvents/<userid>')
 def getEvents(userid):
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = get_db()
 
     cursor = connection.cursor()
 
@@ -230,7 +215,7 @@ def removeEvent():
         data = request.get_json(force=True)
         eventId=data['eventId']
 
-        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = get_db()
 
         try:
             cursor = connection.cursor()
@@ -240,7 +225,6 @@ def removeEvent():
             connection.commit()
         finally:
             print ("DONE")
-            connection.close()
 
     return json.dumps([])
 
@@ -255,7 +239,7 @@ def addEvent():
         endTime=data['endTime']
         tagId=data['tagId']
 
-        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = get_db()
 
 
         try:
@@ -267,7 +251,6 @@ def addEvent():
             event_id = cursor.lastrowid
         finally:
             print ("DONE")
-        connection.close()
     return json.dumps([event_id])
 
 @app.route('/updateEvent/', methods=['POST'])
@@ -280,7 +263,7 @@ def updateEvent():
         endTime=data['endTime']
         tagId=data['tagId']
 
-        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = get_db()
 
         try:
             cursor = connection.cursor()
@@ -292,14 +275,13 @@ def updateEvent():
             connection.commit()
         finally:
             print ("DONE")
-            connection.close()
 
     return json.dumps([])
 
 
 @app.route('/getTasks/<userId>', methods=['GET'])
 def getTasks(userId):
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = get_db()
     cursor = connection.cursor()
     cursor.execute('SELECT DISTINCT * FROM samwisedb.Task WHERE user = %s', (userId,))
     data = [{
@@ -320,7 +302,7 @@ def removeTask():
         data = request.get_json(force=True)
         taskid=data['taskid']
 
-        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = get_db()
 
         try:
             cursor = connection.cursor()
@@ -330,7 +312,6 @@ def removeTask():
             connection.commit()
         finally:
             print ("DONE")
-            connection.close()
 
     return json.dumps([])
 
@@ -346,7 +327,7 @@ def addTaskCourse():
         duedate=data['duedate']
         details=data['details']
 
-        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = get_db()
 
         try:
             cursor = connection.cursor()
@@ -357,7 +338,6 @@ def addTaskCourse():
             task_id = cursor.lastrowid
         finally:
             print ("DONE")
-            connection.close()
     return json.dumps([task_id])
 
 
@@ -374,7 +354,7 @@ def updateTask():
 
         taskid = int(taskid)
 
-        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        connection = get_db()
 
         try:
             cursor = connection.cursor()
@@ -386,7 +366,6 @@ def updateTask():
             connection.commit()
         finally:
             print ("DONE")
-            connection.close()
 
     return json.dumps([])
 
@@ -394,17 +373,16 @@ def updateTask():
 @app.route('/exams/<course_id>')
 def getExams(course_id):
     # Open the connection to database
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = get_db()
     cursor = connection.cursor()
     cursor.execute('SELECT time FROM samwisedb.Exam WHERE courseId = %s', (course_id,))
     data = [{'course_id': course_id, 'start': item[0]} for item in cursor.fetchall()]
-    connection.close()
     return jsonify(data)
 
 @app.route('/courses/<course>')
 def getClassInfo(course):
     # Open the connection to database
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = get_db()
 
     cursor = connection.cursor()
 
@@ -418,8 +396,6 @@ def getClassInfo(course):
     next_monday = next_weekday(d, 0) # 0 = Monday, 1=Tuesday, 2=Wednesday...
 
     data = [{"title" : course + " Class", "start" : str(item[0])} for item in cursor.fetchall()]
-
-    connection.close()
 
     return json.dumps(data)
 
@@ -659,25 +635,21 @@ def addSubtask():
     data = request.get_json(force=True)
     projectId = data['projectId']
     subtask = data['subtask']
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe',
-                                         host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = get_db()
     cursor = connection.cursor()
     cursor.execute('INSERT INTO samwisedb.Subtask(projectId, subtask) VALUES (%s, %s)', (projectId, subtask))
     subtaskId = cursor.lastrowid
     connection.commit()
-    connection.close()
     return jsonify([subtaskId])
 
 @app.route('/removeSubtask/', methods=['POST'])
 def removeSubtask():
     data = request.get_json(force=True)
     subtaskId = data['subtaskId']
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe',
-                                         host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = get_db()
     cursor = connection.cursor()
     cursor.execute('DELETE FROM samwisedb.Subtask WHERE subtaskId = %s', (subtaskId,))
     connection.commit()
-    connection.close()
     return jsonify([subtaskId])
 
 @app.route('/updateSubtask/', methods=['POST'])
@@ -685,12 +657,10 @@ def updateSubtask():
     data = request.get_json(force=True)
     subtaskId = data['subtaskId']
     subtaskName = data['subtaskName']
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe',
-                                         host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    connection = get_db()
     cursor = connection.cursor()
     cursor.execute('UPDATE samwisedb.Subtask SET subtaskName = %s WHERE subtaskId = %s', (subtaskName, subtaskId))
     connection.commit()
-    connection.close()
     return jsonify([subtaskName])
 
 if __name__ == "__main__":

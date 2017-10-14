@@ -120,8 +120,8 @@
 		      signoutButton.style.display = 'block';
 		      userid = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail().split("@")[0];
 		      console.log(userid);
-					console.log(getExams(userid));
-					addExamEvents(getExams(userid));
+					// console.log(getExams(userid));
+					// addExamEvents(getExams(userid));
 		      // location.reload();
 		      syncGoogleToFullCalendar();
 		    } else {

@@ -134,6 +134,19 @@ def addCourse(userId, courseId):
         connection.close()
     return redirect(url_for('index'))
 
+@app.route('/removeCourse/', methods=['POST'])
+def removeCourse():
+    data = request.get_json(force=True)
+    courseId = data['courseId']
+    userId = data['userId']
+    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe',
+                                         host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    cursor = connection.cursor()
+    cursor.execute('DELETE FROM samwisedb.User WHERE (userId, courseId) = (%s, %s)', (userId, courseId,))
+    connection.commit()
+    connection.close()
+    return jsonify([])
+
 @app.route('/getProjects/<userId>')
 def getProjects(userId):
     connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
@@ -150,15 +163,14 @@ def getProjects(userId):
 
 @app.route('/removeProject/', methods=['POST'])
 def removeProject():
-    if request.method == 'POST':
-        data = request.get_json(force=True)
-        projectId = data['projectId']
-        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
-        cursor = connection.cursor()
-        cursor.execute('DELETE FROM samwisedb.Project WHERE projectId = %s', (projectId,))
-        cursor.execute('DELETE FROM samwisedb.Subtask WHERE projectId = %s', (projectId,))
-        connection.commit()
-        connection.close()
+    data = request.get_json(force=True)
+    projectId = data['projectId']
+    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+    cursor = connection.cursor()
+    cursor.execute('DELETE FROM samwisedb.Project WHERE projectId = %s', (projectId,))
+    cursor.execute('DELETE FROM samwisedb.Subtask WHERE projectId = %s', (projectId,))
+    connection.commit()
+    connection.close()
     return jsonify([])
 
 @app.route('/updateProject/', methods=['POST'])

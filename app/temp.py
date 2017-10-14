@@ -1,69 +1,84 @@
-@app.route('/cal/<userid>/<course>')
-def addCourse(userid, course):
-    if 'netid' in session:
+@app.route('/getEvents/<userid>')
+def getEvents(userid):
+    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+
+    cursor = connection.cursor()
+
+    query = "SELECT DISTINCT * FROM samwisedb.Event WHERE user = \"" + userid + "\";"
+    cursor.execute(query)
+
+    data = [{"eventName" : str(item[2]), "startTime" : str(item[3]), "endTime" : str(item[4]), "tagId" : str(item[5])} for item in cursor.fetchall()]
+
+    return json.dumps(data)
+
+@app.route('/removeEvent/', methods=['POST'])
+def removeEvent():
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        eventId=data['eventId']
+
         connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
         try:
             cursor = connection.cursor()
-            query = "insert into samwisedb.User(netId, courseId) values (\"" + userid + "\", \"" + course + "\");"
+            query = "DELETE FROM samwisedb.Event WHERE eventId = \"" + eventId + "\";"
             print(query)
             cursor.execute(query)
             connection.commit()
         finally:
             print ("DONE")
             connection.close()
-    return redirect(url_for('index'))
 
-@app.route('/addSubtask/', methods=['POST'])
-def addSubtask():
-    data = request.get_json(force=True)
-    project_id = data['id']
-    subtask = data['subtask']
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe',
-                                         host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
-    try:
-        cursor = connection.cursor()
-        query = "insert into samwisedb.subtasks(id, subtask) values (\"" + str(project_id) + "\", \"" + subtask + "\");"
-        print(query)
-        cursor.execute(query)
-        subtask_id = cursor.lastrowid
-        connection.commit()
-    finally:
-        print ("DONE")
-        connection.close()
-    return json.dumps([subtask_id])
+    return json.dumps([])
 
-@app.route('/removeSubtask/', methods=['POST'])
-def removeSubtask():
-    data = request.get_json(force=True)
-    subtask_name = data['subtask']
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe',
-                                         host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
-    try:
-        cursor = connection.cursor()
-        query = "DELETE FROM samwisedb.subtasks WHERE subtask=%s" % subtask_name
-        print(query)
-        cursor.execute(query)
-        connection.commit()
-    finally:
-        print ("DONE")
-        connection.close()
-    return json.dumps([subtask_name])
+@app.route('/addEvent/', methods=['POST'])
+def addEvent():
+    event_id = -1
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        user=data['user']
+        eventName=data['eventName']
+        startTime=data['startTime']
+        endTime=data['endTime']
+        tagId=data['tagId']
 
-@app.route('/updateSubtask/', methods=['POST'])
-def updateSubtask():
-    data = request.get_json(force=True)
-    subtask_id = data['id']
-    subtask_name = data['subtask']
-    connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe',
-                                         host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
-    try:
-        cursor = connection.cursor()
-        query = "UPDATE samwisedb.subtasks SET subtask=%s WHERE id = %s" % (subtask_name, subtask_id)
-        print(query)
-        cursor.execute(query)
-        connection.commit()
-    finally:
-        print ("DONE")
+        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+
+
+        try:
+            cursor = connection.cursor()
+            query = "insert into samwisedb.Event(user, eventName, startTime, endTime, tagId) values (\"" + user + "\", \"" + eventName + "\", \"" + startTime + "\", \"" + endTime + "\", \"" + tagId + "\");"
+            print(query)
+            cursor.execute(query)
+            connection.commit()
+            event_id = cursor.lastrowid
+        finally:
+            print ("DONE")
         connection.close()
-    return json.dumps([subtask_name])
+    return json.dumps([event_id])
+
+@app.route('/updateEvent/', methods=['POST'])
+def updateEvent():
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        eventId=data['eventId']
+        eventName=data['eventName']
+        startTime=data['startTime']
+        endTime=data['endTime']
+        tagId=data['tagId']
+
+        connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+
+        try:
+            cursor = connection.cursor()
+            cursor.execute ("""
+               UPDATE samwisedb.Event
+               SET eventName=%s, startTime=%s, endTime=%s, tagId=%s
+               WHERE eventId=%s
+            """, (eventName, startTime, endTime, tagId, eventId))
+            connection.commit()
+        finally:
+            print ("DONE")
+            connection.close()
+
+    return json.dumps([])

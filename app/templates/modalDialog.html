@@ -17,8 +17,6 @@
         var spanproject = document.getElementsByClassName('close')[5];
         var spantask = document.getElementsByClassName('close')[6];
 
-
-
         var courseAddButton = document.getElementById('courseAdd');
         var eventAddButton = document.getElementById('eventAdd');
         var input = document.getElementById("nameOne");
@@ -75,19 +73,19 @@
 						}
         }
 
-        {% if netid %}
-        	var dataurl = 'http://localhost:5000/cal/' + '{{ netid }}' + '/getExams';
-			$("#calendar").fullCalendar('addEventSource', {url: dataurl});
-		{% endif %}
-
-		var events = JSON.parse(localStorage.getItem("events")) == null ? [] : JSON.parse(localStorage.getItem("events"));
-		for (var i = 0; i < events.length; i++) {
-			var eventTitle = events[i];
-			$("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/exams/' + eventTitle});
-            $("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/courses/' + eventTitle});
-            $('#calendar').fullCalendar('prev');
-			$('#calendar').fullCalendar('next');
-		}
+    //     {% if netid %}
+    //     	var dataurl = 'http://localhost:5000/cal/' + '{{ netid }}' + '/getExams';
+		// 	$("#calendar").fullCalendar('addEventSource', {url: dataurl});
+		// {% endif %}
+		//
+		// var events = JSON.parse(localStorage.getItem("events")) == null ? [] : JSON.parse(localStorage.getItem("events"));
+		// for (var i = 0; i < events.length; i++) {
+		// 	var eventTitle = events[i];
+		// 	$("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/exams/' + eventTitle});
+    //         $("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/courses/' + eventTitle});
+    //         $('#calendar').fullCalendar('prev');
+		// 	$('#calendar').fullCalendar('next');
+		// }
 
 		var renderedDays = [];
 
@@ -165,19 +163,19 @@
                 // modal.style.display = "block";
 
 
-				var ul = document.getElementById("dayEvents");
-                while (ul.hasChildNodes()) {
-                	ul.removeChild(ul.lastChild);
-                }
-
-                $('#calendar').fullCalendar('clientEvents', function(event) {
-					if(moment(date).format('YYYY-MM-DD')==moment(event._start).format('YYYY-MM-DD')) {
-						// console.log(event.title);
-						var li = document.createElement("li");
-						li.appendChild(document.createTextNode(moment(event._start).format('hh:mma') + " " + event.title));
-						ul.appendChild(li);
-					}
-				});
+				// var ul = document.getElementById("dayEvents");
+        //         while (ul.hasChildNodes()) {
+        //         	ul.removeChild(ul.lastChild);
+        //         }
+				//
+        //         $('#calendar').fullCalendar('clientEvents', function(event) {
+				// 	if(moment(date).format('YYYY-MM-DD')==moment(event._start).format('YYYY-MM-DD')) {
+				// 		// console.log(event.title);
+				// 		var li = document.createElement("li");
+				// 		li.appendChild(document.createTextNode(moment(event._start).format('hh:mma') + " " + event.title));
+				// 		ul.appendChild(li);
+				// 	}
+				// });
 
             }
         });
@@ -271,7 +269,6 @@
         modal.style.display = 'block';
     }
 
-
     function eventToggle() {
         var modal = document.getElementById('eventModal');
         modal.style.display = 'block';
@@ -290,6 +287,13 @@
     	return xhr.responseText;
     }
 
+		function addExamEvents(exams){
+			for (var i = 0; i < exams.length; i++) {
+				var eventObj = exams[i];
+				//put event into calendar
+				$("#calendar").fullCalendar();
+			}
+		}
 
 
 </script>

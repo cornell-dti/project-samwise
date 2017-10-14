@@ -205,10 +205,10 @@ def getEvents(userid):
 
     cursor = connection.cursor()
 
-    query = "SELECT DISTINCT * FROM samwisedb.events WHERE user = \"" + userid + "\";"
+    query = "SELECT DISTINCT * FROM samwisedb.Event WHERE user = \"" + userid + "\";"
     cursor.execute(query)
 
-    data = [{"eventname" : str(item[1]), "date" : str(item[2]), "color" : str(item[3])} for item in cursor.fetchall()]
+    data = [{"eventName" : str(item[2]), "startTime" : str(item[3]), "endTime" : str(item[4]), "tagId" : str(item[5])} for item in cursor.fetchall()]
 
     return json.dumps(data)
 
@@ -216,13 +216,13 @@ def getEvents(userid):
 def removeEvent():
     if request.method == 'POST':
         data = request.get_json(force=True)
-        eventid=data['eventid']
+        eventId=data['eventId']
 
         connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
         try:
             cursor = connection.cursor()
-            query = "DELETE FROM samwisedb.events WHERE eventid = \"" + eventid + "\";"
+            query = "DELETE FROM samwisedb.Event WHERE eventId = \"" + eventId + "\";"
             print(query)
             cursor.execute(query)
             connection.commit()
@@ -237,17 +237,18 @@ def addEvent():
     event_id = -1
     if request.method == 'POST':
         data = request.get_json(force=True)
-        userid=data['userid']
-        eventname=data['eventname']
-        date=data['date']
-        color=data['color']
+        user=data['user']
+        eventName=data['eventName']
+        startTime=data['startTime']
+        endTime=data['endTime']
+        tagId=data['tagId']
 
         connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
 
         try:
             cursor = connection.cursor()
-            query = "insert into samwisedb.events(user, eventname, date, color) values (\"" + userid + "\", \"" + eventname + "\", \"" + date + "\", \"" + color + "\");"
+            query = "insert into samwisedb.Event(user, eventName, startTime, endTime, tagId) values (\"" + user + "\", \"" + eventName + "\", \"" + startTime + "\", \"" + endTime + "\", \"" + tagId + "\");"
             print(query)
             cursor.execute(query)
             connection.commit()
@@ -261,21 +262,21 @@ def addEvent():
 def updateEvent():
     if request.method == 'POST':
         data = request.get_json(force=True)
-        eventid=data['eventid']
-        eventname=data['eventname']
-        date=data['date']
-        course=data['course']
-        color=data['color']
+        eventId=data['eventId']
+        eventName=data['eventName']
+        startTime=data['startTime']
+        endTime=data['endTime']
+        tagId=data['tagId']
 
         connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
 
         try:
             cursor = connection.cursor()
             cursor.execute ("""
-               UPDATE samwisedb.events
-               SET eventname=%s, date=%s, course=%s, color=%s
-               WHERE id=%s
-            """, (eventname, date, course, color, eventid))
+               UPDATE samwisedb.Event
+               SET eventName=%s, startTime=%s, endTime=%s, tagId=%s
+               WHERE eventId=%s
+            """, (eventName, startTime, endTime, tagId, eventId))
             connection.commit()
         finally:
             print ("DONE")
@@ -649,7 +650,7 @@ def addSubtask():
     connection = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe',
                                          host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
     cursor = connection.cursor()
-    cursor.execute('INSERT INTO samwisedb.Subtask(projectId, subtask) VALUES (%s, %s)', % (projectId, subtask))
+    cursor.execute('INSERT INTO samwisedb.Subtask(projectId, subtask) VALUES (%s, %s)', (projectId, subtask))
     subtaskId = cursor.lastrowid
     connection.commit()
     connection.close()

@@ -1,6 +1,8 @@
 <script type='text/javascript'>
 	$(document).ready(function() {
 
+				
+
         // page is now ready, initialize the calendar...
 
         var intromodal = document.getElementById('introModal');
@@ -82,127 +84,6 @@
 							displayProjectModal.style.display = 'none';
 						}
         }
-
-    //     {% if netid %}
-    //     	var dataurl = 'http://localhost:5000/cal/' + '{{ netid }}' + '/getExams';
-		// 	$("#calendar").fullCalendar('addEventSource', {url: dataurl});
-		// {% endif %}
-		//
-		// var events = JSON.parse(localStorage.getItem("events")) == null ? [] : JSON.parse(localStorage.getItem("events"));
-		// for (var i = 0; i < events.length; i++) {
-		// 	var eventTitle = events[i];
-		// 	$("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/exams/' + eventTitle});
-    //         $("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/courses/' + eventTitle});
-    //         $('#calendar').fullCalendar('prev');
-		// 	$('#calendar').fullCalendar('next');
-		// }
-
-		var renderedDays = [];
-
-
-        $('#calendar').fullCalendar({
-
-			header: {
-				right: 'prev,next,today',
-				center: 'month,agendaWeek,agendaDay'
-			},
-
-			eventColor: "rgba(0, 0, 0, 0)",
-			eventTextColor: "rgba(0, 0, 0, 0)",
-
-			// eventAfterAllRender: function(view) {
-		  //       renderedDays = getDates($('#calendar').fullCalendar('getView').start, $('#calendar').fullCalendar('getView').end);
-			//
-			//
-		  //       $('#calendar').fullCalendar('clientEvents', function(event) {
-			//
-		  //         var result = $.grep(renderedDays, function(e) {
-		  //           return e.id == event.start.format('YYYY-MM-DD');
-		  //         });
-		  //         if (result.length > 0) {
-		  //           result[0].events += 1;
-		  //         }
-		  //       });
-			//
-		  //       $.each(renderedDays, function(index, value) {
-		  //       	var td = $('td.fc-day[data-date="' + value.id + '"]');
-		  //         if (value.events > 0 && value.events < 2) {
-		  //           td.css("background-color", "#fbf4ad");
-		  //         }
-		  //         else if (value.events >= 2 && value.events < 4) {
-		  //           td.css("background-color", "#fdb373");
-		  //         }
-		  //         else if (value.events >= 4 && value.events < 6) {
-		  //           td.css("background-color", "#f67b8a");
-		  //         }
-		  //         else if (value.events >= 6) {
-		  //         	td.css("background-color", "#f7485f");
-		  //         }
-			//
-		  //         td.addClass('pointer');
-			//
-		  //       });
-		  //     },
-			//
-		  //   eventClick: function(calEvent) {
-			//
-      //   		var ul = document.getElementById("dayEvents");
-      //           while (ul.hasChildNodes()) {
-      //           	ul.removeChild(ul.lastChild);
-      //           }
-			//
-      //           $('#calendar').fullCalendar('clientEvents', function(event) {
-			// 		if(moment(calEvent._start).format('YYYY-MM-DD')==moment(event._start).format('YYYY-MM-DD')) {
-			// 			var li = document.createElement("li");
-			// 			li.appendChild(document.createTextNode(moment(event._start).format('hh:mma') + " " + event.title));
-			// 			ul.appendChild(li);
-			// 		}
-			// 	});
-			//
-      //  		 return false;
-    	// 	},
-			//
-    	// 	dayRender: function( date, cell ) {
-    	// 		cell.addClass('pointer');
-    	// 	},
-			//
-      //       // put your options and callbacks here
-      //       dayClick: function(date) {
-			//
-      //           // modal.style.display = "block";
-			//
-			//
-			// 	// var ul = document.getElementById("dayEvents");
-      //   //         while (ul.hasChildNodes()) {
-      //   //         	ul.removeChild(ul.lastChild);
-      //   //         }
-			// 	//
-      //   //         $('#calendar').fullCalendar('clientEvents', function(event) {
-			// 	// 	if(moment(date).format('YYYY-MM-DD')==moment(event._start).format('YYYY-MM-DD')) {
-			// 	// 		// console.log(event.title);
-			// 	// 		var li = document.createElement("li");
-			// 	// 		li.appendChild(document.createTextNode(moment(event._start).format('hh:mma') + " " + event.title));
-			// 	// 		ul.appendChild(li);
-			// 	// 	}
-			// 	// });
-			//
-      //       }
-        });
-
-        function getDates(startDate, endDate) {
-		  var now = startDate,
-		    dates = [];
-
-		  while (now.format('YYYY-MM-DD') <= endDate.format('YYYY-MM-DD')) {
-		    dates.push({
-		      id: now.format('YYYY-MM-DD'),
-		      events: 0
-		    });
-		    now.add('days', 1);
-		  }
-		  return dates;
-		};
-
 
     });
 
@@ -304,9 +185,8 @@
 				course = "CS3110";
 			}
 			console.log(name + " " + date + " " + course);
-			$("#calendar").fullCalendar('renderEvent', {title : name, start : date, allDay : false});
+			//$("#calendar").fullCalendar('renderEvent', {title : name, start : date, allDay : false});
 		}
-
 
 </script>
 

@@ -14,14 +14,13 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-  <link rel='stylesheet' href='../static/js/fullcalendar-3.2.0/fullcalendar.css' />
-	<link rel='stylesheet' href='../static/css/stylesheet.css' />
 
-  <script src='../static/js/fullcalendar-3.2.0/lib/jquery.min.js'></script>
-  <script src='../static/js/fullcalendar-3.2.0/lib/moment.min.js'></script>
-  <script src='../static/js/fullcalendar-3.2.0/fullcalendar.js'></script>
+    <link rel='stylesheet' href='../static/js/fullcalendar-3.2.0/fullcalendar.css' />
 
-	<script src = '../static/js/jquery-sortable.js'></script>
+    <script src='../static/js/fullcalendar-3.2.0/lib/jquery.min.js'></script>
+    <script src='../static/js/fullcalendar-3.2.0/lib/moment.min.js'></script>
+    <script src='../static/js/fullcalendar-3.2.0/fullcalendar.js'></script>
+
 
 </head>
 
@@ -32,20 +31,12 @@
 		</div>
 
 		<div class="col-sm-3">
-			{% include 'toggleMenu.html' %}
 		</div>
 
-
-				<!-- "HELPER FUNCTIONS" -->
-		    {% include 'modalDialog.html' %}
 
 			<div class="col-sm-12">
 				<div class="topnav">
 
-						<!--ADD CLASS FUNCTIONALITY-->
-					  <a onclick="introAdd()">+</a>
-						<a onclick="displayClassModal()">Add class</a>
-						<a onclick="displayProjectModal()">Add event</a>
 				</div>
 			</div>
 
@@ -57,32 +48,22 @@
     </body>
 	<script>
 
-	$('#calendar').fullCalendar({
+		$(document).ready(function() {
 
-		header: {
-			right: 'prev,next,today',
-			center: 'month,agendaWeek,agendaDay'
-		}
-	});
+	    // page is now ready, initialize the calendar...
+
+	    $('#calendar').fullCalendar({
+				events: [
+					 {
+							 title  : 'event1',
+							 start  : '2017-10-15'
+					 }
+			 	]
+	    })
+
+		});
 		var events = JSON.parse(localStorage.getItem("events")) == null ? [] : JSON.parse(localStorage.getItem("events"));
-		function myFunction() {
-	    	var eventTitle = document.getElementById("nameOne").value;
-	    	if (eventTitle) {
-	        	// This one adds all exams for the input
-	            {% if netid %}
-	        		var dataurl = 'http://localhost:5000/cal/' + '{{ netid }}' + '/' + eventTitle;
-					window.location.replace(dataurl);
-				{% else %}
-					$("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/exams/' + eventTitle});
-	            	$("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/courses/' + eventTitle});
-	            	events.push(eventTitle);
-	            	localStorage.setItem("events", JSON.stringify(events));
-	            	console.log(events);
-				{% endif %}
-	        }
-	        var modal = document.getElementById('myModal');
-	        modal.style.display = "none";
-		}
+
 		// OAUTH
 		// Client ID and API key from the Developer Console
 		var CLIENT_ID = '197302358001-s09lnod2vb7rltrkj9qn906tte1u4esp.apps.googleusercontent.com';
@@ -158,7 +139,7 @@
 	          } else {
 	            console.log('No upcoming events found.');
 	          }
-	          $("#calendar").fullCalendar('addEventSource', eventSource);
+	          // $("#calendar").fullCalendar('addEventSource', eventSource);
 	        });
 	      }
 	      /**

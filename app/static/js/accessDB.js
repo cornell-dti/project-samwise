@@ -75,6 +75,15 @@ function updateEvent(eventId, eventName, startTime, endTime, tagId) {
     xhr.send(JSON.stringify(obj));
 }
 
+function getEvents(id) {
+    var userid = id;
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", 'http://localhost:5000/getEvents/' + userid, false);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.send(null);
+    return JSON.parse(xhr.responseText);
+}
+
 function updateExam(eventId, eventName, startTime, endTime, tagId) {
 
     var obj = {"eventId" : eventId, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId};

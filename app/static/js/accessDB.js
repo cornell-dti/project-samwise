@@ -75,28 +75,6 @@ function updateEvent(eventId, eventName, startTime, endTime, tagId) {
     xhr.send(JSON.stringify(obj));
 }
 
-function addEvent(user, eventName, startTime, endTime, tagId) {
-
-    var obj = {"user" : user, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId};
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", 'http://localhost:5000/addEvent/', true);
-    xhr.setRequestHeader("Content-Type", "application/json")
-    console.log(JSON.stringify(obj));
-    xhr.send(JSON.stringify(obj));
-}
-
-function removeEvent(eventId) {
-
-    var obj = {"eventId" : eventId};
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", 'http://localhost:5000/removeEvent/', true);
-    xhr.setRequestHeader("Content-Type", "application/json")
-    console.log(JSON.stringify(obj));
-    xhr.send(JSON.stringify(obj));
-}
-
 function updateExam(eventId, eventName, startTime, endTime, tagId) {
 
     var obj = {"eventId" : eventId, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId};

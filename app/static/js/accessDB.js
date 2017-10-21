@@ -39,7 +39,7 @@ function getProjects(id) {
         xhr.open("GET", 'http://localhost:5000/getProjects/' + userid, false);
     xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(null);
-    return xhr.responseText;
+    return JSON.parse(xhr.responseText);
 }
 
 function addEvent(user, eventName, startTime, endTime, tagId) {
@@ -70,28 +70,6 @@ function updateEvent(eventId, eventName, startTime, endTime, tagId) {
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", 'http://localhost:5000/updateEvent/', true);
-    xhr.setRequestHeader("Content-Type", "application/json")
-    console.log(JSON.stringify(obj));
-    xhr.send(JSON.stringify(obj));
-}
-
-function addEvent(user, eventName, startTime, endTime, tagId) {
-
-    var obj = {"user" : user, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId};
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", 'http://localhost:5000/addEvent/', true);
-    xhr.setRequestHeader("Content-Type", "application/json")
-    console.log(JSON.stringify(obj));
-    xhr.send(JSON.stringify(obj));
-}
-
-function removeEvent(eventId) {
-
-    var obj = {"eventId" : eventId};
-
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", 'http://localhost:5000/removeEvent/', true);
     xhr.setRequestHeader("Content-Type", "application/json")
     console.log(JSON.stringify(obj));
     xhr.send(JSON.stringify(obj));
@@ -137,7 +115,7 @@ function getExams(id) {
         xhr.open("GET", 'http://localhost:5000/getExams/' + courseId, false);
     xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(null);
-    return xhr.responseText;
+    return JSON.parse(xhr.responseText);
 }
 
 function getUserExams(id) {
@@ -146,7 +124,7 @@ function getUserExams(id) {
         xhr.open("GET", 'http://localhost:5000/getUserExams/' + userid, false);
     xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(null);
-    return xhr.responseText;
+    return JSON.parse(xhr.responseText);
 }
 
 
@@ -167,7 +145,7 @@ function getTasks(id) {
         xhr.open("GET", 'http://localhost:5000/getTasks/' + id, false);
     xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(null);
-    return xhr.responseText;
+    return JSON.parse(xhr.responseText);
 }
 
 function addCourse(user, courseId) {
@@ -190,6 +168,23 @@ function removeCourse(user, courseId) {
     xhr.setRequestHeader("Content-Type", "application/json")
     console.log(JSON.stringify(obj));
     xhr.send(JSON.stringify(obj));
+}
+
+function getUserCourses(id) {
+  var userid = id;
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", 'http://localhost:5000/getUserCourses/' + userid, false);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.send(null);
+  return JSON.parse(xhr.responseText);
+}
+
+function getAllCourses() {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", 'http://localhost:5000/getAllCourses/', false);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.send(null);
+  return JSON.parse(xhr.responseText);
 }
 
 function removeCourseAndProjects (user, courseId) {

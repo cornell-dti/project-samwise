@@ -170,6 +170,23 @@ function removeCourse(user, courseId) {
     xhr.send(JSON.stringify(obj));
 }
 
+function getUserCourses(id) {
+  var userid = id;
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", 'http://localhost:5000/getUserCourses/' + userid, false);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.send(null);
+  return JSON.parse(xhr.responseText);
+}
+
+function getAllCourses() {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", 'http://localhost:5000/getAllCourses/', false);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.send(null);
+  return JSON.parse(xhr.responseText);
+}
+
 function removeCourseAndProjects (user, courseId) {
   var obj = {"user" : user,  "courseId" : courseId };
 

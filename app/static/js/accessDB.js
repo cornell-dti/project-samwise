@@ -39,7 +39,7 @@ function getProjects(id) {
         xhr.open("GET", 'http://localhost:5000/getProjects/' + userid, false);
     xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(null);
-    return xhr.responseText;
+    return JSON.parse(xhr.responseText);
 }
 
 function addEvent(user, eventName, startTime, endTime, tagId) {
@@ -115,7 +115,7 @@ function getExams(id) {
         xhr.open("GET", 'http://localhost:5000/getExams/' + courseId, false);
     xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(null);
-    return xhr.responseText;
+    return JSON.parse(xhr.responseText);
 }
 
 function getUserExams(id) {
@@ -124,7 +124,7 @@ function getUserExams(id) {
         xhr.open("GET", 'http://localhost:5000/getUserExams/' + userid, false);
     xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(null);
-    return xhr.responseText;
+    return JSON.parse(xhr.responseText);
 }
 
 
@@ -145,7 +145,7 @@ function getTasks(id) {
         xhr.open("GET", 'http://localhost:5000/getTasks/' + id, false);
     xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(null);
-    return xhr.responseText;
+    return JSON.parse(xhr.responseText);
 }
 
 function addCourse(user, courseId) {

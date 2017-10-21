@@ -634,6 +634,12 @@ def updateSubtask():
     connection.commit()
     return jsonify([subtaskName])
 
+
+colors = ['4286f4', 'ed4040', 'd33fed', '17b236', '17c2ed']
+@app.route('/getColor/<name>')
+def getColor(name):
+    return colors[hash(name) % len(colors)]
+
 if __name__ == "__main__":
     # db.create_all()
     lm.init_app(app)

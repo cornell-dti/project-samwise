@@ -55,36 +55,18 @@ def index():
         return redirect(url_for('calData', userid=session['netid']))
     return render_template("index.html")
 
-@app.route('/', methods=['GET'])
-def index2():
-    """Initialize a session for the current user, and render index.html."""
-    # Create a state token to prevent request forgery.
-    # Store it in the session for later validation.
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
-                  for x in xrange(32))
-    session['state'] = state
-    # Set the Client ID, Token State, and Application Name in the HTML while
-    # serving it.
-    response = make_response(
-        render_template('index.html',
-                      CLIENT_ID=CLIENT_ID,
-                      STATE=state,
-                      APPLICATION_NAME=APPLICATION_NAME))
-    response.headers['Content-Type'] = 'text/html'
-    return response
-
 @app.route("/calendar")
 def calendar():
     return render_template("calendar.html")
 
-@app.route("/cal/<userid>")
+@app.route("/<userid>")
 def calData(userid):
     if 'netid' in session:
         app.logger.debug('User ID Data For ' + session['netid'])
         return render_template("index.html", netid=userid)
     return redirect(url_for('index'))
 
-@app.route('/cal/<netId>/getUserExams')
+@app.route('/<netId>/getUserExams')
 def getUserExams(netId):
     if 'netid' in session:
         connection = get_db()
@@ -107,14 +89,14 @@ def getClasses():
 
     cursor = connection.cursor()
 
-    query = "SELECT DISTINCT course FROM samwisedb.courses ORDER BY course;"
+    query = "SELECT DISTINCT courseId FROM samwisedb.Course ORDER BY courseId;"
     cursor.execute(query)
 
     data = [item[0] for item in cursor.fetchall()]
 
     return json.dumps(data)
 
-@app.route('/cal/<userId>/<courseId>')
+@app.route('/<userId>/<courseId>')
 def addCourse(userId, courseId):
     if 'netid' in session:
         connection = get_db()
@@ -298,20 +280,13 @@ def getTasks(userId):
 
 @app.route('/removeTask/', methods=['POST'])
 def removeTask():
-    if request.method == 'POST':
-        data = request.get_json(force=True)
-        taskid=data['taskid']
+    data = request.get_json(force=True)
+    taskId = data['taskid']
 
-        connection = get_db()
-
-        try:
-            cursor = connection.cursor()
-            query = "DELETE FROM samwisedb.tasks WHERE taskid = \"" + taskid + "\";"
-            print(query)
-            cursor.execute(query)
-            connection.commit()
-        finally:
-            print ("DONE")
+    connection = get_db()
+    cursor = connection.cursor()
+    cursor.execute('DELETE FROM samwisedb.Task WHERE taskId = %s', taskId)
+    connection.commit()
 
     return json.dumps([])
 
@@ -323,7 +298,6 @@ def addTaskCourse():
         userid=data['userid']
         taskname=data['taskname']
         course=data['course']
-        color=data['color']
         duedate=data['duedate']
         details=data['details']
 
@@ -331,7 +305,7 @@ def addTaskCourse():
 
         try:
             cursor = connection.cursor()
-            query = "insert into samwisedb.tasks(user, taskname, course, color, duedate, details) values (\"" + userid + "\", \"" + taskname + "\", \"" + course + "\", \"" + color + "\", \"" + duedate + "\", \"" + details + "\");"
+            query = "INSERT into samwisedb.Task(user, taskName, courseId, dueDate, details) values (\"" + userid + "\", \"" + taskname + "\", \"" + course + "\", \"" + duedate + "\", \"" + details + "\");"
             print(query)
             cursor.execute(query)
             connection.commit()
@@ -350,7 +324,6 @@ def updateTask():
         details=data['details']
         duedate=data['duedate']
         course=data['course']
-        color=data['color']
 
         taskid = int(taskid)
 
@@ -359,10 +332,10 @@ def updateTask():
         try:
             cursor = connection.cursor()
             cursor.execute ("""
-               UPDATE samwisedb.tasks
-               SET taskname=%s, duedate=%s, course=%s, color=%s, details=%s
-               WHERE taskid=%s
-            """, (taskname, duedate, course, color, details, taskid))
+               UPDATE samwisedb.Task
+               SET taskName=%s, dueDate=%s, courseId=%s, details=%s
+               WHERE taskId=%s
+            """, (taskname, duedate, course, details, taskid))
             connection.commit()
         finally:
             print ("DONE")
@@ -379,23 +352,20 @@ def getExams(course_id):
     data = [{'course_id': course_id, 'start': item[0]} for item in cursor.fetchall()]
     return jsonify(data)
 
-@app.route('/courses/<course>')
-def getClassInfo(course):
+@app.route('/courses/<courseId>')
+def getClassInfo(courseId):
     # Open the connection to database
     connection = get_db()
 
     cursor = connection.cursor()
-
-    query = "SELECT st FROM samwisedb.courses WHERE course = \"" + course + "\";"
-
-    cursor.execute(query)
+    cursor.execute('SELECT startTime FROM samwisedb.Course WHERE courseId = %s', courseId)
 
     weekday_range()
 
     d = datetime.date(2011, 7, 2)
     next_monday = next_weekday(d, 0) # 0 = Monday, 1=Tuesday, 2=Wednesday...
 
-    data = [{"title" : course + " Class", "start" : str(item[0])} for item in cursor.fetchall()]
+    data = [{"course" : courseId + " Class", "start": str(item[0])} for item in cursor.fetchall()]
 
     return json.dumps(data)
 

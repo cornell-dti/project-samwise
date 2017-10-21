@@ -68,33 +68,34 @@ def calData(userid):
 
 @app.route('/<netId>/getUserExams')
 def getUserExams(netId):
-    if 'netid' in session:
-        connection = get_db()
-        cursor = connection.cursor()
-        cursor.execute('SELECT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
-        courses = [item[0] for item in cursor.fetchall()]
-        data = []
-        for courseId in courses:
-            cursor.execute('SELECT time FROM samwisedb.Exam WHERE courseId = %s', (courseId,))
-            exam = [{'courseId': courseId, 'start': item[0]} for item in cursor.fetchall()]
-            data.append(exam)
-        return jsonify(data)
-    return jsonify([])
+    connection = get_db()
+    cursor = connection.cursor()
+    cursor.execute('SELECT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
+    courses = [item[0] for item in cursor.fetchall()]
+    data = []
+    for courseId in courses:
+        cursor.execute('SELECT sections, time FROM samwisedb.Exam WHERE courseId = %s', (courseId,))
+        exam = [{'courseId': courseId, 'section': item[0], 'start': item[1]} for item in cursor.fetchall()]
+        data.append(exam)
+    return jsonify(data)
 
-@app.route('/getAllClasses')
-def getClasses():
-
+@app.route('/getAllCourses')
+def getAllCourses():
     # Open the connection to database
     connection = get_db()
-
     cursor = connection.cursor()
-
-    query = "SELECT DISTINCT courseId FROM samwisedb.Course ORDER BY courseId;"
-    cursor.execute(query)
-
+    cursor.execute('SELECT DISTINCT courseId FROM samwisedb.Course ORDER BY courseId')
     data = [item[0] for item in cursor.fetchall()]
+    return jsonify(data)
 
-    return json.dumps(data)
+@app.route('/<netId>/getUserCourses')
+def getUserCourses(netId):
+    # Open the connection to database
+    connection = get_db()
+    cursor = connection.cursor()
+    cursor.execute('SELECT DISTINCT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
+    data = [item[0] for item in cursor.fetchall()]
+    return jsonify(data)
 
 @app.route('/<userId>/<courseId>')
 def addCourse(userId, courseId):
@@ -113,7 +114,7 @@ def removeCourse():
     userId = data['userId']
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM samwisedb.User WHERE (userId, courseId) = (%s, %s)', (userId, courseId,))
+    cursor.execute('DELETE FROM samwisedb.User WHERE (userId, courseId) = (%s, %s)', (userId, courseId))
     connection.commit()
     return jsonify([])
 

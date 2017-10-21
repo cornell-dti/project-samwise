@@ -63,7 +63,8 @@
 		header: {
 			right: 'prev,next,today',
 			center: 'month,agendaWeek,agendaDay'
-		}
+		},
+		nextDayThreshold: '00:00:00'
 	});
 		var events = JSON.parse(localStorage.getItem("events")) == null ? [] : JSON.parse(localStorage.getItem("events"));
 		function myFunction() {
@@ -124,7 +125,7 @@
 		      signoutButton.style.display = 'block';
 		      userid = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail().split("@")[0];
 		      console.log(userid);
-					// addStoredEvents();
+					addStoredEvents();
 
 		      // location.reload();
 		      syncGoogleToFullCalendar();

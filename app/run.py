@@ -74,8 +74,8 @@ def getUserExams(netId):
     courses = [item[0] for item in cursor.fetchall()]
     data = []
     for courseId in courses:
-        cursor.execute('SELECT time FROM samwisedb.Exam WHERE courseId = %s', (courseId,))
-        exam = [{'courseId': courseId, 'start': str(item[0])} for item in cursor.fetchall()]
+        cursor.execute('SELECT sections, time FROM samwisedb.Exam WHERE courseId = %s', (courseId,))
+        exam = [{'courseId': courseId, 'section': item[0], 'start': item[1]} for item in cursor.fetchall()]
         data.append(exam)
     return jsonify(data)
 

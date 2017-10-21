@@ -131,8 +131,16 @@ function removeExam(taskId) {
     xhr.send(JSON.stringify(obj));
 }
 
+function getExams(id) {
+    var courseId = id;
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", 'http://localhost:5000/getExams/' + courseId, false);
+    xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(null);
+    return xhr.responseText;
+}
+
 function getUserExams(id) {
-    console.log("hi");
     var userid = id;
         var xhr = new XMLHttpRequest();
         xhr.open("GET", 'http://localhost:5000/getUserExams/' + userid, false);

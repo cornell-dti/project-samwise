@@ -55,24 +55,6 @@ def index():
         return redirect(url_for('calData', userid=session['netid']))
     return render_template("index.html")
 
-@app.route('/', methods=['GET'])
-def index2():
-    """Initialize a session for the current user, and render index.html."""
-    # Create a state token to prevent request forgery.
-    # Store it in the session for later validation.
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
-                  for x in xrange(32))
-    session['state'] = state
-    # Set the Client ID, Token State, and Application Name in the HTML while
-    # serving it.
-    response = make_response(
-        render_template('index.html',
-                      CLIENT_ID=CLIENT_ID,
-                      STATE=state,
-                      APPLICATION_NAME=APPLICATION_NAME))
-    response.headers['Content-Type'] = 'text/html'
-    return response
-
 @app.route("/calendar")
 def calendar():
     return render_template("calendar.html")

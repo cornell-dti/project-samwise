@@ -182,7 +182,7 @@ function removeCourse(user, courseId) {
 function getUserCourses(id) {
   var userid = id;
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", 'http://localhost:5000/getUserCourses/' + userid, false);
+  xhr.open("GET", 'http://localhost:5000/' + userid + '/getUserCourses', false);
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.send(null);
   return JSON.parse(xhr.responseText);

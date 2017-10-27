@@ -56,24 +56,6 @@ def index():
         return redirect(url_for('calData', userid=session['netid']))
     return render_template("index.html")
 
-@app.route('/', methods=['GET'])
-def index2():
-    """Initialize a session for the current user, and render index.html."""
-    # Create a state token to prevent request forgery.
-    # Store it in the session for later validation.
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
-                  for x in xrange(32))
-    session['state'] = state
-    # Set the Client ID, Token State, and Application Name in the HTML while
-    # serving it.
-    response = make_response(
-        render_template('index.html',
-                      CLIENT_ID=CLIENT_ID,
-                      STATE=state,
-                      APPLICATION_NAME=APPLICATION_NAME))
-    response.headers['Content-Type'] = 'text/html'
-    return response
-
 @app.route("/calendar")
 def calendar():
     return render_template("calendar.html")
@@ -87,33 +69,34 @@ def calData(userid):
 
 @app.route('/<netId>/getUserExams')
 def getUserExams(netId):
-    # if 'netid' in session:
-        connection = get_db()
-        cursor = connection.cursor()
-        cursor.execute('SELECT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
-        courses = [item[0] for item in cursor.fetchall()]
-        data = []
-        for courseId in courses:
-            cursor.execute('SELECT time FROM samwisedb.Exam WHERE courseId = %s', (courseId,))
-            exam = [{'courseId': courseId, 'start': item[0]} for item in cursor.fetchall()]
-            data.append(exam)
-        return jsonify(data)
-    # return jsonify([])
+    connection = get_db()
+    cursor = connection.cursor()
+    cursor.execute('SELECT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
+    courses = [item[0] for item in cursor.fetchall()]
+    data = []
+    for courseId in courses:
+        cursor.execute('SELECT sections, time FROM samwisedb.Exam WHERE courseId = %s', (courseId,))
+        exam = [{'courseId': courseId, 'section': item[0], 'start': item[1]} for item in cursor.fetchall()]
+        data.append(exam)
+    return jsonify(data)
 
-@app.route('/getAllClasses')
-def getClasses():
-
+@app.route('/getAllCourses')
+def getAllCourses():
     # Open the connection to database
     connection = get_db()
-
     cursor = connection.cursor()
-
-    query = "SELECT DISTINCT courseId FROM samwisedb.Course ORDER BY courseId;"
-    cursor.execute(query)
-
+    cursor.execute('SELECT DISTINCT courseId FROM samwisedb.Course ORDER BY courseId')
     data = [item[0] for item in cursor.fetchall()]
+    return jsonify(data)
 
-    return json.dumps(data)
+@app.route('/<netId>/getUserCourses')
+def getUserCourses(netId):
+    # Open the connection to database
+    connection = get_db()
+    cursor = connection.cursor()
+    cursor.execute('SELECT DISTINCT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
+    data = [item[0] for item in cursor.fetchall()]
+    return jsonify(data)
 
 @app.route('/<userId>/<courseId>')
 def addCourse(userId, courseId):
@@ -132,7 +115,7 @@ def removeCourse():
     userId = data['userId']
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM samwisedb.User WHERE (userId, courseId) = (%s, %s)', (userId, courseId,))
+    cursor.execute('DELETE FROM samwisedb.User WHERE (userId, courseId) = (%s, %s)', (userId, courseId))
     connection.commit()
     return jsonify([])
 
@@ -649,6 +632,12 @@ def updateSubtask():
     cursor.execute('UPDATE samwisedb.Subtask SET subtaskName = %s WHERE subtaskId = %s', (subtaskName, subtaskId))
     connection.commit()
     return jsonify([subtaskName])
+
+
+colors = ['4286f4', 'ed4040', 'd33fed', '17b236', '17c2ed']
+@app.route('/getColor/<name>')
+def getColor(name):
+    return colors[hash(name) % len(colors)]
 
 if __name__ == "__main__":
     # db.create_all()

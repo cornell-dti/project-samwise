@@ -231,6 +231,9 @@
 		function addStoredEvents(){
 
 			var exams = getUserExams(userid);
+			if (exams.length < 1){
+				return;
+			}
 
 			for (j = 0; j < exams[0].length; j++){
 
@@ -274,6 +277,9 @@
 
 		function populateUserCourses(){
 			var userCourses = getUserCourses(userid);
+			if (userCourses.length < 1){
+				return;
+			}
 			var lst = document.getElementById("currentClasses");
 			for (i = 0; i < userCourses.length; i++){
 				var li = document.createElement("li");
@@ -286,6 +292,7 @@
 
 		function displayIntroModal(){
 			var userCourses = getUserCourses(userid);
+			console.log("test");
 			if (userCourses.length == 0){
 				var introModal = document.getElementById("introModal");
 				introModal.style.display = 'block';

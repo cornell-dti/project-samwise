@@ -157,6 +157,17 @@ function getTasks(id) {
     return JSON.parse(xhr.responseText);
 }
 
+function addTask()) {
+
+    var obj = {"user" : user, "taskName" : taskName, "courseId" : courseId, "tag" : tag, "startDate" : startDate, "dueDate" : dueDate, "details" : details};
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", 'http://localhost:5000/addTask/', true);
+    xhr.setRequestHeader("Content-Type", "application/json")
+    console.log(JSON.stringify(obj));
+    xhr.send(JSON.stringify(obj));
+}
+
 function addCourse(user, courseId) {
 
     var obj = {"user" : user,  "courseId" : courseId };

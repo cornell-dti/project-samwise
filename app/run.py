@@ -47,11 +47,11 @@ lm.login_view = 'index'
 # See the simplekv documentation for details
 store = DictStore()
 
-@auth.verify_password
-def verify(username, password):
-    if not (username and password):
-        return False
-    return USER_DATA.get(username) == password
+# @auth.verify_password
+# def verify(username, password):
+#     if not (username and password):
+#         return False
+#     return USER_DATA.get(username) == password
 
 
 def get_db():

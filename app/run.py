@@ -20,24 +20,24 @@ def close_db(error):
         g.db.close()
 
 
-@app.route("/")
+@app.route('/')
 def index():
     if 'netid' in session:
         app.logger.debug('NetID: ' + session['netid'])
         return redirect(url_for('calData', userid=session['netid']))
-    return render_template("index.html")
+    return render_template('index.html')
 
 
-@app.route("/calendar")
+@app.route('/calendar')
 def calendar():
-    return render_template("calendar.html")
+    return render_template('calendar.html')
 
 
-@app.route("/<userid>")
+@app.route('/<userid>')
 def calData(userid):
     if 'netid' in session:
         app.logger.debug('User ID Data For ' + session['netid'])
-        return render_template("index.html", netid=userid)
+        return render_template('index.html', netid=userid)
     return redirect(url_for('index'))
 
 
@@ -171,79 +171,70 @@ def getEvents(userid):
 
     cursor = connection.cursor()
     cursor.execute('SELECT DISTINCT * FROM samwisedb.Event WHERE user = %s', userid)
-    data = [{"eventName": str(item[2]), "startTime": str(item[3]), "endTime": str(item[4]), "tagId": str(item[5])} for
+    data = [{'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]), 'tagId': str(item[5])} for
             item in cursor.fetchall()]
 
     return jsonify(data)
 
 
--
-
-
 @app.route('/removeEvent/', methods=['POST'])
 def removeEvent():
-    if request.method == 'POST':
-        data = request.get_json(force=True)
-        eventId = data['eventId']
+    data = request.get_json(force=True)
+    eventId = data['eventId']
 
-        connection = get_db()
+    connection = get_db()
 
-        try:
-            cursor = connection.cursor()
-            cursor.execute('DELETE FROM samwisedb.Event WHERE eventId = %s', eventId)
-            connection.commit()
-        finally:
-            print ("DONE")
-
+    try:
+        cursor = connection.cursor()
+        cursor.execute('DELETE FROM samwisedb.Event WHERE eventId = %s', eventId)
+        connection.commit()
+    finally:
+        print ('DONE')
     return jsonify([])
 
 
 @app.route('/addEvent/', methods=['POST'])
 def addEvent():
-    event_id = -1
-    if request.method == 'POST':
-        data = request.get_json(force=True)
-        user = data['user']
-        eventName = data['eventName']
-        startTime = data['startTime']
-        endTime = data['endTime']
-        tagId = data['tagId']
+    data = request.get_json(force=True)
+    user = data['user']
+    eventName = data['eventName']
+    startTime = data['startTime']
+    endTime = data['endTime']
+    tagId = data['tagId']
 
-        connection = get_db()
+    connection = get_db()
 
-        try:
-            cursor = connection.cursor()
-            cursor.execute(
-                'INSERT INTO samwisedb.Event(user, eventName, startTime, endTime, tagId) values (%s, %s, %s, %s, %s)',
-                (user, eventName, startTime, endTime, tagId))
-            connection.commit()
-            event_id = cursor.lastrowid
-        finally:
-            print ("DONE")
+    try:
+        cursor = connection.cursor()
+        cursor.execute(
+            'INSERT INTO samwisedb.Event(user, eventName, startTime, endTime, tagId) values (%s, %s, %s, %s, %s)',
+            (user, eventName, startTime, endTime, tagId))
+        connection.commit()
+        event_id = cursor.lastrowid
+    finally:
+        print ('DONE')
     return jsonify([event_id])
 
 
 @app.route('/updateEvent/', methods=['POST'])
 def updateEvent():
-    if request.method == 'POST':
-        data = request.get_json(force=True)
-        eventId = data['eventId']
-        eventName = data['eventName']
-        startTime = data['startTime']
-        endTime = data['endTime']
-        tagId = data['tagId']
+    data = request.get_json(force=True)
+    eventId = data['eventId']
+    eventName = data['eventName']
+    startTime = data['startTime']
+    endTime = data['endTime']
+    tagId = data['tagId']
 
-        connection = get_db()
+    connection = get_db()
 
-        try:
-            cursor = connection.cursor()
-            cursor.execute(
-                'UPDATE samwisedb.Event SET eventName=%s, startTime=%s, endTime=%s, tagId=%s WHERE eventId=%s',
-                (eventName, startTime, endTime, tagId, eventId))
-            connection.commit()
-        finally:
-            print ("DONE")
-
+    try:
+        cursor = connection.cursor()
+        cursor.execute(
+            'UPDATE samwisedb.Event SET eventName=%s, startTime=%s, endTime=%s, tagId=%s WHERE eventId=%s',
+            (eventName, startTime, endTime, tagId, eventId))
+        connection.commit()
+    finally:
+        print ('DONE')
     return jsonify([])
 
 
@@ -280,52 +271,48 @@ def removeTask():
 
 @app.route('/addTask/', methods=['POST'])
 def addTaskCourse():
-    task_id = -1
-    if request.method == 'POST':
-        data = request.get_json(force=True)
-        userid = data['userid']
-        taskname = data['taskname']
-        course = data['course']
-        duedate = data['duedate']
-        details = data['details']
+    data = request.get_json(force=True)
+    userid = data['userid']
+    taskname = data['taskname']
+    course = data['course']
+    duedate = data['duedate']
+    details = data['details']
 
-        connection = get_db()
+    connection = get_db()
 
-        try:
-            cursor = connection.cursor()
-            cursor.execute('INSERT INTO samwisedb.Task(user, taskName, courseId, dueDate, details) values (%s, %s, %s, %s, %s)', (userid, taskname, course, duedate, details))
-            connection.commit()
-            task_id = cursor.lastrowid
-        finally:
-            print ("DONE")
+    try:
+        cursor = connection.cursor()
+        cursor.execute('INSERT INTO samwisedb.Task(user, taskName, courseId, dueDate, details) values (%s, %s, %s, %s, %s)', (userid, taskname, course, duedate, details))
+        connection.commit()
+        task_id = cursor.lastrowid
+    finally:
+        print ('DONE')
     return jsonify([task_id])
 
 
 @app.route('/updateTask/', methods=['POST'])
 def updateTask():
-    if request.method == 'POST':
-        data = request.get_json(force=True)
-        taskid = data['taskid']
-        taskname = data['taskname']
-        details = data['details']
-        duedate = data['duedate']
-        course = data['course']
+    data = request.get_json(force=True)
+    taskid = data['taskid']
+    taskname = data['taskname']
+    details = data['details']
+    duedate = data['duedate']
+    course = data['course']
 
-        taskid = int(taskid)
+    taskid = int(taskid)
 
-        connection = get_db()
+    connection = get_db()
 
-        try:
-            cursor = connection.cursor()
-            cursor.execute("""
-               UPDATE samwisedb.Task
-               SET taskName=%s, dueDate=%s, courseId=%s, details=%s
-               WHERE taskId=%s
-            """, (taskname, duedate, course, details, taskid))
-            connection.commit()
-        finally:
-            print ("DONE")
-
+    try:
+        cursor = connection.cursor()
+        cursor.execute('''
+           UPDATE samwisedb.Task
+           SET taskName=%s, dueDate=%s, courseId=%s, details=%s
+           WHERE taskId=%s
+        ''', (taskname, duedate, course, details, taskid))
+        connection.commit()
+    finally:
+        print ('DONE')
     return jsonify([])
 
 
@@ -346,7 +333,7 @@ def getClassInfo(courseId):
 
     cursor = connection.cursor()
     cursor.execute('SELECT startTime FROM samwisedb.Course WHERE courseId = %s', courseId)
-    data = [{"course": courseId + " Class", "start": str(item[0])} for item in cursor.fetchall()]
+    data = [{'course': courseId + ' Class', 'start': str(item[0])} for item in cursor.fetchall()]
     return jsonify(data)
 
 
@@ -391,5 +378,5 @@ def getColor(name):
     return app.config['COLORS'][hash(name) % len(app.config['COLORS'])]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)

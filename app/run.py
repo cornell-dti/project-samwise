@@ -116,16 +116,15 @@ def getUserCourses(netId):
 
 @app.route('/addCourse/', methods=['POST'])
 def addCourse():
-    if 'netid' in session:
-        data = request.get_json(force=True)
-        courseId = data['courseId']
-        user = data['user']
-        connection = get_db()
-        cursor = connection.cursor()
-        # TODO: Make sure course exists and use does not already have course
-        cursor.execute('INSERT INTO samwisedb.User(netId, courseId) VALUES (%s, %s)', (user, courseId))
-        connection.commit()
-    return redirect(url_for('index'))
+    data = request.get_json(force=True)
+    courseId = data['courseId']
+    user = data['user']
+    connection = get_db()
+    cursor = connection.cursor()
+    # TODO: Make sure course exists and use does not already have course
+    cursor.execute('INSERT INTO samwisedb.User(netId, courseId) VALUES (%s, %s)', (user, courseId))
+    connection.commit()
+    return jsonify([])
 
 @app.route('/removeCourse/', methods=['POST'])
 def removeCourse():

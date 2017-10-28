@@ -1,12 +1,10 @@
 import json
-import httplib2
-import datetime
 import os
 import mysql.connector
-from flask import Flask, render_template, make_response, url_for, redirect, request, session, jsonify, g
+from flask import Flask, render_template, url_for, redirect, request, session, jsonify, g
 
 app = Flask(__name__)
-
+app.config.from_object('config')
 
 def get_db():
     if not hasattr(g, 'db'):
@@ -395,7 +393,7 @@ def updateSubtask():
 
 @app.route('/getColor/<name>')
 def getColor(name):
-    return app.config.COLORS[hash(name) % len(app.config.COLORS)]
+    return app.config['COLORS'][hash(name) % len(app.config['COLORS'])]
 
 
 if __name__ == "__main__":

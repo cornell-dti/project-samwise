@@ -1,4 +1,3 @@
-import json
 import os
 import mysql.connector
 from flask import Flask, render_template, url_for, redirect, request, session, jsonify, g
@@ -282,7 +281,9 @@ def addTaskCourse():
 
     try:
         cursor = connection.cursor()
-        cursor.execute('INSERT INTO samwisedb.Task(user, taskName, courseId, dueDate, details) values (%s, %s, %s, %s, %s)', (userid, taskname, course, duedate, details))
+        cursor.execute(
+            'INSERT INTO samwisedb.Task(user, taskName, courseId, dueDate, details) values (%s, %s, %s, %s, %s)',
+            (userid, taskname, course, duedate, details))
         connection.commit()
         task_id = cursor.lastrowid
     finally:

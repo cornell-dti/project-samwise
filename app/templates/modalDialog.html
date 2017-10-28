@@ -270,58 +270,106 @@
 
 <div id = "addProjectModal" class="modal" style= "display:none;">
 	<div class="modal-content">
-	 <div class="modal-header" style="background-color: #4a4a4a;">
+	 <div class="modal-header" style="background-color: rgba(255, 5, 35, 1); opacity: 0.7">
 		 <span class="close">&times;</span>
-		 <h2>Add A Project</h2>
-
+		 <!--<h2>Add A Project</h2>
+		 <br>-->
 		 <div class="col-sm-8">
-			<h4>Add a project</h3>
-			<div class="col-sm-8">
-			 <input style= "background-color: white; color: black" class= "task_name" type="text" id ="projectName" placeholder="Project Description"> <br>
+			<!--<h4>Add a project</h3>
+			<div class="col-sm-8">-->
+
+			 <input style= "color: white" class= "task_name" type="text" id ="projectName" placeholder="Title"> <br>
 			</div>
 			<br>
 			<br>
 			<br>
 			<br>
-			<h4>Select a date and time </h3>
+			<div class = "col-sm-1"></div>
+			<div class = "col-sm-1 title">
+				Tag
+			</div>
+				<!-- add radio buttons w/ tags extract from backend -->
+
+			<br>
+			<br>
+			<div class = "col-sm-1"></div>
+			<div class = "col-sm-2 title">
+				Starts
+			</div>
+			<div class='col-md-3'>
+        <div class="form-group">
+            <div class='input-group date' id='datetimepicker6'>
+                <input type='text' class="form-control" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+			<br>
+			<div class = "col-sm-1"></div>
+			<div class = "col-sm-2 title">
+				Ends
+			</div>
+			<div class='col-md-3'>
+        <div class="form-group">
+            <div class='input-group date' id='datetimepicker7'>
+                <input type='text' class="form-control" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+		<br>
+		<div class = "col-sm-1"></div>
+		<div class = "col-sm-2 start-working-title">
+			 Start Working
+		</div>
+		<div class = "col-sm-4">
+			<select class = "start-working">
+			  <option value="volvo">None</option>
+			  <option value="saab">2 days ahead</option>
+			  <option value="opel">5 days ahead</option>
+			  <option value="audi">1 week ahead</option>
+			</select>
+		</div>
+
+			<br>
+			<br>
+			<br>
+			<br>
+			<div class = "col-sm-1"></div>
+			<div class = "col-sm-1 title">
+				Location
+			</div>
+			<div class = "col-sm-1"></div>
 			<div class = "col-sm-8">
-				<input type="datetime-local" style = "color: black;" id = "projectDate">
+				<input style= "color: white" class= "project_location" type="text" id ="projectLocation" placeholder="Event Location Here">
 			</div>
-			<br>
-			<br>
-			<br>
-			<br>
-			<div class="col-sm-8">
-			 <h4>Choose a class</h3>
-			 <div class="col-sm-8">
-				<input style= "background-color: white; color: black" class= "task_name" type="text" id="projectClass" placeholder="Class goes here"> <br>
-			 </div>
 
+			<br>
+			<br>
 
+			<div class = "col-sm-1"></div>
+			<div class = "col-sm-1 title">
+				Notes
+			</div>
+			<div class = "col-sm-1"></div>
+			<div class = "col-sm-8">
+				<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" placeholder="Enter Event Notes Here">
+			</div>
 
-			 <div class="col-sm-4">
-					</div>
-			 </div>
-			 <div class="col-sm-4">
-				<br>
-				<br>
-				<br>
-				<br>
-				<br>
-				<br>
-				<br>
-				<br>
-				<br>
-				<br>
-				<br>
-				<br>
-				<br>
-				<button class="w3-button w3-green w3-round-xxlarge" style="float:right;" onclick="addProjectToCalendar()">Add</button>
-			 </div>
+			<div class = "col-sm-1">
+			<button class="btn btn-sm btn-default" style="float:right;" onclick="addUserClass()">Save</button>
+			</div>
 		 </div>
 	 </div>
 </div>
-</div>
+
+<!-- https://eonasdan.github.io/bootstrap-datetimepicker/ -->
+
 
 <div id="introModal" class="modal" style= "display:block;">
 

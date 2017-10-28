@@ -17,8 +17,8 @@ from oauth2client import tools
 from oauth2client.file import Storage
 from simplekv.memory import DictStore
 
-# from flask_restful import Resource, Api
-# from flask_httpauth import HTTPBasicAuth
+
+from flask_httpauth import HTTPBasicAuth
 
 app = Flask(__name__)
 app.config['GOOGLE_LOGIN_CLIENT_ID'] = '197302358001-s09lnod2vb7rltrkj9qn906tte1u4esp.apps.googleusercontent.com'
@@ -31,15 +31,15 @@ app.config['OAUTH_CREDENTIALS'] = {
     }
 }
 
-# auth = HTTPBasicAuth()
+auth = HTTPBasicAuth()
 
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
-# USER_DATA = {
-#     "admin": "Kevin_Li"
-# }
+USER_DATA = {
+    "admin": "Kevin_Li"
+}
 
 lm = LoginManager()
 lm.login_view = 'index'
@@ -47,11 +47,11 @@ lm.login_view = 'index'
 # See the simplekv documentation for details
 store = DictStore()
 
-# @auth.verify_password
-# def verify(username, password):
-#     if not (username and password):
-#         return False
-#     return USER_DATA.get(username) == password
+@auth.verify_password
+def verify(username, password):
+    if not (username and password):
+        return False
+    return USER_DATA.get(username) == password
 
 
 def get_db():
@@ -97,6 +97,7 @@ def getUserExams(netId):
     return jsonify(data)
 
 @app.route('/getAllCourses')
+@auth.login_required
 def getAllCourses():
     # Open the connection to database
     connection = get_db()

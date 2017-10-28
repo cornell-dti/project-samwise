@@ -54,17 +54,10 @@ store = DictStore()
 #     return USER_DATA.get(username) == password
 
 
-# def get_db():
-#     if not hasattr(g, 'db'):
-#         g.db = mysql.connector.connect(user=os.getenv('SAMWISE_USERNAME'), password=os.getenv('SAMWISE_PASSWORD'),
-#                                        host=os.getenv('SAMWISE_DB'))
-#     return g.db
-
 def get_db():
     if not hasattr(g, 'db'):
-        # g.db = mysql.connector.connect(user=os.getenv('SAMWISE_USERNAME'), password=os.getenv('SAMWISE_PASSWORD'),
-        #                                host=os.getenv('SAMWISE_DB'))
-        g.db = mysql.connector.connect(user='samwise', password='3XJ73bgCS87mfvbe', host='samwisedata.ckbdcr0vghnq.us-east-1.rds.amazonaws.com')
+        g.db = mysql.connector.connect(user=os.getenv('SAMWISE_USERNAME'), password=os.getenv('SAMWISE_PASSWORD'),
+                                       host=os.getenv('SAMWISE_DB'))
     return g.db
 
 @app.teardown_appcontext
@@ -299,8 +292,9 @@ def getTasks(userId):
         'taskName': item[2],
         'courseId': item[3],
         'tag': item[4],
-        'dueDate': item[5],
-        'details': item[6]
+        'startDate': item[5],
+        'dueDate': item[6],
+        'details': item[7]
     } for item in cursor.fetchall()]
 
     return jsonify(data)
@@ -318,13 +312,15 @@ def removeTask():
     return json.dumps([])
 
 @app.route('/addTask/', methods=['POST'])
-def addTaskCourse():
+def addTask():
     task_id = -1
     if request.method == 'POST':
         data = request.get_json(force=True)
         userid=data['userid']
         taskname=data['taskname']
         course=data['course']
+        tag=data['tag']
+        startdate=data['startdate']
         duedate=data['duedate']
         details=data['details']
 
@@ -332,7 +328,7 @@ def addTaskCourse():
 
         try:
             cursor = connection.cursor()
-            query = "INSERT into samwisedb.Task(user, taskName, courseId, dueDate, details) values (\"" + userid + "\", \"" + taskname + "\", \"" + course + "\", \"" + duedate + "\", \"" + details + "\");"
+            query = "INSERT into samwisedb.Task(user, taskName, courseId, tag, startDate, dueDate, details) values (\"" + userid + "\", \"" + taskname + "\", \"" + course + "\", \"" + tag + "\", \"" +  startdate + "\", \"" +duedate + "\", \"" + details + "\");"
             print(query)
             cursor.execute(query)
             connection.commit()
@@ -349,6 +345,7 @@ def updateTask():
         taskid=data['taskid']
         taskname=data['taskname']
         details=data['details']
+        startdate=data['startdate']
         duedate=data['duedate']
         course=data['course']
 
@@ -360,9 +357,9 @@ def updateTask():
             cursor = connection.cursor()
             cursor.execute ("""
                UPDATE samwisedb.Task
-               SET taskName=%s, dueDate=%s, courseId=%s, details=%s
+               SET taskName=%s, startDate=%s, dueDate=%s, courseId=%s, details=%s
                WHERE taskId=%s
-            """, (taskname, duedate, course, details, taskid))
+            """, (taskname, startdate, duedate, course, details, taskid))
             connection.commit()
         finally:
             print ("DONE")

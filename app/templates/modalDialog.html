@@ -5,22 +5,25 @@
         var intromodal = document.getElementById('introModal');
 				var modal = document.getElementById('myModal');
 				var modalevent = document.getElementById('eventModal');
-        var desktopmodal = document.getElementById('desktopModal');
+        var notModal = document.getElementById('notificationModal');
 				var displayClassModal = document.getElementById('addClassModal')
 				var displayProjectModal = document.getElementById('addProjectModal')
-
-				var spanaddclass = document.getElementsByClassName('close')[0];
-				var spanaddproject = document.getElementsByClassName('close')[1];
-        var spanintro = document.getElementsByClassName('close')[2];
-        var span = document.getElementsByClassName('close')[3];
-        var span2 = document.getElementsByClassName('close')[4];
-        var spandesktop = document.getElementsByClassName('close')[5];
-        var spanproject = document.getElementsByClassName('close')[6];
-        var spantask = document.getElementsByClassName('close')[7];
 
 				var closeIntro = document.getElementById("closeIntro");
 				closeIntro.onclick = function(){
 					intromodal.style.display = 'none';
+				}
+				var closeClass = document.getElementById("closeClass");
+				closeClass.onclick = function(){
+					displayClassModal.style.display = 'none';
+				}
+				var closeProject = document.getElementById("closeProject");
+				closeProject.onclick = function(){
+					displayProjectModal.style.display = 'none';
+				}
+				var closeNot = document.getElementById("closeNotification");
+				closeNot.onclick = function(){
+					notModal.style.display = 'none';
 				}
 
         var courseAddButton = document.getElementById('courseAdd');
@@ -31,34 +34,6 @@
 				  autoFirst: true
 				});
 
-        // When the user clicks on <span> (x), close the modal
-        eventAddButton.onclick = function() {
-        	modalevent.style.display = 'none';
-        }
-        spanintro.onclick = function() {
-            intromodal.style.display = 'none';
-        }
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-            modal.style.display = 'none';
-        }
-
-        span2.onclick = function() {
-        	modalevent.style.display = 'none';
-        }
-
-        spandesktop.onclick = function() {
-            desktopmodal.style.display = 'none';
-        }
-
-				spanaddclass.onclick = function(){
-					displayClassModal.style.display = 'none';
-				}
-
-				spanaddproject.onclick = function(){
-					displayProjectModal.style.display = 'none';
-				}
 
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function(event) {
@@ -74,8 +49,8 @@
                 intromodal.style.display = 'none';
             }
 
-            if (event.target == desktopmodal) {
-                desktopmodal.style.display = 'none';
+            if (event.target == notModal) {
+                notModal.style.display = 'none';
             }
 
 						if (event.target == displayClassModal){
@@ -160,7 +135,7 @@
     }
 
     function desktopToggle() {
-        var modal = document.getElementById('desktopModal');
+        var modal = document.getElementById('notificationModal');
         modal.style.display = 'block';
     }
 
@@ -304,7 +279,7 @@
 	<div id = "addClassModal" class="modal" style= "display:none;">
 		<div class="modal-content">
 		 <div class="modal-header" style="background-color: #4a4a4a;">
-			 <span class="close">&times;</span>
+			 <span class="close" id="closeClass">&times;</span>
 			 <h2>Add A Class</h2>
 
 			 <div class="col-sm-8">
@@ -343,7 +318,7 @@
 <div id = "addProjectModal" class="modal" style= "display:none;">
 	<div class="modal-content">
 	 <div class="modal-header" style="background-color: rgba(255, 5, 35, 1); opacity: 0.7">
-		 <span class="close">&times;</span>
+		 <span class="close" id="closeProject">&times;</span>
 		 <!--<h2>Add A Project</h2>
 		 <br>-->
 		 <div class="col-sm-8">
@@ -473,12 +448,12 @@
 		    </div>
 
 
-<div id="desktopModal" class="modal">
+<div id="notificationModal" class="modal">
 
 		      <!-- Modal content -->
 		      <div class="modal-content">
 			<div class="modal-header" style="background-color: #4a4a4a;">
-			  <span class="close">&times;</span>
+			  <span class="close" id="closeNotification">&times;</span>
 			  <h2>Notification Settings</h2>
 			</div>
 			<div class="modal-body" style="background-color: #4a4a4a;">

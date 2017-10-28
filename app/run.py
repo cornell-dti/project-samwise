@@ -105,7 +105,7 @@ def getAllCourses():
     data = [item[0] for item in cursor.fetchall()]
     return jsonify(data)
 
-@app.route('/<netId>/getUserCourses')
+@app.route('/getUserCourses/<netId>')
 def getUserCourses(netId):
     # Open the connection to database
     connection = get_db()
@@ -119,7 +119,7 @@ def addCourse():
     if 'netid' in session:
         data = request.get_json(force=True)
         courseId = data['courseId']
-        userId = data['user']
+        user = data['user']
         connection = get_db()
         cursor = connection.cursor()
         # TODO: Make sure course exists and use does not already have course

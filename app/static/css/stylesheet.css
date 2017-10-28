@@ -10,7 +10,41 @@ input {
     padding: 10px;
     float: left;
     font-size: 12px;
+		outline: none;
 }
+
+.task_name {
+	font-size: 27px;
+	border-bottom: 1px solid white;
+	background-color: rgba(255, 5, 35, 0.7);
+}
+
+.project_location, .project_notes {
+	background-color: rgba(255, 5, 35, 0.7);
+}
+
+.title{
+	font-size: 16px;
+}
+
+.start-working {
+	color: black;
+}
+
+
+input::placeholder{
+	color: white;
+	opacity: 0.5;
+}
+
+
+.input-group .form-control{
+	width: 100%;
+}
+.input-group-addon {
+	width: auto;
+}
+
 
 /* Nav Bar */
 .topnav {

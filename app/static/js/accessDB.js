@@ -130,7 +130,7 @@ function getExams(id) {
 function getUserExams(id) {
     var userid = id;
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", 'http://localhost:5000/' + userid + '/getUserExams', false);
+        xhr.open("GET", 'http://localhost:5000/getUserExams/' + userid, false);
     xhr.setRequestHeader("Content-Type", "application/json");
         xhr.send(null);
     return JSON.parse(xhr.responseText);
@@ -182,7 +182,7 @@ function removeCourse(user, courseId) {
 function getUserCourses(id) {
   var userid = id;
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", 'http://localhost:5000/' + userid + '/getUserCourses', false);
+  xhr.open("GET", 'http://localhost:5000/getUserCourses/' + userid, false);
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.send(null);
   return JSON.parse(xhr.responseText);
@@ -190,7 +190,7 @@ function getUserCourses(id) {
 
 function getAllCourses() {
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", 'http://localhost:5000/getAllCourses/', false);
+  xhr.open("GET", 'http://localhost:5000/getAllCourses', false);
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.send(null);
   return JSON.parse(xhr.responseText);

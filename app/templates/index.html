@@ -9,8 +9,8 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://cdn.rawgit.com/LeaVerou/awesomplete/gh-pages/awesomplete.css">
-	<script src="https://cdn.rawgit.com/LeaVerou/awesomplete/gh-pages/awesomplete.min.js"></script>
+	<link rel="stylesheet" href="../static/css/awesomplete.css" />
+	<script src="../static/js/awesomplete.js" async></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
@@ -62,8 +62,16 @@
 
 		header: {
 			right: 'prev,next,today',
+			// center: 'semester,month,agendaWeek,agendaDay'
 			center: 'month,agendaWeek,agendaDay'
 		},
+		// views: {
+		// 	semester: {
+		// 		type: 'basic',
+		// 		duration: {months: 4},
+		// 		buttonText: 'Semester'
+		// 	}
+		// },
 		nextDayThreshold: '00:00:00'
 	});
 		var events = JSON.parse(localStorage.getItem("events")) == null ? [] : JSON.parse(localStorage.getItem("events"));
@@ -125,8 +133,18 @@
 		      signoutButton.style.display = 'block';
 		      userid = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail().split("@")[0];
 		      console.log(userid);
-					console.log(getUserCourses(userid));
+					// console.log(getUserCourses(userid));
+					var input = document.getElementById("classSearch");
+
+					displayIntroModal();
+					populateUserCourses();
 					addStoredEvents();
+
+					var courses = getAllCourses();
+					var awesomplete = new Awesomplete(input);
+					awesomplete.list = courses;
+
+
 
 		      // location.reload();
 		      syncGoogleToFullCalendar();

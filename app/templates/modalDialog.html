@@ -215,18 +215,48 @@
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			$("#calendar").fullCalendar('rerenderEvents');
 
-			addProject(userid, name, date, course);
+			addEvent(userid, name, date, date, course);
+			console.log("added");
+
 
 			var modal = document.getElementById('addProjectModal');
 			modal.style.display = 'none';
 		}
 
 		function addStoredEvents(){
-			//get user exams
-			//get user projects
-			// console.log(getUserExams(userid));
+
+			var exams = getUserExams(userid);
+
+			for (j = 0; j < exams[0].length; j++){
+
+				var date = exams[0][j].start;
+				date = date.split(", ");
 
 
+				//07 Dec 2017 09:00:00 GMT must become
+				//2010-01-09T12:30:00
+
+				date = date[1].split(" ");
+				function getMonthFromString(mon){
+				   return new Date(Date.parse(mon +" 1, 2012")).getMonth()+1
+				}
+				var monthNum = getMonthFromString(date[1]);
+
+				var dateString = date[2] + "-" + parseInt(monthNum) +
+									"-" + date[0] + "T" + date[3];
+
+				var newEvent = {
+					title : exams[0][j].courseId,
+					start : dateString
+				}
+
+				$("#calendar").fullCalendar('addEventSource', [newEvent]);
+				$("#calendar").fullCalendar('rerenderEvents');
+
+			}
+
+			var events = getEvents(userid);
+			console.log(events[0]);
 		}
 
 </script>

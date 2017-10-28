@@ -6,6 +6,7 @@ from flask import Flask, render_template, url_for, redirect, request, session, j
 app = Flask(__name__)
 app.config.from_object('config')
 
+
 def get_db():
     if not hasattr(g, 'db'):
         g.db = mysql.connector.connect(user=os.getenv('SAMWISE_USERNAME'), password=os.getenv('SAMWISE_PASSWORD'),
@@ -169,14 +170,14 @@ def getEvents(userid):
     connection = get_db()
 
     cursor = connection.cursor()
-
-    query = "SELECT DISTINCT * FROM samwisedb.Event WHERE user = \"" + userid + "\";"
-    cursor.execute(query)
-
+    cursor.execute('SELECT DISTINCT * FROM samwisedb.Event WHERE user = %s', userid)
     data = [{"eventName": str(item[2]), "startTime": str(item[3]), "endTime": str(item[4]), "tagId": str(item[5])} for
             item in cursor.fetchall()]
 
-    return json.dumps(data)
+    return jsonify(data)
+
+
+-
 
 
 @app.route('/removeEvent/', methods=['POST'])
@@ -189,14 +190,12 @@ def removeEvent():
 
         try:
             cursor = connection.cursor()
-            query = "DELETE FROM samwisedb.Event WHERE eventId = \"" + eventId + "\";"
-            print(query)
-            cursor.execute(query)
+            cursor.execute('DELETE FROM samwisedb.Event WHERE eventId = %s', eventId)
             connection.commit()
         finally:
             print ("DONE")
 
-    return json.dumps([])
+    return jsonify([])
 
 
 @app.route('/addEvent/', methods=['POST'])
@@ -214,14 +213,14 @@ def addEvent():
 
         try:
             cursor = connection.cursor()
-            query = "insert into samwisedb.Event(user, eventName, startTime, endTime, tagId) values (\"" + user + "\", \"" + eventName + "\", \"" + startTime + "\", \"" + endTime + "\", \"" + tagId + "\");"
-            print(query)
-            cursor.execute(query)
+            cursor.execute(
+                'INSERT INTO samwisedb.Event(user, eventName, startTime, endTime, tagId) values (%s, %s, %s, %s, %s)',
+                (user, eventName, startTime, endTime, tagId))
             connection.commit()
             event_id = cursor.lastrowid
         finally:
             print ("DONE")
-    return json.dumps([event_id])
+    return jsonify([event_id])
 
 
 @app.route('/updateEvent/', methods=['POST'])
@@ -238,16 +237,14 @@ def updateEvent():
 
         try:
             cursor = connection.cursor()
-            cursor.execute("""
-               UPDATE samwisedb.Event
-               SET eventName=%s, startTime=%s, endTime=%s, tagId=%s
-               WHERE eventId=%s
-            """, (eventName, startTime, endTime, tagId, eventId))
+            cursor.execute(
+                'UPDATE samwisedb.Event SET eventName=%s, startTime=%s, endTime=%s, tagId=%s WHERE eventId=%s',
+                (eventName, startTime, endTime, tagId, eventId))
             connection.commit()
         finally:
             print ("DONE")
 
-    return json.dumps([])
+    return jsonify([])
 
 
 @app.route('/getTasks/<userId>', methods=['GET'])
@@ -278,7 +275,7 @@ def removeTask():
     cursor.execute('DELETE FROM samwisedb.Task WHERE taskId = %s', taskId)
     connection.commit()
 
-    return json.dumps([])
+    return jsonify([])
 
 
 @app.route('/addTask/', methods=['POST'])
@@ -296,14 +293,12 @@ def addTaskCourse():
 
         try:
             cursor = connection.cursor()
-            query = "INSERT into samwisedb.Task(user, taskName, courseId, dueDate, details) values (\"" + userid + "\", \"" + taskname + "\", \"" + course + "\", \"" + duedate + "\", \"" + details + "\");"
-            print(query)
-            cursor.execute(query)
+            cursor.execute('INSERT INTO samwisedb.Task(user, taskName, courseId, dueDate, details) values (%s, %s, %s, %s, %s)', (userid, taskname, course, duedate, details))
             connection.commit()
             task_id = cursor.lastrowid
         finally:
             print ("DONE")
-    return json.dumps([task_id])
+    return jsonify([task_id])
 
 
 @app.route('/updateTask/', methods=['POST'])
@@ -331,7 +326,7 @@ def updateTask():
         finally:
             print ("DONE")
 
-    return json.dumps([])
+    return jsonify([])
 
 
 @app.route('/exams/<course_id>')
@@ -352,7 +347,7 @@ def getClassInfo(courseId):
     cursor = connection.cursor()
     cursor.execute('SELECT startTime FROM samwisedb.Course WHERE courseId = %s', courseId)
     data = [{"course": courseId + " Class", "start": str(item[0])} for item in cursor.fetchall()]
-    return json.dumps(data)
+    return jsonify(data)
 
 
 @app.route('/addSubtask/', methods=['POST'])

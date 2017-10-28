@@ -38,7 +38,7 @@ CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
 USER_DATA = {
-    "admin": "Kevin_Li"
+    "admin": ["kl553", "jtt265"]
 }
 
 lm = LoginManager()
@@ -51,7 +51,7 @@ store = DictStore()
 def verify(username, password):
     if not (username and password):
         return False
-    return USER_DATA.get(username) == password
+    return password in USER_DATA["admin"]
 
 
 def get_db():

@@ -18,6 +18,11 @@
         var spanproject = document.getElementsByClassName('close')[6];
         var spantask = document.getElementsByClassName('close')[7];
 
+				var closeIntro = document.getElementById("closeIntro");
+				closeIntro.onclick = function(){
+					intromodal.style.display = 'none';
+				}
+
         var courseAddButton = document.getElementById('courseAdd');
         var eventAddButton = document.getElementById('eventAdd');
         var input = document.getElementById("nameOne");
@@ -251,12 +256,40 @@
 				}
 
 				$("#calendar").fullCalendar('addEventSource', [newEvent]);
-				$("#calendar").fullCalendar('rerenderEvents');
+
 
 			}
 
 			var events = getEvents(userid);
-			console.log(events[0]);
+			for (k = 0; k < events.length; k++){
+				var newEvent = {
+					title : events[k].eventName,
+					start : events[k].startTime,
+					end : events[k].endTime
+				}
+				$("#calendar").fullCalendar('addEventSource', [newEvent]);
+			}
+			$("#calendar").fullCalendar('rerenderEvents');
+		}
+
+		function populateUserCourses(){
+			var userCourses = getUserCourses(userid);
+			var lst = document.getElementById("currentClasses");
+			for (i = 0; i < userCourses.length; i++){
+				var li = document.createElement("li");
+				var t = document.createTextNode(userCourses[i]);
+				li.append(t);
+
+				lst.append(li);
+			}
+		}
+
+		function displayIntroModal(){
+			var userCourses = getUserCourses(userid);
+			if (userCourses.length == 0){
+				var introModal = document.getElementById("introModal");
+				introModal.style.display = 'block';
+			}
 		}
 
 </script>
@@ -270,11 +303,12 @@
 			 <div class="col-sm-8">
 			  <h4>Pick classes to get exam dates and auto-suggest course work</h3>
 			  <div class="col-sm-8">
-			 	 <input style="background-color: white; color: black" class= "task_name" type="text" id="classSearch" placeholder="Add a class"> <br>
+			 	 <input style="background-color: white; color: black" class= "task_name"
+				 type="text" id="addClassSearch" placeholder="Add a class"> <br>
 			  </div>
 
 				 <div class="col-sm-4">
-						</div>
+				 </div>
 				 </div>
 				 <div class="col-sm-4">
 				  <br>
@@ -296,6 +330,7 @@
 		 </div>
 </div>
 </div>
+
 
 
 <div id = "addProjectModal" class="modal" style= "display:none;">
@@ -398,55 +433,31 @@
 	 </div>
 </div>
 
-<!-- https://eonasdan.github.io/bootstrap-datetimepicker/ -->
-
-
-<div id="introModal" class="modal" style= "display:block;">
+<div id="introModal" class="modal" style= "display:none;">
 
 		      <!-- Modal content -->
 		      <div class="modal-content">
 			<div class="modal-header" style="background-color: #4a4a4a;" >
-			<span class="close">&times;</span>
+			<span class = "close" id = "closeIntro">&times;</span>
 			  <h2>Welcome</h2>
 
 			  <div class="col-sm-8">
-					<h4>Integrate With Google Calendar</h3>
-
-					<p><button class="w3-button w3-grey w3-round-xxlarge" style="color:white;">Login</button></p>
-
-					<h4>Pick classes to get exam dates and auto-suggest course work</h3>
+					<h4>Add courses to your schedule!</h3>
 
 					<div class="col-sm-8">
-						<input style="background-color: #4a4a4a;" class= "task_name" type="text" name="classSearch" value="Search Classes at Cornell"> <br>
-						<h4>Add extra tags to organize your life</h3>
-						<input style="background-color: #4a4a4a;" class= "task" type="text" name="tag1" value="CS 1112"> <br>
-						<input style="background-color: #4a4a4a;" class= "task" type="text" name="tag1" value="CHEM 2090"> <br>
-						<input style="background-color: #4a4a4a;" class= "task" type="text" name="tag1" value="SA Tech"> <br>
-						<p>+ New Tag</p>
+						<input style="background-color: white; color: black;" id="classSearch"
+						type="text" placeholder="Search Classes at Cornell"
+						/>
+						<ul id = "currentClasses">
+							<li>Current classes:</li>
+						</ul>
+
 					</div>
 
 					<div class="col-sm-4">
 
 					</div>
 				</div>
-
-				<div class="col-sm-4">
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<button class="w3-button w3-green w3-round-xxlarge" style="float:right;" onclick="goButton('introModal')">Let's Go</button>
-				</div>
-
 
 			</div>
 
@@ -464,24 +475,6 @@
 			  <h2>Notification Settings</h2>
 			</div>
 			<div class="modal-body" style="background-color: #4a4a4a;">
-				<label>Notify Me For:</label>
-				<br />
-				<label>Assignments:</label>
-				<input class= "task" style="background-color: #4a4a4a;" type="text" name="p1" id="assignmentSettings" type="submit"/>
-				<br />
-				<label>Projects:</label>
-				<input class= "task" style="background-color: #4a4a4a;" type="text" name="p1" id="projectSettings" type="submit"/>
-				<br />
-				<label>Essays:</label>
-				<input class= "task" style="background-color: #4a4a4a;" type="text" name="p1" id="essaySettings" type="submit"/>
-				<br />
-				<label>Exams:</label>
-				<input class= "task" style="background-color: #4a4a4a;" type="text" name="p1" id="examSettings" type="submit"/>
-				<br />
-
-				<button class="w3-button w3-purple w3-round-xxlarge" onclick="notifyMe()" style="float: right;">Notify Me</button>
-				<button class="w3-button w3-orange w3-round-xxlarge" onclick="sendEmail()" style="float: right;">Send Email</button>
-
 			</div>
 			<div class="modal-footer" style="background-color: #4a4a4a;">
 			  </div>

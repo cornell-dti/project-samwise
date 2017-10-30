@@ -6,9 +6,14 @@
 				var modal = document.getElementById('myModal');
 				var modalevent = document.getElementById('eventModal');
         var notModal = document.getElementById('notificationModal');
-				var displayClassModal = document.getElementById('addClassModal')
-				var displayProjectModal = document.getElementById('addProjectModal')
+				var displayClassModal = document.getElementById('addClassModal');
+				var displayProjectModal = document.getElementById('addProjectModal');
+				var welcomeModal = document.getElementById("welcomeModal");
 
+				var closeWelcome = document.getElementById("closeWelcome");
+				closeWelcome.onclick = function(){
+					welcomeModal.style.display = 'none';
+				}
 				var closeIntro = document.getElementById("closeIntro");
 				closeIntro.onclick = function(){
 					intromodal.style.display = 'none';
@@ -226,6 +231,7 @@
 				var newEvent = {
 					title : exams[0][j].courseId,
 					start : dateString
+					//TODO: add className as tag
 				}
 
 				$("#calendar").fullCalendar('addEventSource', [newEvent]);
@@ -248,7 +254,6 @@
 		function remove(link) {
 				removeCourse(userid, link.innerHTML);
 		    link.parentNode.parentNode.removeChild(link.parentNode);
-
 		}
 
 		function populateUserCourses(){
@@ -290,9 +295,10 @@
 					}
 				}
 			}
-			addCourse(userid, className);
-			populateUserCourses();
-
+			if (className.length > 0){
+				addCourse(userid, className);
+				populateUserCourses();
+			}
 		}
 
 </script>
@@ -472,17 +478,32 @@
 
 
 <div id="notificationModal" class="modal">
-
 		      <!-- Modal content -->
-		      <div class="modal-content">
+	  <div class="modal-content">
 			<div class="modal-header" style="background-color: #4a4a4a;">
 			  <span class="close" id="closeNotification">&times;</span>
 			  <h2>Notification Settings</h2>
-			</div>
-			<div class="modal-body" style="background-color: #4a4a4a;">
-			</div>
+				</div>
+				<div class="modal-body" style="background-color: #4a4a4a;">
+				</div>
 			<div class="modal-footer" style="background-color: #4a4a4a;">
-			  </div>
-		      </div>
+			</div>
+	  </div>
 
-		    </div>
+</div>
+
+<div id = "welcomeModal" class="modal" style="display:block;">
+	<div class="modal-content">
+		<div class="modal-header" style="background-color: #4a4a4a;">
+			<span class="close" id="closeWelcome">&times;</span>
+			<center>
+				<br><br><br>
+				<h1 style="font-size: 100px">Samwise.</h1>
+				<button class="loginbutton" id = "login"></button>
+				<br><br><br>
+				<p style="font-size: 25px">Made by D&TI</p>
+				<p style="font-size: 15px">Cornell Design & Tech Initiative</p>
+			</center>
+		</div>
+	</div>
+</div>

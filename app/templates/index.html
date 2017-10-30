@@ -130,6 +130,7 @@
 		function updateSigninStatus(isSignedIn) {
 		    if (isSignedIn) {
 		      authorizeButton.style.display = 'none';
+					welcomeModal.style.display = 'none';
 		      signoutButton.style.display = 'block';
 		      userid = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail().split("@")[0];
 		      console.log(userid);

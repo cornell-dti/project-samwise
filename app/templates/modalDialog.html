@@ -6,7 +6,6 @@
 				var modal = document.getElementById('myModal');
 				var modalevent = document.getElementById('eventModal');
         var notModal = document.getElementById('notificationModal');
-				var displayClassModal = document.getElementById('addClassModal');
 				var displayProjectModal = document.getElementById('addProjectModal');
 				var welcomeModal = document.getElementById("welcomeModal");
 
@@ -17,10 +16,6 @@
 				var closeIntro = document.getElementById("closeIntro");
 				closeIntro.onclick = function(){
 					intromodal.style.display = 'none';
-				}
-				var closeClass = document.getElementById("closeClass");
-				closeClass.onclick = function(){
-					displayClassModal.style.display = 'none';
 				}
 				var closeProject = document.getElementById("closeProject");
 				closeProject.onclick = function(){
@@ -105,13 +100,10 @@
         modal.style.display = 'block';
     }
 
-		function displayClassModal() {
-			var modal = document.getElementById('addClassModal');
-			modal.style.display = 'block';
-		}
 
 		function displayProjectModal() {
 			var modal = document.getElementById('addProjectModal');
+			populateProjectTagSelect();
 			modal.style.display = 'block';
 		}
 
@@ -158,46 +150,46 @@
 		function addProjectToCalendar(){
 			name = document.getElementById("projectName").value;
 			date = document.getElementById("projectDate").value;
-			course = document.getElementById("projectClass").value;
+			course = document.getElementById("selectDropdown").value;
+			start = document.getElementById("startWorking").value;
+			realstart = document.getElementById("realstart").value;
 
 			if (name === 'undefined'){
 				name = "Empty"
 			}
 			if (date){
-				dateArr = date.split("-");
-				console.log(dateArr[1]);
-				if (dateArr[1].length == 1){
-					dateArr[1] = ("0").concat(dateArr[1]);
-				}
-				date = dateArr.join();
-				var fullDate = "";
-				for (i = 0; i < dateArr.length; i++){
-					fullDate = fullDate.concat(dateArr[i]);
-					if (i == 0 || i == 1){
-						fullDate = fullDate.concat("-");
-					}
-				}
-				date = fullDate.concat(":00");
+				date = date.concat(":00");
 
 			}
 			else{
 				var today = new Date();
-				var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-				var dateTime = date;
+				var date = today.toISOString();
+				console.log(date);
+			}
 
+			if (realstart){
+				realstart = realstart.concat(":00");
+			}
+			else{
+				realstart = date;
 			}
 			if (course === 'undefined'){
 				course = "Blank";
 			}
+			var startWorkingDateObj = new Date(realstart);
+			startWorkingDateObj.setDate(startWorkingDateObj.getDate() - start);
+			var startDate = startWorkingDateObj.toISOString();
 			var newEvent = {
 				title : name,
-				start : date
+				start : startDate,
+				end : date,
+				className : course,
+				actualstart : realstart
 			}
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			$("#calendar").fullCalendar('rerenderEvents');
 
-			addEvent(userid, name, date, date, course);
-
+			addEvent(userid, name, startDate, date, course);
 
 			var modal = document.getElementById('addProjectModal');
 			modal.style.display = 'none';
@@ -230,8 +222,8 @@
 
 				var newEvent = {
 					title : exams[0][j].courseId,
-					start : dateString
-					//TODO: add className as tag
+					start : dateString,
+					className : exams[0][j].courseId
 				}
 
 				$("#calendar").fullCalendar('addEventSource', [newEvent]);
@@ -244,7 +236,8 @@
 				var newEvent = {
 					title : events[k].eventName,
 					start : events[k].startTime,
-					end : events[k].endTime
+					end : events[k].endTime,
+					className : events[k].tagid
 				}
 				$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			}
@@ -276,6 +269,23 @@
 			}
 		}
 
+		function populateProjectTagSelect(){
+			var userCourses = getUserCourses(userid);
+			if (userCourses.length < 1){
+				return;
+			}
+			var dropdown = document.getElementById("selectDropdown");
+			$('#selectDropdown').empty();
+			for (i = 0; i < userCourses.length; i++){
+				var opt = document.createElement("option");
+				opt.setAttribute("value", userCourses[i]);
+				var t = document.createTextNode(userCourses[i]);
+				opt.append(t);
+
+				dropdown.append(opt);
+			}
+		}
+
 		function displayIntroModal(){
 			var userCourses = getUserCourses(userid);
 			if (userCourses.length == 0){
@@ -303,44 +313,6 @@
 
 </script>
 
-	<div id = "addClassModal" class="modal" style= "display:none;">
-		<div class="modal-content">
-		 <div class="modal-header" style="background-color: #4a4a4a;">
-			 <span class="close" id="closeClass">&times;</span>
-			 <h2>Add A Class</h2>
-
-			 <div class="col-sm-8">
-			  <h4>Pick classes to get exam dates and auto-suggest course work</h3>
-			  <div class="col-sm-8">
-			 	 <input style="background-color: white; color: black" class= "task_name"
-				 type="text" id="addClassSearch" placeholder="Add a class"> <br>
-			  </div>
-
-				 <div class="col-sm-4">
-				 </div>
-				 </div>
-				 <div class="col-sm-4">
-				  <br>
-				  <br>
-				  <br>
-				  <br>
-				  <br>
-				  <br>
-				  <br>
-				  <br>
-				  <br>
-				  <br>
-				  <br>
-				  <br>
-				  <br>
-				  <button class="w3-button w3-green w3-round-xxlarge" style="float:right;" onclick="addUserClass()">Add</button>
-				 </div>
-			 </div>
-		 </div>
-</div>
-</div>
-
-
 
 <div id = "addProjectModal" class="modal" style= "display:none;">
 	<div class="modal-content">
@@ -348,99 +320,41 @@
 		 <span class="close" id="closeProject">&times;</span>
 		 <!--<h2>Add A Project</h2>
 		 <br>-->
-		 <div class="col-sm-8">
 			<!--<h4>Add a project</h3>
 			<div class="col-sm-8">-->
 
+			<br>
+			<h3>Add New</h3>
 			 <input style= "color: white" class= "task_name" type="text" id ="projectName" placeholder="Title"> <br>
-			</div>
+
+
 			<br>
 			<br>
 			<br>
-			<br>
-			<div class = "col-sm-1"></div>
-			<div class = "col-sm-1 title">
-				Tag
-			</div>
+				<!--TODO: Popupate select tag with user tags -->
+			<p>Tag</p><select style="color: black" id = "selectDropdown"></select>
 				<!-- add radio buttons w/ tags extract from backend -->
 
+			<br><br>
+			<p>Start time</p><input type="datetime" style="color: black; width:200px"id="realstart">
 			<br>
 			<br>
-			<div class = "col-sm-1"></div>
-			<div class = "col-sm-2 title">
-				Starts
-			</div>
-				<div class='col-md-3'>
-	        <div class="form-group">
-	            <div class='input-group date' id='datetimepicker6'>
-	                <input type='text' class="form-control" />
-	                <span class="input-group-addon">
-	                    <span class="glyphicon glyphicon-calendar"></span>
-	                </span>
-	            </div>
-	        </div>
-	    </div>
+			<p>End time</p><input type="datetime" style="color: black; width:200px"id="projectDate">
 			<br>
 			<br>
-			<div class = "col-sm-1"></div>
-			<div class = "col-sm-2 title">
-				Ends
-			</div>
-			<div class='col-md-3'>
-        <div class="form-group">
-            <div class='input-group date' id='datetimepicker7'>
-                <input type='text' class="form-control" />
-                <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                </span>
-            </div>
-        </div>
-    </div>
-		<br>
-		<div class = "col-sm-1"></div>
-		<div class = "col-sm-2 start-working-title">
-			 Start Working
-		</div>
-		<div class = "col-sm-4">
-			<select class = "start-working">
-			  <option value="volvo">None</option>
-			  <option value="saab">2 days ahead</option>
-			  <option value="opel">5 days ahead</option>
-			  <option value="audi">1 week ahead</option>
-			</select>
-		</div>
+			<br>
+			<p>How many days ahead do you want to start preparing?</p>
+			<input type="number" style="color: black; width:80px" id="startWorking" value="0">
+			<br><br>
 
-			<br>
-			<br>
-			<br>
-			<br>
-			<div class = "col-sm-1"></div>
-			<div class = "col-sm-1 title">
-				Location
-			</div>
-			<div class = "col-sm-1"></div>
-			<div class = "col-sm-8">
-				<input style= "color: white" class= "project_location" type="text" id ="projectLocation" placeholder="Event Location Here">
-			</div>
+			<button class="btn btn-sm btn-default" style="float:right;" onclick="addProjectToCalendar()">Save</button>
 
-			<br>
-			<br>
-
-			<div class = "col-sm-1"></div>
-			<div class = "col-sm-1 title">
-				Notes
-			</div>
-			<div class = "col-sm-1"></div>
-			<div class = "col-sm-8">
-				<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" placeholder="Enter Event Notes Here">
-			</div>
-
-			<div class = "col-sm-1">
-			<button class="btn btn-sm btn-default" style="float:right;" onclick="addUserClass()">Save</button>
-			</div>
 		 </div>
 	 </div>
 </div>
+
+
+
 
 <div id="introModal" class="modal" style= "display:none;">
 

@@ -178,9 +178,9 @@ function addCourse(user, courseId) {
     xhr.send(JSON.stringify(obj));
 }
 
-function removeCourse(user, courseId) {
+function removeCourse(userId, courseId) {
 
-    var obj = {"user" : user,  "courseId" : courseId };
+    var obj = {"courseId" : courseId , "userId" : userId };
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", 'http://localhost:5000/removeCourse/', true);

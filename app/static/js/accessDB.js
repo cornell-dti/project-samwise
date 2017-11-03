@@ -136,6 +136,16 @@ function getUserExams(id) {
     return JSON.parse(xhr.responseText);
 }
 
+function addTask(userid, taskname, course, duedate, details) {
+
+    var obj = {"userid" : userid, "taskname" : taskname, "course" : course,  "duedate" : duedate, "details" : details};
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", 'http://localhost:5000/addTask/', true);
+    xhr.setRequestHeader("Content-Type", "application/json")
+    console.log(JSON.stringify(obj));
+    xhr.send(JSON.stringify(obj));
+}
 
 function updateTask(taskId, taskName, courseId, tag, dueDate, details) {
 

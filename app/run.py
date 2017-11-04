@@ -248,8 +248,9 @@ def getTasks(userId):
         'taskName': item[2],
         'courseId': item[3],
         'tag': item[4],
-        'dueDate': item[5],
-        'details': item[6]
+        'startDate': item[5],
+        'dueDate': item[6],
+        'details': item[7]
     } for item in cursor.fetchall()]
 
     return jsonify(data)
@@ -269,26 +270,30 @@ def removeTask():
 
 
 @app.route('/addTask/', methods=['POST'])
-def addTaskCourse():
-    data = request.get_json(force=True)
-    userid = data['userid']
-    taskname = data['taskname']
-    course = data['course']
-    duedate = data['duedate']
-    details = data['details']
+def addTask():
+    task_id = -1
+    if request.method == 'POST':
+        data = request.get_json(force=True)
+        userid=data['userid']
+        taskname=data['taskname']
+        course=data['course']
+        tag=data['tag']
+        startdate=data['startdate']
+        duedate=data['duedate']
+        details=data['details']
 
-    connection = get_db()
+        connection = get_db()
 
-    try:
-        cursor = connection.cursor()
-        cursor.execute(
-            'INSERT INTO samwisedb.Task(user, taskName, courseId, dueDate, details) values (%s, %s, %s, %s, %s)',
-            (userid, taskname, course, duedate, details))
-        connection.commit()
-        task_id = cursor.lastrowid
-    finally:
-        print ('DONE')
-    return jsonify([task_id])
+        try:
+            cursor = connection.cursor()
+            query = "INSERT into samwisedb.Task(user, taskName, courseId, tag, startDate, dueDate, details) values (\"" + userid + "\", \"" + taskname + "\", \"" + course + "\", \"" + tag + "\", \"" +  startdate + "\", \"" +duedate + "\", \"" + details + "\");"
+            print(query)
+            cursor.execute(query)
+            connection.commit()
+            task_id = cursor.lastrowid
+        finally:
+            print ("DONE")
+    return json.dumps([task_id])
 
 
 @app.route('/updateTask/', methods=['POST'])

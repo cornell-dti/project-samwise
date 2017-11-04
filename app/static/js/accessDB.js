@@ -170,7 +170,7 @@ function addCourse(user, courseId) {
 
 function removeCourse(user, courseId) {
 
-    var obj = {"courseId" : courseId, "user" : user};
+    var obj = {"courseId" : courseId, "userId" : user};
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", 'http://localhost:5000/removeCourse/', true);
@@ -204,4 +204,13 @@ function removeCourseAndProjects (user, courseId) {
   xhr.setRequestHeader("Content-Type", "application/json")
   console.log(JSON.stringify(obj));
   xhr.send(JSON.stringify(obj));
+}
+
+function getColor(name) {
+  var xhr = new XMLHttpRequest();
+  var hash = name;
+  xhr.open("GET", 'http://localhost:5000/getColor/' + hash, false);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.send(null);
+  return JSON.parse(xhr.responseText);
 }

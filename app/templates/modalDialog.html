@@ -184,11 +184,14 @@
 			var startWorkingDateObj = new Date(realstart);
 			startWorkingDateObj.setDate(startWorkingDateObj.getDate() - start);
 			var startDate = startWorkingDateObj.toISOString();
+			var c = getColor(course);
+			console.log("COLOR " + c);
 			var newEvent = {
 				title : name,
 				start : startDate,
 				end : date,
 				className : course,
+				color : "#" + c
 			}
 
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
@@ -228,16 +231,22 @@
 						continue;
 					}
 					else{
+						var startWorkingExam = new Date(dateString);
+						startWorkingExam.setDate(startWorkingExam.getDate() - 7);
+						var startDate = startWorkingExam.toISOString();
+						var c = getColor(exams[k][j].courseId);
+						console.log("COLOR " + c);
 						var newEvent = {
 							title : exams[k][j].courseId,
-							start : dateString,
-							className : exams[k][j].courseId
+							start : startDate,
+							end : dateString,
+							className : exams[k][j].courseId,
+							color : "#" + c
 						}
-						console.log(newEvent.title);
 
 						$("#calendar").fullCalendar('addEventSource', [newEvent]);
 					}
-					
+
 
 				}
 			}
@@ -245,11 +254,13 @@
 
 			var events = getEvents(userid);
 			for (k = 0; k < events.length; k++){
+				var c = getColor(events[k].tagid);
 				var newEvent = {
 					title : events[k].eventName,
 					start : events[k].startTime,
 					end : events[k].endTime,
-					className : events[k].tagid
+					className : events[k].tagid,
+					color : "#" + c
 				}
 				$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			}

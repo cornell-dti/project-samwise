@@ -1,4 +1,4 @@
-# config.py
+import os
 
-# Enable Flask's debugging features. Should be False in production
-DEBUG = True
+SECRET_KEY = os.urandom(32)
+COLORS = ['4286f4', 'ed4040', 'd33fed', '17b236', '17c2ed']

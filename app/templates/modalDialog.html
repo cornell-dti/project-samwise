@@ -207,7 +207,6 @@
 				var date = exams[0][j].start;
 				date = date.split(", ");
 
-
 				//07 Dec 2017 09:00:00 GMT must become
 				//2010-01-09T12:30:00
 
@@ -311,6 +310,36 @@
 			}
 		}
 
+		function updateCalendar(){
+			var events = $("#calendar").fullCalendar('getEventSources');
+			var eventObjs = [];
+			for (k = 0; k < events.length; k++){
+				for (x = 0; x < events[k].events.length; x++){
+					eventObjs.push(events[k].events[x]);
+				}
+			}
+			var lst = document.getElementById("currentClasses").getElementsByTagName("li");
+			var lstPrime = [];
+			for (j = 0; j < lst.length; j++){
+				lstPrime.push(lst[j].getElementsByTagName("a")[0].innerHTML);
+			}
+			console.log(lstPrime);
+
+			for (i = 0; i < eventObjs.length; i++){
+				console.log(eventObjs[i].className[0]);
+				if (eventObjs[i].className.length == 1 && lstPrime.indexOf(eventObjs[i].className[0]) != -1){
+					console.log("remove " + eventObjs[i].title);
+					removeEvent(eventObjs[i].title);
+				}
+			}
+			$("#calendar").fullCalendar('removeEvents');
+			syncGoogleToFullCalendar();
+			addStoredEvents();
+
+			$("#calendar").fullCalendar('rerenderEvents');
+			introModal.style.display = 'none';
+		}
+
 </script>
 
 
@@ -336,10 +365,10 @@
 				<!-- add radio buttons w/ tags extract from backend -->
 
 			<br><br>
-			<p>Start time</p><input type="datetime" style="color: black; width:200px"id="realstart">
+			<p>Start time</p><input type="datetime-local" style="color: black; width:200px"id="realstart">
 			<br>
 			<br>
-			<p>End time</p><input type="datetime" style="color: black; width:200px"id="projectDate">
+			<p>End time</p><input type="datetime-local" style="color: black; width:200px"id="projectDate">
 			<br>
 			<br>
 			<br>
@@ -362,27 +391,20 @@
 		      <div class="modal-content">
 			<div class="modal-header" style="background-color: #4a4a4a;" >
 			<span class = "close" id = "closeIntro">&times;</span>
-			  <h2>Welcome</h2>
+			  <h2>Settings</h2>
 
-			  <div class="col-sm-8">
-					<h4>Add courses to your schedule!</h3>
+					<h4>Add courses and event tags to your schedule</h3>
 
-					<div class="col-sm-8">
 						<input style="background-color: white; color: black;" id="classSearchIntro"
 						type="text" placeholder="Search Classes at Cornell"
 						/>
 						<button class="btn btn-sm btn-default" style="float:right;" onclick="addUserClass()">Save</button>
 						<br><br>
-						<h4>Current classes (click to remove):</h4>
+						<h4>Current classes and tags (click to remove):</h4>
 						<ul id = "currentClasses">
 						</ul>
 
-					</div>
-
-					<div class="col-sm-4">
-
-					</div>
-				</div>
+						<button class="btn btn-sm btn-default" style="float:right;" onclick="updateCalendar()">Save tags</button>
 
 			</div>
 

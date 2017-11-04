@@ -1,9 +1,46 @@
 import os
+import datetime
+import config
 import mysql.connector
+from urllib2 import HTTPError
 from flask import Flask, render_template, url_for, redirect, request, session, jsonify, g
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
+from requests_oauthlib import OAuth2Session
 
 app = Flask(__name__)
-app.config.from_object('config')
+app.config.from_object(config)
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+db = SQLAlchemy(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+login_manager.session_protection = 'strong'
+
+
+class UserData(db.Model, UserMixin):
+    __tablename__ = 'samwisedb.UserData'
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    name = db.Column(db.String(255), nullable=True)
+    netid = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow())
+
+
+def google_auth(state=None, token=None):
+    if token:
+        return OAuth2Session(app.config['GOOGLE_CLIENT_ID'], token=token)
+    if state:
+        return OAuth2Session(
+            app.config['GOOGLE_CLIENT_ID'],
+            state=state,
+            redirect_uri=app.config['REDIRECT_URI']
+        )
+    return OAuth2Session(
+        app.config['GOOGLE_CLIENT_ID'],
+        redirect_uri=app.config['REDIRECT_URI'],
+        scope=app.config['SCOPE']
+    )
 
 
 def get_db():
@@ -11,6 +48,13 @@ def get_db():
         g.db = mysql.connector.connect(user=os.getenv('SAMWISE_USERNAME'), password=os.getenv('SAMWISE_PASSWORD'),
                                        host=os.getenv('SAMWISE_DB'))
     return g.db
+
+
+@login_manager.user_loader
+def load_user(id):
+    if id is None:
+        return None
+    return UserData.query.get(id)
 
 
 @app.teardown_appcontext
@@ -21,26 +65,76 @@ def close_db(error):
 
 @app.route('/')
 def index():
-    if 'netid' in session:
-        app.logger.debug('NetID: ' + session['netid'])
-        return redirect(url_for('calData', userid=session['netid']))
     return render_template('index.html')
 
 
+@app.route('/login')
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    google = google_auth()
+    auth_url, state = google.authorization_url(
+        app.config['AUTH_URI'],
+        access_type='offline'
+    )
+    session['oauth_state'] = state
+    return redirect(auth_url)
+
+
+@app.route('/gauth_callback')
+def callback():
+    if current_user and current_user.is_authenticated:
+        return redirect(url_for('index'))
+    if 'error' in request.args:
+        print('error while logging in: %s' % request['error'])
+        return redirect(url_for('index'))
+    if 'code' not in request.args and 'state' not in request.args:
+        return redirect(url_for('login'))
+    google = google_auth(state=session['oauth_state'])
+    try:
+        token = google.fetch_token(
+            app.config['TOKEN_URI'],
+            client_secret=app.config['GOOGLE_CLIENT_SECRET'],
+            authorization_response=request.url
+        )
+    except HTTPError:
+        print('Encountered an HTTPError while logging in.')
+        return redirect(url_for('index'))
+    google = google_auth(token=token)
+    resp = google.get(app.config['USER_INFO'])
+    if resp.status_code == 200:
+        user_data = resp.json()
+        email = user_data['email']
+        user = UserData.query.filter_by(email=email).first()
+        if not user:
+            user = UserData()
+            user.email = email
+        user.name = user_data['name']
+        user.netid = email.split('@')[0]
+        db.session.add(user)
+        db.session.commit()
+        login_user(user)
+    return redirect(url_for('index'))
+
+
 @app.route('/calendar')
+@login_required
 def calendar():
+    print('Current user: %s' % current_user.netid)
     return render_template('calendar.html')
 
 
 @app.route('/<userid>')
+@login_required
 def calData(userid):
-    if 'netid' in session:
+    if current_user.netid == userid:
         app.logger.debug('User ID Data For ' + session['netid'])
         return render_template('index.html', netid=userid)
     return redirect(url_for('index'))
 
 
 @app.route('/getUserExams/<netId>')
+@login_required
 def getUserExams(netId):
     connection = get_db()
     cursor = connection.cursor()
@@ -55,6 +149,7 @@ def getUserExams(netId):
 
 
 @app.route('/getAllCourses')
+@login_required
 def getAllCourses():
     # Open the connection to database
     connection = get_db()
@@ -65,6 +160,7 @@ def getAllCourses():
 
 
 @app.route('/getUserCourses/<netId>')
+@login_required
 def getUserCourses(netId):
     # Open the connection to database
     connection = get_db()
@@ -75,6 +171,7 @@ def getUserCourses(netId):
 
 
 @app.route('/addCourse/', methods=['POST'])
+@login_required
 def addCourse():
     data = request.get_json(force=True)
     courseId = data['courseId']
@@ -88,6 +185,7 @@ def addCourse():
 
 
 @app.route('/removeCourse/', methods=['POST'])
+@login_required
 def removeCourse():
     data = request.get_json(force=True)
     courseId = data['courseId']
@@ -100,6 +198,7 @@ def removeCourse():
 
 
 @app.route('/getProjects/<userId>')
+@login_required
 def getProjects(userId):
     connection = get_db()
     cursor = connection.cursor()
@@ -114,6 +213,7 @@ def getProjects(userId):
 
 
 @app.route('/removeProject/', methods=['POST'])
+@login_required
 def removeProject():
     data = request.get_json(force=True)
     projectId = data['projectId']
@@ -126,6 +226,7 @@ def removeProject():
 
 
 @app.route('/updateProject/', methods=['POST'])
+@login_required
 def updateProject():
     data = request.get_json(force=True)
     projectId = data['projectid']
@@ -145,6 +246,7 @@ def updateProject():
 
 
 @app.route('/addProject/', methods=['POST'])
+@login_required
 def addProject():
     data = request.get_json(force=True)
     userId = data['userId']
@@ -165,18 +267,21 @@ def addProject():
 
 
 @app.route('/getEvents/<userid>')
+@login_required
 def getEvents(userid):
     connection = get_db()
 
     cursor = connection.cursor()
-    cursor.execute('SELECT DISTINCT * FROM samwisedb.Event WHERE user = %s', userid)
-    data = [{'eventId': str(item[1]), 'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]), 'tagId': str(item[5])} for
+    cursor.execute('SELECT DISTINCT * FROM samwisedb.Event WHERE user = %s', (userid,))
+    data = [{'eventId': str(item[1]), 'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]),
+             'tagId': str(item[5])} for
             item in cursor.fetchall()]
 
     return jsonify(data)
 
 
 @app.route('/removeEvent/', methods=['POST'])
+@login_required
 def removeEvent():
     data = request.get_json(force=True)
     eventId = data['eventId']
@@ -193,6 +298,7 @@ def removeEvent():
 
 
 @app.route('/addEvent/', methods=['POST'])
+@login_required
 def addEvent():
     data = request.get_json(force=True)
     user = data['user']
@@ -216,6 +322,7 @@ def addEvent():
 
 
 @app.route('/updateEvent/', methods=['POST'])
+@login_required
 def updateEvent():
     data = request.get_json(force=True)
     eventId = data['eventId']
@@ -238,6 +345,7 @@ def updateEvent():
 
 
 @app.route('/getTasks/<userId>', methods=['GET'])
+@login_required
 def getTasks(userId):
     connection = get_db()
     cursor = connection.cursor()
@@ -257,6 +365,7 @@ def getTasks(userId):
 
 
 @app.route('/removeTask/', methods=['POST'])
+@login_required
 def removeTask():
     data = request.get_json(force=True)
     taskId = data['taskid']
@@ -270,23 +379,23 @@ def removeTask():
 
 
 @app.route('/addTask/', methods=['POST'])
+@login_required
 def addTask():
     task_id = -1
     if request.method == 'POST':
         data = request.get_json(force=True)
-        userid=data['userid']
-        taskname=data['taskname']
-        course=data['course']
-        tag=data['tag']
-        startdate=data['startdate']
-        duedate=data['duedate']
-        details=data['details']
-
+        userid = data['userid']
+        taskname = data['taskname']
+        course = data['course']
+        tag = data['tag']
+        startdate = data['startdate']
+        duedate = data['duedate']
+        details = data['details']
         connection = get_db()
 
         try:
             cursor = connection.cursor()
-            query = "INSERT into samwisedb.Task(user, taskName, courseId, tag, startDate, dueDate, details) values (\"" + userid + "\", \"" + taskname + "\", \"" + course + "\", \"" + tag + "\", \"" +  startdate + "\", \"" +duedate + "\", \"" + details + "\");"
+            query = "INSERT into samwisedb.Task(user, taskName, courseId, tag, startDate, dueDate, details) values (\"" + userid + "\", \"" + taskname + "\", \"" + course + "\", \"" + tag + "\", \"" + startdate + "\", \"" + duedate + "\", \"" + details + "\");"
             print(query)
             cursor.execute(query)
             connection.commit()
@@ -297,6 +406,7 @@ def addTask():
 
 
 @app.route('/updateTask/', methods=['POST'])
+@login_required
 def updateTask():
     data = request.get_json(force=True)
     taskid = data['taskid']
@@ -323,6 +433,7 @@ def updateTask():
 
 
 @app.route('/exams/<course_id>')
+@login_required
 def getExams(course_id):
     # Open the connection to database
     connection = get_db()
@@ -344,6 +455,7 @@ def getClassInfo(courseId):
 
 
 @app.route('/addSubtask/', methods=['POST'])
+@login_required
 def addSubtask():
     data = request.get_json(force=True)
     projectId = data['projectId']
@@ -357,6 +469,7 @@ def addSubtask():
 
 
 @app.route('/removeSubtask/', methods=['POST'])
+@login_required
 def removeSubtask():
     data = request.get_json(force=True)
     subtaskId = data['subtaskId']
@@ -368,6 +481,7 @@ def removeSubtask():
 
 
 @app.route('/updateSubtask/', methods=['POST'])
+@login_required
 def updateSubtask():
     data = request.get_json(force=True)
     subtaskId = data['subtaskId']
@@ -380,18 +494,23 @@ def updateSubtask():
 
 
 @app.route('/getColor/<name>')
+@login_required
 def getColor(name):
     return jsonify([app.config['COLORS'][hash(name) % len(app.config['COLORS'])]])
 
 
 @app.route('/getUserCourseColor/<userId>/<courseId>')
+@login_required
 def getUserCourseColor(userId, courseId):
     # Open the connection to database
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT netId, courseId, color FROM samwisedb.User WHERE netId = %s AND courseId = %s', (userId, courseId))
+    cursor.execute('SELECT netId, courseId, color FROM samwisedb.User WHERE netId = %s AND courseId = %s',
+                   (userId, courseId))
     data = [item[2] for item in cursor.fetchall()]
     return jsonify(data)
 
+
 if __name__ == '__main__':
+    db.create_all()
     app.run(debug=True)

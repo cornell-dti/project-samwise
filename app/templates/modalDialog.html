@@ -15,6 +15,7 @@
 				}
 				var closeIntro = document.getElementById("closeIntro");
 				closeIntro.onclick = function(){
+					document.getElementById("classSearchIntro").value = "";
 					intromodal.style.display = 'none';
 				}
 				var closeProject = document.getElementById("closeProject");
@@ -97,6 +98,7 @@
 
     function introAdd() {
         var modal = document.getElementById('introModal');
+				document.getElementById("classSearchIntro").value = "";
         modal.style.display = 'block';
     }
 
@@ -204,34 +206,42 @@
 			if (exams.length < 1){
 				return;
 			}
+			for (k = 0; k < exams.length; k++){
+				for (j = 0; j < exams[k].length; j++){
 
-			for (j = 0; j < exams[0].length; j++){
+					var date = exams[k][j].start;
+					date = date.split(", ");
 
-				var date = exams[0][j].start;
-				date = date.split(", ");
+					//07 Dec 2017 09:00:00 GMT must become
+					//2010-01-09T12:30:00
 
-				//07 Dec 2017 09:00:00 GMT must become
-				//2010-01-09T12:30:00
+					date = date[1].split(" ");
+					function getMonthFromString(mon){
+					   return new Date(Date.parse(mon +" 1, 2012")).getMonth()+1
+					}
+					var monthNum = getMonthFromString(date[1]);
 
-				date = date[1].split(" ");
-				function getMonthFromString(mon){
-				   return new Date(Date.parse(mon +" 1, 2012")).getMonth()+1
+					var dateString = date[2] + "-" + parseInt(monthNum) +
+										"-" + date[0] + "T" + date[3];
+
+					if (exams[k][j].courseId === 'undefined'){
+						continue;
+					}
+					else{
+						var newEvent = {
+							title : exams[k][j].courseId,
+							start : dateString,
+							className : exams[k][j].courseId
+						}
+						console.log(newEvent.title);
+
+						$("#calendar").fullCalendar('addEventSource', [newEvent]);
+					}
+					
+
 				}
-				var monthNum = getMonthFromString(date[1]);
-
-				var dateString = date[2] + "-" + parseInt(monthNum) +
-									"-" + date[0] + "T" + date[3];
-
-				var newEvent = {
-					title : exams[0][j].courseId,
-					start : dateString,
-					className : exams[0][j].courseId
-				}
-
-				$("#calendar").fullCalendar('addEventSource', [newEvent]);
-
-
 			}
+
 
 			var events = getEvents(userid);
 			for (k = 0; k < events.length; k++){
@@ -309,6 +319,7 @@
 			}
 			if (className.length > 0){
 				addCourse(userid, className);
+				console.log(className);
 				populateUserCourses();
 			}
 		}
@@ -343,8 +354,8 @@
 			}
 			$("#calendar").fullCalendar('removeEvents');
 
-			syncGoogleToFullCalendar();
 			addStoredEvents();
+			syncGoogleToFullCalendar();
 
 			$("#calendar").fullCalendar('rerenderEvents');
 			introModal.style.display = 'none';

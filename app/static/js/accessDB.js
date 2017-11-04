@@ -163,18 +163,18 @@ function addCourse(user, courseId) {
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", 'http://localhost:5000/addCourse/', true);
-    xhr.setRequestHeader("Content-Type", "application/json")
+    xhr.setRequestHeader("Content-Type", "application/json");
     console.log(JSON.stringify(obj));
     xhr.send(JSON.stringify(obj));
 }
 
 function removeCourse(user, courseId) {
 
-    var obj = {"user" : user,  "courseId" : courseId };
+    var obj = {"courseId" : courseId, "user" : user};
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", 'http://localhost:5000/removeCourse/', true);
-    xhr.setRequestHeader("Content-Type", "application/json")
+    xhr.setRequestHeader("Content-Type", "application/json");
     console.log(JSON.stringify(obj));
     xhr.send(JSON.stringify(obj));
 }

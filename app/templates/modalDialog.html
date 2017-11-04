@@ -176,6 +176,9 @@
 			if (course === 'undefined'){
 				course = "Blank";
 			}
+			if (start < 1){
+				start = 1;
+			}
 			var startWorkingDateObj = new Date(realstart);
 			startWorkingDateObj.setDate(startWorkingDateObj.getDate() - start);
 			var startDate = startWorkingDateObj.toISOString();
@@ -184,8 +187,8 @@
 				start : startDate,
 				end : date,
 				className : course,
-				actualstart : realstart
 			}
+
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			$("#calendar").fullCalendar('rerenderEvents');
 
@@ -312,6 +315,7 @@
 
 		function updateCalendar(){
 			var events = $("#calendar").fullCalendar('getEventSources');
+			var userEvents = getEvents(userid);
 			var eventObjs = [];
 			for (k = 0; k < events.length; k++){
 				for (x = 0; x < events[k].events.length; x++){
@@ -323,16 +327,22 @@
 			for (j = 0; j < lst.length; j++){
 				lstPrime.push(lst[j].getElementsByTagName("a")[0].innerHTML);
 			}
-			console.log(lstPrime);
 
-			for (i = 0; i < eventObjs.length; i++){
-				console.log(eventObjs[i].className[0]);
-				if (eventObjs[i].className.length == 1 && lstPrime.indexOf(eventObjs[i].className[0]) != -1){
-					console.log("remove " + eventObjs[i].title);
-					removeEvent(eventObjs[i].title);
+			// for (i = 0; i < eventObjs.length; i++){
+			// 	if (eventObjs[i].className.length == 1 && lstPrime.indexOf(eventObjs[i].className[0]) == -1){
+			// 		console.log(eventObjs[i].className[0] + " " + eventObjs[i].title);
+			// 		removeEvent(eventObjs[i].title);
+			// 	}
+			// }
+			for (i = 0; i < userEvents.length; i++){
+				console.log(userEvents[i]);
+				if (userEvents[i].tagId.length > 0 && lstPrime.indexOf(userEvents[i].tagId) == -1){
+					console.log(userEvents[i].eventId + " " + userEvents[i].eventName);
+					removeEvent(userEvents[i].eventId);
 				}
 			}
 			$("#calendar").fullCalendar('removeEvents');
+
 			syncGoogleToFullCalendar();
 			addStoredEvents();
 

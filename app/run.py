@@ -130,10 +130,10 @@ def addCourse():
 def removeCourse():
     data = request.get_json(force=True)
     courseId = data['courseId']
-    userId = data['userId']
+    userId = data['user']
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM samwisedb.User WHERE (userId, courseId) = (%s, %s)', (userId, courseId))
+    cursor.execute('DELETE FROM samwisedb.User WHERE (netId, courseId) = (%s, %s)', (userId, courseId))
     connection.commit()
     return jsonify([])
 
@@ -207,7 +207,7 @@ def getEvents(userid):
     query = "SELECT DISTINCT * FROM samwisedb.Event WHERE user = \"" + userid + "\";"
     cursor.execute(query)
 
-    data = [{"eventName" : str(item[2]), "startTime" : str(item[3]), "endTime" : str(item[4]), "tagId" : str(item[5])} for item in cursor.fetchall()]
+    data = [{"eventId": str(item[1]), "eventName" : str(item[2]), "startTime" : str(item[3]), "endTime" : str(item[4]), "tagId" : str(item[5])} for item in cursor.fetchall()]
 
     return json.dumps(data)
 

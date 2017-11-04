@@ -262,3 +262,11 @@ li a:focus {
 	border:0 none;
 	/*border: 1px solid #ddd;*/
 }
+
+
+/*style calendar*/
+
+#calendar{
+	margin-left: 20%;
+	margin-right: 20%;
+}

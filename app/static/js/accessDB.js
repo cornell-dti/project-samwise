@@ -235,3 +235,13 @@ function getColor(name) {
   xhr.send(null);
   return JSON.parse(xhr.responseText);
 }
+
+function getUserCourseColor(userId, courseId) {
+  var xhr = new XMLHttpRequest();
+  var netId = userId;
+  var course_id = courseId;
+  xhr.open("GET", 'http://localhost:5000/getUserCourseColor/' + netId + '/' + course_id, false);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.send(null);
+  return JSON.parse(xhr.responseText);
+}

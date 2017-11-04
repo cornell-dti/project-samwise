@@ -383,33 +383,57 @@
 		 <br>-->
 			<!--<h4>Add a project</h3>
 			<div class="col-sm-8">-->
+			<div class = "col-sm-12">
+				<br>
+				<h3>Add New</h3>
+				 <input style= "color: white" class= "task_name" type="text" id ="projectName" placeholder="Title"> <br>
+				 <div class = "col-sm-4"></div>
+	 			<br>
+	 		  <br>
+	 			<br>
+	 			<br>
 
-			<br>
-			<h3>Add New</h3>
-			 <input style= "color: white" class= "task_name" type="text" id ="projectName" placeholder="Title"> <br>
+					<!--TODO: Popupate select tag with user tags -->
+					<div class = "col-sm-2 title">
+						Tag
+					</div>
+					<select style="color: black" id = "selectDropdown"></select>
+					<!-- add radio buttons w/ tags extract from backend -->
 
+				<br><br>
+				<div class = "col-sm-2 title">
+					Starts
+				</div>
+				<input type="datetime-local" style="color: black; width:200px"id="realstart">
+				<br>
+				<br>
+				<div class = "col-sm-2 title">
+					Ends
+				</div>
+				<input type="datetime-local" style="color: black; width:200px"id="projectDate">
+				<br>
+				<br>
+				<br>
+				<div class = "col-sm-2 title">
+					Start working
+				</div>
+				<input class = "col-sm-1" type="number" style="color: black; width:80px" id="startWorking" value="0">
+				<div class = "col-sm-2 title days-ahead">Days Ahead</div>
+				<br><br>
 
-			<br>
-			<br>
-			<br>
-				<!--TODO: Popupate select tag with user tags -->
-			<p>Tag</p><select style="color: black" id = "selectDropdown"></select>
-				<!-- add radio buttons w/ tags extract from backend -->
+				<br>
+				<div class = "col-sm-2 title">
+					Location
+				</div>
+					<input style= "color: white" class= "project_location" type="text" id ="projectLocation" placeholder="Event Location Here">
+				<div class = "col-sm-2 title">
+					Notes
+				</div>
+					<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" placeholder="Enter Event Notes Here">
+			 </div>
 
-			<br><br>
-			<p>Start time</p><input type="datetime-local" style="color: black; width:200px"id="realstart">
-			<br>
-			<br>
-			<p>End time</p><input type="datetime-local" style="color: black; width:200px"id="projectDate">
-			<br>
-			<br>
-			<br>
-			<p>How many days ahead do you want to start preparing?</p>
-			<input type="number" style="color: black; width:80px" id="startWorking" value="0">
-			<br><br>
-
-			<button class="btn btn-sm btn-default" style="float:right;" onclick="addProjectToCalendar()">Save</button>
-
+				<button class="btn btn-sm btn-default" style="float:right;" onclick="addProjectToCalendar()">Save</button>
+			</div>
 		 </div>
 	 </div>
 </div>

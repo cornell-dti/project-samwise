@@ -383,6 +383,15 @@ def updateSubtask():
 def getColor(name):
     return jsonify([app.config['COLORS'][hash(name) % len(app.config['COLORS'])]])
 
+@app.route('/getUserCourseColor/<userId>/<courseId>')
+def getUserCourseColor(userId, courseId):
+    # Open the connection to database
+    connection = get_db()
+    cursor = connection.cursor()
+    cursor.execute('SELECT netId, courseId, color FROM samwisedb.User WHERE netId = %s AND courseId = %s', (userId, courseId))
+    data = [item[2] for item in cursor.fetchall()]
+    return jsonify(data)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

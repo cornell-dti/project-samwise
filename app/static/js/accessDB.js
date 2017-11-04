@@ -229,7 +229,8 @@ function removeCourseAndProjects (user, courseId) {
 
 function getColor(name) {
   var xhr = new XMLHttpRequest();
-  xhr.open("GET", 'http://localhost:5000/getColor/' + name, false);
+  var hash = name;
+  xhr.open("GET", 'http://localhost:5000/getColor/' + hash, false);
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.send(null);
   return JSON.parse(xhr.responseText);

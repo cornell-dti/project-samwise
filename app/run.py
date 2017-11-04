@@ -381,7 +381,7 @@ def updateSubtask():
 
 @app.route('/getColor/<name>')
 def getColor(name):
-    return app.config['COLORS'][hash(name) % len(app.config['COLORS'])]
+    return jsonify([app.config['COLORS'][hash(name) % len(app.config['COLORS'])]])
 
 
 if __name__ == '__main__':

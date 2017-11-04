@@ -170,7 +170,7 @@ def getEvents(userid):
 
     cursor = connection.cursor()
     cursor.execute('SELECT DISTINCT * FROM samwisedb.Event WHERE user = %s', userid)
-    data = [{'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]), 'tagId': str(item[5])} for
+    data = [{'eventId': str(item[1]), 'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]), 'tagId': str(item[5])} for
             item in cursor.fetchall()]
 
     return jsonify(data)

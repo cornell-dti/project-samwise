@@ -13,6 +13,14 @@ input {
 		outline: none;
 }
 
+.btn-lg{
+	background-color: #ffffff;
+	border-radius: 20px;
+	width: 135px;
+	font-size: 16px;
+	border-color: #ffffff;
+	padding: 8px 12px;
+}
 
 
 .task_name {
@@ -21,15 +29,19 @@ input {
 	background-color: rgba(255, 5, 35, 0.7);
 }
 
-.project_location, .project_notes {
+.project_location, .project_notes, .start_working {
 	background-color: rgba(255, 5, 35, 0.7);
+	color: white;
+	opacity: 0.5;
 }
 
 .title{
 	font-size: 16px;
 }
 
-
+input[type=number]{
+	color: white;
+}
 
 input::placeholder{
 	color: white;

@@ -379,12 +379,7 @@
 	<div class="modal-content">
 	 <div class="modal-header" style="background-color: rgba(255, 5, 35, 1); opacity: 0.7">
 		 <span class="close" id="closeProject">&times;</span>
-		 <!--<h2>Add A Project</h2>
-		 <br>-->
-			<!--<h4>Add a project</h3>
-			<div class="col-sm-8">-->
 			<div class = "col-sm-12">
-				<br>
 				<h3>Add New</h3>
 				 <input style= "color: white" class= "task_name" type="text" id ="projectName" placeholder="Title"> <br>
 				 <div class = "col-sm-4"></div>
@@ -417,7 +412,7 @@
 				<div class = "col-sm-2 title">
 					Start working
 				</div>
-				<input class = "col-sm-1" type="number" style="color: black; width:80px" id="startWorking" value="0">
+				<input class = "col-sm-1 start_working" type="number" style="color: black; width:80px" id="startWorking" value="0">
 				<div class = "col-sm-2 title days-ahead">Days Ahead</div>
 				<br><br>
 
@@ -432,7 +427,10 @@
 					<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" placeholder="Enter Event Notes Here">
 			 </div>
 
-				<button class="btn btn-sm btn-default" style="float:right;" onclick="addProjectToCalendar()">Save</button>
+				<button class="btn btn-lg btn-default" style="float:right;" onclick="addProjectToCalendar()">Save</button>
+
+				<br>
+				<br>
 			</div>
 		 </div>
 	 </div>

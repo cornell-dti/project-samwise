@@ -170,8 +170,8 @@ def getEvents(userid):
 
     cursor = connection.cursor()
     cursor.execute('SELECT DISTINCT * FROM samwisedb.Event WHERE user = %s', (userid,))
-    data = [{'eventId' : str(item[1]), 'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]), 'tagId': str(item[5])} for
-            item in cursor.fetchall()]
+    data = [{'eventId': str(item[1]), 'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]), 'tagId': str(item[5]), 'notes': str(item[6]), 'location': str(item[7])} for
+                 item in cursor.fetchall()]
 
     return jsonify(data)
 
@@ -200,14 +200,16 @@ def addEvent():
     startTime = data['startTime']
     endTime = data['endTime']
     tagId = data['tagId']
+    notes = data['notes']
+    location = data['location']
 
     connection = get_db()
 
     try:
         cursor = connection.cursor()
         cursor.execute(
-            'INSERT INTO samwisedb.Event(user, eventName, startTime, endTime, tagId) values (%s, %s, %s, %s, %s)',
-            (user, eventName, startTime, endTime, tagId))
+             'INSERT INTO samwisedb.Event(user, eventName, startTime, endTime, tagId, notes, location) values (%s, %s, %s, %s, %s, %s, %s)',
+            (user, eventName, startTime, endTime, tagId, notes, location))
         connection.commit()
         event_id = cursor.lastrowid
     finally:
@@ -223,14 +225,16 @@ def updateEvent():
     startTime = data['startTime']
     endTime = data['endTime']
     tagId = data['tagId']
+    notes = data['notes']
+    location = data['location']
 
     connection = get_db()
 
     try:
         cursor = connection.cursor()
         cursor.execute(
-            'UPDATE samwisedb.Event SET eventName=%s, startTime=%s, endTime=%s, tagId=%s WHERE eventId=%s',
-            (eventName, startTime, endTime, tagId, eventId))
+            'UPDATE samwisedb.Event SET eventName=%s, startTime=%s, endTime=%s, tagId=%s, notes=%s, location=%s WHERE eventId=%s',
+            (eventName, startTime, endTime, tagId, eventId, notes, location))
         connection.commit()
     finally:
         print ('DONE')

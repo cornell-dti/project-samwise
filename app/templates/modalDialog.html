@@ -155,6 +155,8 @@
 			course = document.getElementById("selectDropdown").value;
 			start = document.getElementById("startWorking").value;
 			realstart = document.getElementById("realstart").value;
+			location = document.getElementById("projectLocation").value;
+			notes = document.getElementById("projectNotes").value;
 
 			if (name === 'undefined'){
 				name = "Empty"
@@ -191,13 +193,15 @@
 				start : startDate,
 				end : date,
 				className : course,
-				color : c
+				color : c,
+				notes : notes,
+				location : location
 			}
 
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			$("#calendar").fullCalendar('rerenderEvents');
 
-			addEvent(userid, name, startDate, date, course);
+			addEvent(userid, name, startDate, date, course, location, notes);
 
 			var modal = document.getElementById('addProjectModal');
 			modal.style.display = 'none';

@@ -1,8 +1,9 @@
 import os
 import datetime
 import config
+import urllib2
+import json
 import mysql.connector
-from urllib2 import HTTPError
 from flask import Flask, render_template, url_for, redirect, request, session, jsonify, g
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
@@ -29,6 +30,7 @@ class UserData(db.Model, UserMixin):
 
 def google_auth(state=None, token=None):
     if token:
+        session['bearer_token'] = token['access_token']
         return OAuth2Session(app.config['GOOGLE_CLIENT_ID'], token=token)
     if state:
         return OAuth2Session(
@@ -108,7 +110,7 @@ def callback():
             client_secret=app.config['GOOGLE_CLIENT_SECRET'],
             authorization_response=request.url
         )
-    except HTTPError:
+    except urllib2.HTTPError:
         print('Encountered an HTTPError while logging in.')
         return redirect(url_for('index'))
     google = google_auth(token=token)
@@ -546,6 +548,17 @@ def getUserCourseColor(userId, courseId):
         data = [item[2] for item in cursor.fetchall()]
         return jsonify(data)
     return access_denied()
+
+
+@app.route('/getCalendarData')
+@login_required
+def getCalendarData():
+    url = 'https://www.googleapis.com/calendar/v3/calendars/primary/events'
+    token = session['bearer_token']
+    req = urllib2.Request(url, None, {'Authorization': 'Bearer %s' % token})
+    res = urllib2.urlopen(req)
+    return jsonify(json.loads(res.read()))
+
 
 
 def get_user_from_subtask_id(subtask_id):

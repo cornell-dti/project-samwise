@@ -185,16 +185,15 @@ def getUserCourses(netId):
 
 
 @app.route('/addCourse/', methods=['POST'])
-@login_required
 def addCourse():
     data = request.get_json(force=True)
     courseId = data['courseId']
     user = data['user']
-    if current_user.netid == user:
+    if current_user.is_authenticated and current_user.netid == user:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT * from samwisedb.User WHERE (userId, courseId) = (%s, %s)', (user, courseId))
-        if len(cursor.fetchall() == 0):
+        cursor.execute('SELECT * from samwisedb.User WHERE (netId, courseId) = (%s, %s)', (user, courseId))
+        if len(cursor.fetchall()) == 0:
             cursor.execute('INSERT INTO samwisedb.User(netId, courseId) VALUES (%s, %s)', (user, courseId))
         connection.commit()
         return success()
@@ -202,12 +201,11 @@ def addCourse():
 
 
 @app.route('/removeCourse/', methods=['POST'])
-@login_required
 def removeCourse():
     data = request.get_json(force=True)
     courseId = data['courseId']
     userId = data['userId']
-    if current_user.netid == userId:
+    if current_user.is_authenticated and current_user.netid == userId:
         connection = get_db()
         cursor = connection.cursor()
         cursor.execute('DELETE FROM samwisedb.User WHERE (userId, courseId) = (%s, %s)', (userId, courseId))
@@ -234,7 +232,6 @@ def getProjects(userId):
 
 
 @app.route('/removeProject/', methods=['POST'])
-@login_required
 def removeProject():
     data = request.get_json(force=True)
     projectId = data['projectId']
@@ -243,7 +240,7 @@ def removeProject():
     cursor.execute('SELECT user FROM samwisedb.Project WHERE projectId = %s', (projectId,))
     user_rows = cursor.fetchall()
 
-    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
+    if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute('DELETE FROM samwisedb.Project WHERE projectId = %s', (projectId,))
         cursor.execute('DELETE FROM samwisedb.Subtask WHERE projectId = %s', (projectId,))
         connection.commit()
@@ -252,7 +249,6 @@ def removeProject():
 
 
 @app.route('/updateProject/', methods=['POST'])
-@login_required
 def updateProject():
     data = request.get_json(force=True)
     projectId = data['projectid']
@@ -265,7 +261,7 @@ def updateProject():
     cursor.execute('SELECT user FROM samwisedb.Project WHERE projectId = %s', (projectId,))
     user_rows = cursor.fetchall()
 
-    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
+    if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute('''
            UPDATE samwisedb.Project
            SET projectName=%s, dueDate=%s, courseId=%s
@@ -277,7 +273,6 @@ def updateProject():
 
 
 @app.route('/addProject/', methods=['POST'])
-@login_required
 def addProject():
     data = request.get_json(force=True)
     userId = data['userId']
@@ -285,7 +280,7 @@ def addProject():
     courseId = data['courseId']
     dueDate = data['dueDate']
     subtasks = data['subtasks']
-    if current_user.netid == userId:
+    if current_user.is_authenticated and current_user.netid == userId:
         connection = get_db()
         cursor = connection.cursor()
         cursor.execute('INSERT INTO samwisedb.Project(user, projectName, dueDate, courseId) VALUES (%s, %s, %s, %s)',
@@ -313,7 +308,6 @@ def getEvents(userid):
 
 
 @app.route('/removeEvent/', methods=['POST'])
-@login_required
 def removeEvent():
     data = request.get_json(force=True)
     eventId = data['eventId']
@@ -322,7 +316,7 @@ def removeEvent():
     cursor.execute('SELECT user FROM samwisedb.Event WHERE eventId = %s', (eventId,))
     user_rows = cursor.fetchall()
 
-    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
+    if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute('DELETE FROM samwisedb.Event WHERE eventId = %s', eventId)
         connection.commit()
         return success()
@@ -330,7 +324,6 @@ def removeEvent():
 
 
 @app.route('/addEvent/', methods=['POST'])
-@login_required
 def addEvent():
     data = request.get_json(force=True)
     user = data['user']
@@ -340,7 +333,7 @@ def addEvent():
     tagId = data['tagId']
     notes = data['notes']
     location = data['location']
-    if current_user.netid == user:
+    if current_user.is_authenticated and current_user.netid == user:
         connection = get_db()
         cursor = connection.cursor()
         cursor.execute(
@@ -353,7 +346,6 @@ def addEvent():
 
 
 @app.route('/updateEvent/', methods=['POST'])
-@login_required
 def updateEvent():
     data = request.get_json(force=True)
     eventId = data['eventId']
@@ -368,7 +360,7 @@ def updateEvent():
     cursor.execute('SELECT user FROM samwisedb.Event WHERE eventId = %s', (eventId,))
     user_rows = cursor.fetchall()
 
-    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
+    if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute(
             'UPDATE samwisedb.Event SET eventName=%s, startTime=%s, endTime=%s, tagId=%s, notes=%s, location=%s WHERE eventId=%s',
             (eventName, startTime, endTime, tagId, eventId, notes, location))
@@ -399,7 +391,6 @@ def getTasks(userId):
 
 
 @app.route('/removeTask/', methods=['POST'])
-@login_required
 def removeTask():
     data = request.get_json(force=True)
     taskId = data['taskid']
@@ -409,7 +400,7 @@ def removeTask():
     cursor.execute('SELECT user FROM samwisedb.Task WHERE taskId = %s', (taskId,))
     user_rows = cursor.fetchall()
 
-    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
+    if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute('DELETE FROM samwisedb.Task WHERE taskId = %s', taskId)
         connection.commit()
         return success()
@@ -417,7 +408,6 @@ def removeTask():
 
 
 @app.route('/addTask/', methods=['POST'])
-@login_required
 def addTask():
     data = request.get_json(force=True)
     userid = data['userid']
@@ -427,7 +417,7 @@ def addTask():
     startdate = data['startdate']
     duedate = data['duedate']
     details = data['details']
-    if current_user.netid == userid:
+    if current_user.is_authenticated and current_user.netid == userid:
         connection = get_db()
         cursor = connection.cursor()
         cursor.execute(
@@ -441,7 +431,6 @@ def addTask():
 
 
 @app.route('/updateTask/', methods=['POST'])
-@login_required
 def updateTask():
     data = request.get_json(force=True)
     taskid = data['taskid']
@@ -457,7 +446,7 @@ def updateTask():
     cursor.execute('SELECT user FROM samwisedb.Task WHERE taskId = %s', (taskid,))
     user_rows = cursor.fetchall()
 
-    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
+    if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute('''
            UPDATE samwisedb.Task
            SET taskName=%s, dueDate=%s, courseId=%s, details=%s
@@ -491,7 +480,6 @@ def getClassInfo(courseId):
 
 
 @app.route('/addSubtask/', methods=['POST'])
-@login_required
 def addSubtask():
     data = request.get_json(force=True)
     projectId = data['projectId']
@@ -502,7 +490,7 @@ def addSubtask():
     cursor.execute('SELECT user FROM samwisedb.Project WHERE projectId = %s', (projectId,))
     user_rows = cursor.fetchall()
 
-    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
+    if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute('INSERT INTO samwisedb.Subtask(projectId, subtask) VALUES (%s, %s)', (projectId, subtask))
         connection.commit()
         subtaskId = cursor.lastrowid
@@ -511,7 +499,6 @@ def addSubtask():
 
 
 @app.route('/removeSubtask/', methods=['POST'])
-@login_required
 def removeSubtask():
     data = request.get_json(force=True)
     subtaskId = data['subtaskId']
@@ -519,7 +506,7 @@ def removeSubtask():
     cursor = connection.cursor()
 
     user = get_user_from_subtask_id(subtaskId)
-    if user and current_user.netid == user:
+    if current_user.is_authenticated and user and current_user.netid == user:
         cursor.execute('DELETE FROM samwisedb.Subtask WHERE subtaskId = %s', (subtaskId,))
         connection.commit()
         return jsonify([subtaskId])
@@ -527,7 +514,6 @@ def removeSubtask():
 
 
 @app.route('/updateSubtask/', methods=['POST'])
-@login_required
 def updateSubtask():
     data = request.get_json(force=True)
     subtaskId = data['subtaskId']
@@ -535,7 +521,7 @@ def updateSubtask():
     connection = get_db()
     cursor = connection.cursor()
     user = get_user_from_subtask_id(subtaskId)
-    if user and current_user.netid == user:
+    if current_user.is_authenticated and user and current_user.netid == user:
         cursor.execute('UPDATE samwisedb.Subtask SET subtaskName = %s WHERE subtaskId = %s', (subtaskName, subtaskId))
         connection.commit()
         return jsonify([subtaskName])

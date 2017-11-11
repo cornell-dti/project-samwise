@@ -154,13 +154,13 @@
 
 		function addProjectToCalendar(){
 
-			name = document.getElementById("projectName").value;
-			date = document.getElementById("projectDate").value;
-			course = document.getElementById("selectDropdown").value;
-			start = document.getElementById("startWorking").value;
-			realstart = document.getElementById("realstart").value;
-			location = document.getElementById("projectLocation").value;
-			notes = document.getElementById("projectNotes").value;
+			var name = document.getElementById("projectName").value;
+			var date = document.getElementById("projectDate").value;
+			var course = document.getElementById("selectDropdown").value;
+			var start = document.getElementById("startWorking").value;
+			var realstart = document.getElementById("realstart").value;
+			var pLocation = document.getElementById("projectLocation").value;
+			var notes = document.getElementById("projectNotes").value;
 
 			if (name === 'undefined'){
 				name = "Empty"
@@ -204,13 +204,13 @@
 				tag : course,
 				color : c,
 				notes : notes,
-				location : location
+				location : pLocation
 			}
 
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			$("#calendar").fullCalendar('rerenderEvents');
 
-			// addEvent(userid, name, startDate, date, course, location, notes);
+			addEvent(userid, name, startDate, date, course, pLocation, notes);
 
 			var modal = document.getElementById('addProjectModal');
 			modal.style.display = 'none';

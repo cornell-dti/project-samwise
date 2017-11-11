@@ -65,30 +65,76 @@
 	$('#calendar').fullCalendar({
 
 		eventClick : function(event) {
-			console.log(event);
 			var modal = document.getElementById('eventDetailsModal');
 			var infoDiv = document.getElementById('information');
 
 			var tagTitle = document.createElement("h5");
-			tagTitle.append(document.createTextNode(event.tag));
-
+			if (event.tag === 'undefined'){
+				tagTitle.append(document.createTextNode("No tag"));
+			}
+			else{
+				tagTitle.append(document.createTextNode(event.tag));
+			}
 			infoDiv.append(tagTitle);
 
 			var t = document.createElement("h4");
-			t.append(document.createTextNode(event.title));
+			if (event.title === 'undefined'){
+				t.append(document.createTextNode("No title"));
+			}
+			else{
+				t.append(document.createTextNode(event.title));
+			}
 			infoDiv.append(t);
 
 			var t = document.createElement("h6");
-			t.append(document.createTextNode(event.end));
+
+			if (event.end === 'undefined'){
+				t.append(document.createTextNode("No end date"));
+			}
+			else{
+				t.append(document.createTextNode(event.end));
+			}
 			infoDiv.append(t);
 
 			var t = document.createElement("h6");
-			t.append(document.createTextNode(event.location));
+			if (event.location === 'undefined'){
+				t.append(document.createTextNode("No location"));
+			}
+			else{
+				t.append(document.createTextNode(event.location));
+			}
 			infoDiv.append(t);
 
 			var t = document.createElement("h6");
-			t.append(document.createTextNode(event.notes));
+			if (event.notes === 'undefined'){
+				t.append(document.createTextNode("No notes"));
+			}
+			else{
+				t.append(document.createTextNode(event.notes));
+			}
 			infoDiv.append(t);
+
+			var eId = event.eventId;
+
+			var button = document.createElement("button");
+			button.setAttribute("style", "float:left");
+			button.setAttribute("id", "removeButtonId");
+			button.append(document.createTextNode("Delete"));
+			infoDiv.append(button);
+
+			var b = document.getElementById("removeButtonId");
+			b.onclick = function(){
+				removeEvent(eId);
+				$("#calendar").fullCalendar('removeEvents');
+				addStoredEvents();
+				syncGoogleToFullCalendar();
+
+				$("#calendar").fullCalendar('rerenderEvents');
+				var info = document.getElementById("information");
+				info.innerHTML = "";
+
+				modal.style.display = 'none';
+			}
 
 			modal.style.display = 'block';
 		},
@@ -107,14 +153,19 @@
         if (events.length > 0) {
             for (i = 0; i < events.length; i++) {
                 var event = events[i];
-                var start = event.start.dateTime;
-                if (!start) {
-                    start = event.start.date;
-                }
-                var end = event.end.dateTime;
-                if (!end) {
-                    end = event.end.date;
-                }
+								if (event.start === undefined){
+									continue;
+								}
+								else{
+									var start = event.start.dateTime;
+	                if (!start) {
+	                    start = event.start.date;
+	                }
+	                var end = event.end.dateTime;
+	                if (!end) {
+	                    end = event.end.date;
+	                }
+								}
                 var newEvent = {"title" : event.summary, "start" : start, "end" : end}
                 eventSource.push(newEvent);
             }
@@ -141,6 +192,7 @@
 
     {% if auth %}
     syncGoogleToFullCalendar();
+		addStoredEvents();
     {% endif %}
 </script>
 </html>

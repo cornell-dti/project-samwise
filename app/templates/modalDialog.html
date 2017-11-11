@@ -8,6 +8,14 @@
         var notModal = document.getElementById('notificationModal');
 				var displayProjectModal = document.getElementById('addProjectModal');
 				var welcomeModal = document.getElementById("welcomeModal");
+				var eventDetailsModal = document.getElementById("eventDetailsModal");
+
+				var closeDetails = document.getElementById("closeEventDetails");
+				closeDetails.onclick = function(){
+					var info = document.getElementById("information");
+					info.innerHTML = "";
+					eventDetailsModal.style.display = 'none';
+				}
 
 				var closeWelcome = document.getElementById("closeWelcome");
 				closeWelcome.onclick = function(){
@@ -150,6 +158,7 @@
 
 
 		function addProjectToCalendar(){
+
 			name = document.getElementById("projectName").value;
 			date = document.getElementById("projectDate").value;
 			course = document.getElementById("selectDropdown").value;
@@ -185,14 +194,19 @@
 			}
 			var startWorkingDateObj = new Date(realstart);
 			startWorkingDateObj.setDate(startWorkingDateObj.getDate() - start);
+			startWorkingDateObj.setTime(startWorkingDateObj.getTime() - (5 * 60 * 60 * 1000));
 			var startDate = startWorkingDateObj.toISOString();
+
+			var dateObj = new Date(date);
+			dateObj.setTime(dateObj.getTime() - (5 * 60 * 60 * 1000));
+			date = dateObj.toISOString();
+
 			var c = getUserCourseColor(userid, course);
-			console.log("COLOR " + c);
 			var newEvent = {
 				title : name,
 				start : startDate,
 				end : date,
-				className : course,
+				tag : course,
 				color : c,
 				notes : notes,
 				location : location
@@ -201,7 +215,7 @@
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			$("#calendar").fullCalendar('rerenderEvents');
 
-			addEvent(userid, name, startDate, date, course, location, notes);
+			// addEvent(userid, name, startDate, date, course, location, notes);
 
 			var modal = document.getElementById('addProjectModal');
 			modal.style.display = 'none';
@@ -244,8 +258,10 @@
 							title : exams[k][j].courseId,
 							start : startDate,
 							end : dateString,
-							className : exams[k][j].courseId,
-							color : c
+							tag : exams[k][j].courseId,
+							color : c,
+							location : exams[k][j].location,
+							notes : exams[k][j].notes
 						}
 
 						$("#calendar").fullCalendar('addEventSource', [newEvent]);
@@ -259,12 +275,15 @@
 			var events = getEvents(userid);
 			for (k = 0; k < events.length; k++){
 				var c = getUserCourseColor(userid, events[k].tagid);
+				console.log("TAG" + events[k].eventName + " " + events[k].tagid);
 				var newEvent = {
 					title : events[k].eventName,
 					start : events[k].startTime,
 					end : events[k].endTime,
-					className : events[k].tagid,
-					color : c
+					tag : events[k].tagid,
+					color : c,
+					notes : events[k].notes,
+					location : events[k].location
 				}
 				$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			}
@@ -378,6 +397,14 @@
 
 </script>
 
+<div id = "eventDetailsModal" class="modal" style="display:none;">
+	<div class = "small-modal" id="eventDetaislModalContent">
+		<div class = "modal-header">
+			<span class="close" id="closeEventDetails">&times;</span>
+ 			<div id = "information"></div>
+		</div>
+	</div>
+</div>
 
 <div id = "addProjectModal" class="modal" style= "display:none;">
 	<div class="modal-content">
@@ -392,12 +419,10 @@
 	 			<br>
 	 			<br>
 
-					<!--TODO: Popupate select tag with user tags -->
 					<div class = "col-sm-2 title">
 						Tag
 					</div>
 					<select style="color: black" id = "selectDropdown"></select>
-					<!-- add radio buttons w/ tags extract from backend -->
 
 				<br><br>
 				<div class = "col-sm-2 title">

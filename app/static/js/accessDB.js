@@ -46,7 +46,6 @@ function addEvent(user, eventName, startTime, endTime, tagId) {
 
   var obj = {"user" : user, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId, "notes" : notes, "location" : location};
 
-
     var xhr = new XMLHttpRequest();
     xhr.open("POST", 'http://localhost:5000/addEvent/', true);
     xhr.setRequestHeader("Content-Type", "application/json")

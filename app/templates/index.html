@@ -59,6 +59,34 @@
 
 	$('#calendar').fullCalendar({
 
+		eventClick : function(event) {
+			console.log(event);
+			var modal = document.getElementById('eventDetailsModal');
+			var infoDiv = document.getElementById('information');
+
+			var tagTitle = document.createElement("h5");
+			tagTitle.append(document.createTextNode(event.tag));
+
+			infoDiv.append(tagTitle);
+
+			var t = document.createElement("h4");
+			t.append(document.createTextNode(event.title));
+			infoDiv.append(t);
+
+			var t = document.createElement("h6");
+			t.append(document.createTextNode(event.end));
+			infoDiv.append(t);
+
+			var t = document.createElement("h6");
+			t.append(document.createTextNode(event.location));
+			infoDiv.append(t);
+
+			var t = document.createElement("h6");
+			t.append(document.createTextNode(event.notes));
+			infoDiv.append(t);
+
+			modal.style.display = 'block';
+		},
 		header: {
 			right: 'prev,next,today',
 			// center: 'semester,month,agendaWeek,agendaDay'
@@ -144,11 +172,10 @@
 					populateUserCourses();
 					addStoredEvents();
 
-
-
 		      // location.reload();
 		      syncGoogleToFullCalendar();
 		    } else {
+					welcomeModal.style.display = 'block';
 		      authorizeButton.style.display = 'block';
 		      signoutButton.style.display = 'none';
 		    }

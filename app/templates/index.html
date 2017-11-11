@@ -13,14 +13,15 @@
 	<script src="../static/js/awesomplete.js" async></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
   <link rel='stylesheet' href='../static/js/fullcalendar-3.2.0/fullcalendar.css' />
 	<link rel='stylesheet' href='../static/css/stylesheet.css?version=06' />
 
   <script src='../static/js/fullcalendar-3.2.0/lib/jquery.min.js'></script>
   <script src='../static/js/fullcalendar-3.2.0/lib/moment.min.js'></script>
   <script src='../static/js/fullcalendar-3.2.0/fullcalendar.js'></script>
-
+	<script>
+		var userid = "{{ userid }}";
+	</script>
 	<script src = '../static/js/jquery-sortable.js'></script>
 	<script src = '../static/js/accessDB.js'></script>
 
@@ -38,8 +39,9 @@
 
 
 				<!-- "HELPER FUNCTIONS" -->
+			{% include 'modalDialog.html' %}
 			{% if not auth %}
-		    {% include 'modalDialog.html' %}
+			{% include 'welcomeModal.html' %}
 			{% endif %}
 
 			<div class="col-sm-12">
@@ -58,7 +60,6 @@
 
     </body>
 	<script>
-
 	$('#calendar').fullCalendar({
 
 		eventClick : function(event) {

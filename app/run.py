@@ -75,7 +75,8 @@ def close_db(error):
 
 @app.route('/')
 def index():
-    return render_template('index.html', auth=current_user.is_authenticated)
+    user_id = 'Anonymous' if not current_user.is_authenticated else current_user.netid
+    return render_template('index.html', auth=current_user.is_authenticated, userid=user_id)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -189,6 +190,7 @@ def getUserCourses(netId):
 @app.route('/addCourse/', methods=['POST'])
 def addCourse():
     data = request.get_json(force=True)
+    print(data)
     courseId = data['courseId']
     user = data['user']
     if current_user.is_authenticated and current_user.netid == user:
@@ -210,7 +212,7 @@ def removeCourse():
     if current_user.is_authenticated and current_user.netid == userId:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('DELETE FROM samwisedb.User WHERE (userId, courseId) = (%s, %s)', (userId, courseId))
+        cursor.execute('DELETE FROM samwisedb.User WHERE (netId, courseId) = (%s, %s)', (userId, courseId))
         connection.commit()
         return success()
     return access_denied()

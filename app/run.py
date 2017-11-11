@@ -50,6 +50,14 @@ def get_db():
     return g.db
 
 
+def access_denied():
+    return jsonify({'status': 'Access denied.'})
+
+
+def success():
+    return jsonify({'status': 'Success'})
+
+
 @login_manager.user_loader
 def load_user(id):
     if id is None:
@@ -68,10 +76,11 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    session['next'] = url_for('index') if 'next' not in request.args else request.args['next']
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(session['next'])
     google = google_auth()
     auth_url, state = google.authorization_url(
         app.config['AUTH_URI'],
@@ -83,12 +92,14 @@ def login():
 
 @app.route('/gauth_callback')
 def callback():
+    session['next'] = url_for('index') if 'next' not in session else session['next']
     if current_user and current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(session['next'])
     if 'error' in request.args:
         print('error while logging in: %s' % request['error'])
         return redirect(url_for('index'))
     if 'code' not in request.args and 'state' not in request.args:
+        print('error while logging in: %s' % request['error'])
         return redirect(url_for('login'))
     google = google_auth(state=session['oauth_state'])
     try:
@@ -114,7 +125,7 @@ def callback():
         db.session.add(user)
         db.session.commit()
         login_user(user)
-    return redirect(url_for('index'))
+    return redirect(session['next'])
 
 
 @app.route('/calendar')
@@ -128,7 +139,6 @@ def calendar():
 @login_required
 def calData(userid):
     if current_user.netid == userid:
-        app.logger.debug('User ID Data For ' + session['netid'])
         return render_template('index.html', netid=userid)
     return redirect(url_for('index'))
 
@@ -136,16 +146,18 @@ def calData(userid):
 @app.route('/getUserExams/<netId>')
 @login_required
 def getUserExams(netId):
-    connection = get_db()
-    cursor = connection.cursor()
-    cursor.execute('SELECT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
-    courses = [item[0] for item in cursor.fetchall()]
-    data = []
-    for courseId in courses:
-        cursor.execute('SELECT sections, time FROM samwisedb.Exam WHERE courseId = %s', (courseId,))
-        exam = [{'courseId': courseId, 'section': item[0], 'start': item[1]} for item in cursor.fetchall()]
-        data.append(exam)
-    return jsonify(data)
+    if current_user.netid == netId:
+        connection = get_db()
+        cursor = connection.cursor()
+        cursor.execute('SELECT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
+        courses = [item[0] for item in cursor.fetchall()]
+        data = []
+        for courseId in courses:
+            cursor.execute('SELECT sections, time FROM samwisedb.Exam WHERE courseId = %s', (courseId,))
+            exam = [{'courseId': courseId, 'section': item[0], 'start': item[1]} for item in cursor.fetchall()]
+            data.append(exam)
+        return jsonify(data)
+    return access_denied()
 
 
 @app.route('/getAllCourses')
@@ -162,12 +174,14 @@ def getAllCourses():
 @app.route('/getUserCourses/<netId>')
 @login_required
 def getUserCourses(netId):
-    # Open the connection to database
-    connection = get_db()
-    cursor = connection.cursor()
-    cursor.execute('SELECT DISTINCT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
-    data = [item[0] for item in cursor.fetchall()]
-    return jsonify(data)
+    if current_user.netid == netId:
+        # Open the connection to database
+        connection = get_db()
+        cursor = connection.cursor()
+        cursor.execute('SELECT DISTINCT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
+        data = [item[0] for item in cursor.fetchall()]
+        return jsonify(data)
+    return access_denied()
 
 
 @app.route('/addCourse/', methods=['POST'])
@@ -176,12 +190,15 @@ def addCourse():
     data = request.get_json(force=True)
     courseId = data['courseId']
     user = data['user']
-    connection = get_db()
-    cursor = connection.cursor()
-    # TODO: Make sure course exists and use does not already have course
-    cursor.execute('INSERT INTO samwisedb.User(netId, courseId) VALUES (%s, %s)', (user, courseId))
-    connection.commit()
-    return jsonify([])
+    if current_user.netid == user:
+        connection = get_db()
+        cursor = connection.cursor()
+        cursor.execute('SELECT * from samwisedb.User WHERE (userId, courseId) = (%s, %s)', (user, courseId))
+        if len(cursor.fetchall() == 0):
+            cursor.execute('INSERT INTO samwisedb.User(netId, courseId) VALUES (%s, %s)', (user, courseId))
+        connection.commit()
+        return success()
+    return access_denied()
 
 
 @app.route('/removeCourse/', methods=['POST'])
@@ -190,26 +207,30 @@ def removeCourse():
     data = request.get_json(force=True)
     courseId = data['courseId']
     userId = data['userId']
-    connection = get_db()
-    cursor = connection.cursor()
-    cursor.execute('DELETE FROM samwisedb.User WHERE (userId, courseId) = (%s, %s)', (userId, courseId))
-    connection.commit()
-    return jsonify([])
+    if current_user.netid == userId:
+        connection = get_db()
+        cursor = connection.cursor()
+        cursor.execute('DELETE FROM samwisedb.User WHERE (userId, courseId) = (%s, %s)', (userId, courseId))
+        connection.commit()
+        return success()
+    return access_denied()
 
 
 @app.route('/getProjects/<userId>')
 @login_required
 def getProjects(userId):
-    connection = get_db()
-    cursor = connection.cursor()
-    cursor.execute('SELECT DISTINCT * FROM samwisedb.Project WHERE user = %s', (userId,))
-    data = [{'projectId': item[1], 'projectName': item[2], 'date': item[3], 'courseId': item[4]} for item in
-            cursor.fetchall()]
-    for d in data:
-        cursor.execute('SELECT subtaskName FROM samwisedb.Subtask WHERE projectId = %s', (d['projectId'],))
-        subtasks = [item[0] for item in cursor.fetchall()]
-        d['subtasks'] = subtasks
-    return jsonify(data)
+    if current_user.netid == userId:
+        connection = get_db()
+        cursor = connection.cursor()
+        cursor.execute('SELECT DISTINCT * FROM samwisedb.Project WHERE user = %s', (userId,))
+        data = [{'projectId': item[1], 'projectName': item[2], 'date': item[3], 'courseId': item[4]} for item in
+                cursor.fetchall()]
+        for d in data:
+            cursor.execute('SELECT subtaskName FROM samwisedb.Subtask WHERE projectId = %s', (d['projectId'],))
+            subtasks = [item[0] for item in cursor.fetchall()]
+            d['subtasks'] = subtasks
+        return jsonify(data)
+    return access_denied()
 
 
 @app.route('/removeProject/', methods=['POST'])
@@ -219,10 +240,15 @@ def removeProject():
     projectId = data['projectId']
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM samwisedb.Project WHERE projectId = %s', (projectId,))
-    cursor.execute('DELETE FROM samwisedb.Subtask WHERE projectId = %s', (projectId,))
-    connection.commit()
-    return jsonify([])
+    cursor.execute('SELECT user FROM samwisedb.Project WHERE projectId = %s', (projectId,))
+    user_rows = cursor.fetchall()
+
+    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
+        cursor.execute('DELETE FROM samwisedb.Project WHERE projectId = %s', (projectId,))
+        cursor.execute('DELETE FROM samwisedb.Subtask WHERE projectId = %s', (projectId,))
+        connection.commit()
+        return success()
+    return access_denied()
 
 
 @app.route('/updateProject/', methods=['POST'])
@@ -236,13 +262,18 @@ def updateProject():
 
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('''
-       UPDATE samwisedb.Project
-       SET projectName=%s, dueDate=%s, courseId=%s
-       WHERE projectId=%s
-    ''', (projectName, dueDate, courseId, projectId))
-    connection.commit()
-    return jsonify(data)
+    cursor.execute('SELECT user FROM samwisedb.Project WHERE projectId = %s', (projectId,))
+    user_rows = cursor.fetchall()
+
+    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
+        cursor.execute('''
+           UPDATE samwisedb.Project
+           SET projectName=%s, dueDate=%s, courseId=%s
+           WHERE projectId=%s
+        ''', (projectName, dueDate, courseId, projectId))
+        connection.commit()
+        return jsonify(data)
+    return access_denied()
 
 
 @app.route('/addProject/', methods=['POST'])
@@ -254,30 +285,31 @@ def addProject():
     courseId = data['courseId']
     dueDate = data['dueDate']
     subtasks = data['subtasks']
-
-    connection = get_db()
-    cursor = connection.cursor()
-    cursor.execute('INSERT INTO samwisedb.Project(userId, projectName, dueDate, courseId) VALUES (%s, %s, %s, %s)',
-                   (userId, projectName, dueDate, courseId))
-    projectId = cursor.lastrowid
-    for subtask in subtasks:
-        cursor.execute('INSERT INTO samwisedb.Subtask(projectId, subtaskName) VALUES (%s, %s)', (projectId, subtask))
-    connection.commit()
-    return jsonify([projectId])
+    if current_user.netid == userId:
+        connection = get_db()
+        cursor = connection.cursor()
+        cursor.execute('INSERT INTO samwisedb.Project(user, projectName, dueDate, courseId) VALUES (%s, %s, %s, %s)',
+                       (userId, projectName, dueDate, courseId))
+        projectId = cursor.lastrowid
+        for subtask in subtasks:
+            cursor.execute('INSERT INTO samwisedb.Subtask(projectId, subtaskName) VALUES (%s, %s)',
+                           (projectId, subtask))
+        connection.commit()
+        return jsonify([projectId])
+    return access_denied()
 
 
 @app.route('/getEvents/<userid>')
 @login_required
 def getEvents(userid):
-    connection = get_db()
-
-    cursor = connection.cursor()
-    cursor.execute('SELECT DISTINCT * FROM samwisedb.Event WHERE user = %s', (userid,))
-    data = [{'eventId': str(item[1]), 'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]),
-             'tagId': str(item[5]), 'notes': str(item[6]), 'location': str(item[7])} for
-            item in cursor.fetchall()]
-
-    return jsonify(data)
+    if current_user.netid == userid:
+        connection = get_db()
+        cursor = connection.cursor()
+        cursor.execute('SELECT DISTINCT * FROM samwisedb.Event WHERE user = %s', (userid,))
+        data = [{'eventId': str(item[1]), 'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]),
+                 'tagId': str(item[5]), 'notes': str(item[6]), 'location': str(item[7])} for
+                item in cursor.fetchall()]
+        return jsonify(data)
 
 
 @app.route('/removeEvent/', methods=['POST'])
@@ -285,16 +317,16 @@ def getEvents(userid):
 def removeEvent():
     data = request.get_json(force=True)
     eventId = data['eventId']
-
     connection = get_db()
+    cursor = connection.cursor()
+    cursor.execute('SELECT user FROM samwisedb.Event WHERE eventId = %s', (eventId,))
+    user_rows = cursor.fetchall()
 
-    try:
-        cursor = connection.cursor()
+    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute('DELETE FROM samwisedb.Event WHERE eventId = %s', eventId)
         connection.commit()
-    finally:
-        print ('DONE')
-    return jsonify([])
+        return success()
+    return access_denied()
 
 
 @app.route('/addEvent/', methods=['POST'])
@@ -308,19 +340,16 @@ def addEvent():
     tagId = data['tagId']
     notes = data['notes']
     location = data['location']
-
-    connection = get_db()
-
-    try:
+    if current_user.netid == user:
+        connection = get_db()
         cursor = connection.cursor()
         cursor.execute(
             'INSERT INTO samwisedb.Event(user, eventName, startTime, endTime, tagId, notes, location) values (%s, %s, %s, %s, %s, %s, %s)',
             (user, eventName, startTime, endTime, tagId, notes, location))
         connection.commit()
         event_id = cursor.lastrowid
-    finally:
-        print ('DONE')
-    return jsonify([event_id])
+        return jsonify([event_id])
+    return access_denied()
 
 
 @app.route('/updateEvent/', methods=['POST'])
@@ -334,38 +363,39 @@ def updateEvent():
     tagId = data['tagId']
     notes = data['notes']
     location = data['location']
-
     connection = get_db()
+    cursor = connection.cursor()
+    cursor.execute('SELECT user FROM samwisedb.Event WHERE eventId = %s', (eventId,))
+    user_rows = cursor.fetchall()
 
-    try:
-        cursor = connection.cursor()
+    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute(
             'UPDATE samwisedb.Event SET eventName=%s, startTime=%s, endTime=%s, tagId=%s, notes=%s, location=%s WHERE eventId=%s',
             (eventName, startTime, endTime, tagId, eventId, notes, location))
         connection.commit()
-    finally:
-        print ('DONE')
-    return jsonify([])
+        return success()
+    return access_denied()
 
 
 @app.route('/getTasks/<userId>', methods=['GET'])
 @login_required
 def getTasks(userId):
-    connection = get_db()
-    cursor = connection.cursor()
-    cursor.execute('SELECT DISTINCT * FROM samwisedb.Task WHERE user = %s', (userId,))
-    data = [{
-        'user': item[0],
-        'taskId': item[1],
-        'taskName': item[2],
-        'courseId': item[3],
-        'tag': item[4],
-        'startDate': item[5],
-        'dueDate': item[6],
-        'details': item[7]
-    } for item in cursor.fetchall()]
-
-    return jsonify(data)
+    if current_user.netid == userId:
+        connection = get_db()
+        cursor = connection.cursor()
+        cursor.execute('SELECT DISTINCT * FROM samwisedb.Task WHERE user = %s', (userId,))
+        data = [{
+            'user': item[0],
+            'taskId': item[1],
+            'taskName': item[2],
+            'courseId': item[3],
+            'tag': item[4],
+            'startDate': item[5],
+            'dueDate': item[6],
+            'details': item[7]
+        } for item in cursor.fetchall()]
+        return jsonify(data)
+    return access_denied()
 
 
 @app.route('/removeTask/', methods=['POST'])
@@ -376,37 +406,38 @@ def removeTask():
 
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM samwisedb.Task WHERE taskId = %s', taskId)
-    connection.commit()
+    cursor.execute('SELECT user FROM samwisedb.Task WHERE taskId = %s', (taskId,))
+    user_rows = cursor.fetchall()
 
-    return jsonify([])
+    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
+        cursor.execute('DELETE FROM samwisedb.Task WHERE taskId = %s', taskId)
+        connection.commit()
+        return success()
+    return access_denied()
 
 
 @app.route('/addTask/', methods=['POST'])
 @login_required
 def addTask():
-    task_id = -1
-    if request.method == 'POST':
-        data = request.get_json(force=True)
-        userid = data['userid']
-        taskname = data['taskname']
-        course = data['course']
-        tag = data['tag']
-        startdate = data['startdate']
-        duedate = data['duedate']
-        details = data['details']
+    data = request.get_json(force=True)
+    userid = data['userid']
+    taskname = data['taskname']
+    course = data['course']
+    tag = data['tag']
+    startdate = data['startdate']
+    duedate = data['duedate']
+    details = data['details']
+    if current_user.netid == userid:
         connection = get_db()
-
-        try:
-            cursor = connection.cursor()
-            query = "INSERT into samwisedb.Task(user, taskName, courseId, tag, startDate, dueDate, details) values (\"" + userid + "\", \"" + taskname + "\", \"" + course + "\", \"" + tag + "\", \"" + startdate + "\", \"" + duedate + "\", \"" + details + "\");"
-            print(query)
-            cursor.execute(query)
-            connection.commit()
-            task_id = cursor.lastrowid
-        finally:
-            print ("DONE")
-    return json.dumps([task_id])
+        cursor = connection.cursor()
+        cursor.execute(
+            '''INSERT INTO samwisedb.Task(user, taskName, courseId, tag, startDate, dueDate, details)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)''',
+            (userid, taskname, course, tag, startdate, duedate, details))
+        connection.commit()
+        task_id = cursor.lastrowid
+        return jsonify([task_id])
+    return access_denied()
 
 
 @app.route('/updateTask/', methods=['POST'])
@@ -422,18 +453,19 @@ def updateTask():
     taskid = int(taskid)
 
     connection = get_db()
+    cursor = connection.cursor()
+    cursor.execute('SELECT user FROM samwisedb.Task WHERE taskId = %s', (taskid,))
+    user_rows = cursor.fetchall()
 
-    try:
-        cursor = connection.cursor()
+    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute('''
            UPDATE samwisedb.Task
            SET taskName=%s, dueDate=%s, courseId=%s, details=%s
            WHERE taskId=%s
         ''', (taskname, duedate, course, details, taskid))
         connection.commit()
-    finally:
-        print ('DONE')
-    return jsonify([])
+        return success()
+    return access_denied()
 
 
 @app.route('/exams/<course_id>')
@@ -466,10 +498,16 @@ def addSubtask():
     subtask = data['subtask']
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('INSERT INTO samwisedb.Subtask(projectId, subtask) VALUES (%s, %s)', (projectId, subtask))
-    subtaskId = cursor.lastrowid
-    connection.commit()
-    return jsonify([subtaskId])
+
+    cursor.execute('SELECT user FROM samwisedb.Project WHERE projectId = %s', (projectId,))
+    user_rows = cursor.fetchall()
+
+    if len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
+        cursor.execute('INSERT INTO samwisedb.Subtask(projectId, subtask) VALUES (%s, %s)', (projectId, subtask))
+        connection.commit()
+        subtaskId = cursor.lastrowid
+        return jsonify([subtaskId])
+    return access_denied()
 
 
 @app.route('/removeSubtask/', methods=['POST'])
@@ -479,9 +517,13 @@ def removeSubtask():
     subtaskId = data['subtaskId']
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM samwisedb.Subtask WHERE subtaskId = %s', (subtaskId,))
-    connection.commit()
-    return jsonify([subtaskId])
+
+    user = get_user_from_subtask_id(subtaskId)
+    if user and current_user.netid == user:
+        cursor.execute('DELETE FROM samwisedb.Subtask WHERE subtaskId = %s', (subtaskId,))
+        connection.commit()
+        return jsonify([subtaskId])
+    return access_denied()
 
 
 @app.route('/updateSubtask/', methods=['POST'])
@@ -492,9 +534,12 @@ def updateSubtask():
     subtaskName = data['subtaskName']
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('UPDATE samwisedb.Subtask SET subtaskName = %s WHERE subtaskId = %s', (subtaskName, subtaskId))
-    connection.commit()
-    return jsonify([subtaskName])
+    user = get_user_from_subtask_id(subtaskId)
+    if user and current_user.netid == user:
+        cursor.execute('UPDATE samwisedb.Subtask SET subtaskName = %s WHERE subtaskId = %s', (subtaskName, subtaskId))
+        connection.commit()
+        return jsonify([subtaskName])
+    return access_denied()
 
 
 @app.route('/getColor/<name>')
@@ -506,13 +551,26 @@ def getColor(name):
 @app.route('/getUserCourseColor/<userId>/<courseId>')
 @login_required
 def getUserCourseColor(userId, courseId):
-    # Open the connection to database
+    if current_user.netid == userId:
+        # Open the connection to database
+        connection = get_db()
+        cursor = connection.cursor()
+        cursor.execute('SELECT netId, courseId, color FROM samwisedb.User WHERE netId = %s AND courseId = %s',
+                       (userId, courseId))
+        data = [item[2] for item in cursor.fetchall()]
+        return jsonify(data)
+    return access_denied()
+
+
+def get_user_from_subtask_id(subtask_id):
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT netId, courseId, color FROM samwisedb.User WHERE netId = %s AND courseId = %s',
-                   (userId, courseId))
-    data = [item[2] for item in cursor.fetchall()]
-    return jsonify(data)
+    cursor.execute('SELECT projectId FROM samwisedb.Subtask WHERE subtaskId = %s', (subtask_id,))
+    rows = cursor.fetchall()
+    projectId = -1 if len(rows) == 0 else rows[0][0]
+    cursor.execute('SELECT user FROM samwisedb.Project WHERE projectId = %s', (projectId,))
+    user_rows = cursor.fetchall()
+    return None if len(user_rows) == 0 else user_rows[0][0]
 
 
 if __name__ == '__main__':

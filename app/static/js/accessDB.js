@@ -1,4 +1,12 @@
 
+function syncCalendar() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", 'http://localhost:5000/getCalendarData', false);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send();
+    return JSON.parse(xhr.responseText);
+}
+
 function addProject(user, projectName, dueDate, courseId) {
 
         var obj = {"user" : user, "projectName" : projectName, "dueDate" : dueDate, "courseId" : courseId};

@@ -1,3 +1,12 @@
+<script>
+	$(document).ready(function() {
+		var closeWelcome = document.getElementById("closeWelcome");
+		closeWelcome.onclick = function(){
+			welcomeModal.style.display = 'none';
+		}
+	});
+</script>
+
 <div id = "welcomeModal" class="modal" style="display:block;">
 	<div class="modal-content">
 		<div class="modal-header" style="background-color: #4a4a4a;">

@@ -42,9 +42,9 @@ function getProjects(id) {
     return JSON.parse(xhr.responseText);
 }
 
-function addEvent(user, eventName, startTime, endTime, tagId) {
+function addEvent(user, eventName, startTime, endTime, tagId, notes, location) {
 
-    var obj = {"user" : user, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId};
+    var obj = {"user" : user, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId, "notes" : notes, "location" : location};
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", 'http://localhost:5000/addEvent/', true);
@@ -64,9 +64,9 @@ function removeEvent(eventId) {
     xhr.send(JSON.stringify(obj));
 }
 
-function updateEvent(eventId, eventName, startTime, endTime, tagId) {
+function updateEvent(eventId, eventName, startTime, endTime, tagId, notes, location) {
 
-    var obj = {"eventId" : eventId, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId};
+    var obj = {"eventId" : eventId, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId, "notes" : notes, "location" : location};
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", 'http://localhost:5000/updateEvent/', true);

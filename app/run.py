@@ -75,7 +75,7 @@ def close_db(error):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', auth=current_user.is_authenticated)
 
 
 @app.route('/login', methods=['GET', 'POST'])

@@ -1,58 +1,6 @@
-/* Include the padding and border in an element's total width and height */
-* {
-    box-sizing: border-box;
-}
-
-/* Remove margins and padding from the list */
-.toDoListDiv ul {
-    margin: 0;
-    padding: 0;
-}
-
-/* Style the list items */
-.toDoListDiv ul li {
-    cursor: pointer;
-    position: relative;
-    padding: 6px 4px 6px 20px;
-    background: #eee;
-    font-size: 12px;
-    transition: 0.2s;
-
-    /* make the list items unselectable */
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-/* Set all odd list items to a different color (zebra-stripes) */
-.toDoListDiv ul li:nth-child(odd) {
-    background: #f9f9f9;
-}
-
-/* Darker background-color on hover */
-.toDoListDiv ul li:hover {
-    background: #ddd;
-}
-
-/* When clicked on, add a background color and strike out text */
-.toDoListDiv ul li.checked {
-    background: #888;
-    color: #fff;
-    text-decoration: line-through;
-}
-
-/* Style the close button */
-.toDoListDiv .close {
-    position: absolute;
-    right: 0;
-    top: 0;
-    padding: 0px 3px
-}
-
-.toDoListDiv .close:hover {
-    background-color: #f44336;
-    color: white;
+body{
+	font-family: 'Roboto Condensed', sans-serif;
+	#font-family: 'Open Sans Condensed', sans-serif;
 }
 
 /* Style the input */
@@ -62,67 +10,54 @@ input {
     padding: 10px;
     float: left;
     font-size: 12px;
+		outline: none;
 }
 
-/* Style the "Add" button */
-.addBtn {
-    padding: 10px;
-    width: 25%;
-    background: #d9d9d9;
-    color: #555;
-    float: left;
-    text-align: center;
-    font-size: 12px;
-    cursor: pointer;
-    transition: 0.3s;
+.btn-lg{
+	background-color: #ffffff;
+	border-radius: 20px;
+	width: 135px;
+	font-size: 16px;
+	border-color: #ffffff;
+	padding: 8px 12px;
 }
 
-.addBtn:hover {
-    background-color: #bbb;
+
+.task_name {
+	font-size: 27px;
+	border-bottom: 1px solid white;
+	background-color: rgba(255, 5, 35, 0.7);
 }
 
-body.dragging, body.dragging * {
-  cursor: move !important;
+.project_location, .project_notes, .start_working {
+	background-color: rgba(255, 5, 35, 0.7);
+	color: white;
+	opacity: 0.5;
 }
 
-.dragged {
-  position: absolute;
-  opacity: 0.5;
-  z-index: 2000;
+.title{
+	font-size: 16px;
 }
 
-.toDoListDiv ul.sortable li.placeholder {
-  position: relative;
-  /** More li styles **/
-}
-.toDoListDiv ul.sortable li.placeholder:before {
-  position: absolute;
-  /** Define arrowhead **/
+input[type=number]{
+	color: white;
 }
 
-a.fc-event {
-  /*border-radius: 15px;*/
-  /* round edges */
-  width: 0;
-  height: 0;
-  display: none;
-  /* fixed width */
-  color: transparent;
-  cursor: default;
-  border-color:  = rgba(0, 0, 0, 0);
-  /* hide text */
+input::placeholder{
+	color: white;
+	opacity: 0.5;
 }
 
-.pointer {
-  cursor: default;
+
+.input-group .form-control{
+	width: 100%;
+}
+.input-group-addon {
+	width: auto;
 }
 
-.fc-month-view .fc-event-container{
-    display: none;
-}
 
 /* Nav Bar */
-
 .topnav {
   overflow: hidden;
   background-color: #333;
@@ -160,58 +95,202 @@ a.fc-event {
   float: right;
 }
 
-#project_name {
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  font-size: 30px;
-  box-sizing: border-box;
-  border: none;
-  background-color: #4a90e2;
-  border-bottom: 2px solid white;
-  color: white;
-}
-
-.myInput {
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  font-size: 30px;
-  box-sizing: border-box;
-  border: none;
-  background-color: #4a90e2;
-  border-bottom: 2px solid white;
-  color: white;
-}
 
 #select_tags {
   background-color: #4a90e2;
   font-size: 20px;
 }
 
-.task {
-  width: 100%;
-  padding: 0px 12px;
-  margin: 8px 0;
-  font-size: 12px;
-  box-sizing: border-box;
-  border: none;
-  background-color: #4a90e2;
-  border-bottom: 2px solid white;
-  color: white;
-}
 
-.task_name {
-  width: 100%;
-  font-size: 16px;
-  box-sizing: border-box;
-  border: none;
-  background-color: #4a90e2;
-  color: white;
-}
 
-.fc-ltr .fc-basic-view .fc-day-top { float: none; text-align: center; padding-top: 7%; }
+/*.fc-ltr .fc-basic-view .fc-day-top { float: none; text-align: center; padding-top: 7%; }
 .fc-ltr .fc-basic-view .fc-day-top .fc-day-number { float: none; text-align: center }
 .fc th, .fc td {
   border-width: 0px;
+}*/
+
+.modal-header {
+    padding: 2px 16px;
+    background-color: #3a87ad;
+    color: white;
+}
+
+.modal-body {padding: 2px 16px;}
+
+.modal-footer {
+    padding: 2px 16px;
+    background-color: #3a87ad;
+    color: white;
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 5; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+.small-modal {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 40%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+
+body{
+  font-family: 'Roboto Condensed', sans-serif;
+  #font-family: 'Open Sans Condensed', sans-serif;
+
+}
+
+/* The Menu Toggle*/
+/* Important styles */
+#toggle {
+  display: block;
+  width: 28px;
+  height: 30px;
+  margin: 30px auto 10px;
+}
+
+#toggle span:after,
+#toggle span:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -9px;
+}
+#toggle span:after{
+  top: 9px;
+}
+#toggle span {
+  position: relative;
+  display: block;
+}
+
+#toggle span,
+#toggle span:after,
+#toggle span:before {
+  width: 100%;
+  height: 5px;
+  background-color: #888;
+  transition: all 0.3s;
+  backface-visibility: hidden;
+  border-radius: 2px;
+}
+
+/* on activation */
+#toggle.on span {
+  background-color: transparent;
+}
+#toggle.on span:before {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+#toggle.on span:after {
+  transform: rotate(-45deg) translate(7px, -8px);
+}
+#toggle.on + #menu {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* menu appearance*/
+#menu {
+  position: absolute;
+  z-index: 4;
+  color: #999;
+  width: 200px;
+  padding: 10px;
+  margin: auto;
+  font-family: "Segoe UI", Candara, "Bitstream Vera Sans", "DejaVu Sans", "Bitstream Vera Sans", "Trebuchet MS", Verdana, "Verdana Ref", sans-serif;
+  text-align: center;
+  border-radius: 4px;
+  background: white;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+  /* just for this demo */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .4s;
+}
+#menu:after {
+  position: absolute;
+  top: -15px;
+  left: 95px;
+  content: "";
+  display: block;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-bottom: 20px solid white;
+}
+ul, li, li a {
+  list-style: none;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+li a {
+  padding: 5px;
+  color: #888;
+  text-decoration: none;
+  transition: all .2s;
+}
+li a:hover,
+li a:focus {
+  background: #3a87ad;
+  color: #fff;
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+.loginbutton {
+	background: url("../images/google_signin.png");
+	width: 191px;
+	height: 46px;
+	border:0 none;
+	/*border: 1px solid #ddd;*/
+}
+
+
+/*style calendar*/
+
+#calendar{
+	margin-left: 20%;
+	margin-right: 20%;
 }

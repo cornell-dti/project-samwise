@@ -1,219 +1,201 @@
 <!DOCTYPE html>
 
+<!--MVP INDEX-->
+
 <html lang="en">
 
 <head>
 
-	<script>
-	var userid = '';
-	</script>
-
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-	<script src="https://cdn.rawgit.com/LeaVerou/awesomplete/gh-pages/awesomplete.min.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-<!-- 	<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
-	<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-	<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script> -->
-
-	<script src="../static/js/accessDB.js"></script>
-    <link rel='stylesheet' href='../static/js/fullcalendar-3.2.0/fullcalendar.css' />
-	<link rel='stylesheet' href='../static/js/fullcalendar-3.2.0/fullcalendar-custom.css?version=18' />
-	<link rel='stylesheet' href='../static/css/stylesheet.css?version=19' />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/awesomplete.css"/>
+    <script src="../static/js/awesomplete.js" async></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel='stylesheet' href='../static/js/fullcalendar-3.2.0/fullcalendar.css'/>
+    <link rel='stylesheet' href='../static/css/stylesheet.css?version=06'/>
 
     <script src='../static/js/fullcalendar-3.2.0/lib/jquery.min.js'></script>
     <script src='../static/js/fullcalendar-3.2.0/lib/moment.min.js'></script>
     <script src='../static/js/fullcalendar-3.2.0/fullcalendar.js'></script>
+    <script>
+		var userid = "{{ userid }}";
 
-	<script src = '../static/js/jquery-sortable.js'></script>
 
-	<script type='text/javascript' src= '../static/js/fullcalendar-3.2.0/gcal.js'></script>
-
-    <!--<script src = '../static/js/modalDialogScript.js'></script>-->
-    <!--<script src = '../static/js/toggleMenuScript.js'></script>-->
+    </script>
+    <script src='../static/js/jquery-sortable.js'></script>
+    <script src='../static/js/accessDB.js'></script>
 
 </head>
 
 
 <body>
-		<div class="col-sm-9">
-			<h1>  Project Samwise</h1>
-		</div>
+<div class="col-sm-9">
+    <h1> Project Samwise</h1>
+</div>
 
-		<div class="col-sm-3">
-			{% include 'toggleMenu.html' %}
-		</div>
-
-
-				<!-- The Modal -->
-		    {% include 'modalDialog.html' %}
-
-		<div class="col-sm-12">
-			<div class="topnav">
-				  <a class="active" onclick="location.href='/'">Layout Mode</a>
-				  <a onclick="location.href='calendar'">Calendar Mode</a>
-				  <a onclick="introAdd()">+</a>
-			</div>
-		</div>
-
-		<div class="col-sm-4">
-			<h2>Calendar <input onclick="eventToggle()" id="green-button" type="image" src="../static/images/plus-button-green.png" /></h2>
-			<div id='calendar'>
-
-			</div>
-			<ul id="dayEvents"></ul>
-		</div>
-
-		<div class="col-sm-4">
-			<!-- <h3>The Big Picture <input onclick="projectToggle()" id="green-button" type="image" src="../static/images/plus-button-green.png" /></h3> -->
-			{% include 'bigPicture.html' %}
-
-		</div>
-
-		<div class="col-sm-4">
-			{% include 'toDoList.html' %}
-
-		</div>
+<div class="col-sm-3">
+    {% include 'toggleMenu.html' %}
+</div>
 
 
-    </body>
+<!-- "HELPER FUNCTIONS" -->
+{% include 'modalDialog.html' %}
+{% if not auth %}
+{% include 'welcomeModal.html' %}
+{% endif %}
+
+<div class="col-sm-12">
+    <div class="topnav">
+
+        <!--ADD CLASS FUNCTIONALITY-->
+        <a onclick="introAdd()">+</a>
+        <a onclick="displayProjectModal()">Add event</a>
+    </div>
+</div>
+
+<div id='calendar'>
+
+</div>
+
+
+</body>
 <script>
-	var events = JSON.parse(localStorage.getItem("events")) == null ? [] : JSON.parse(localStorage.getItem("events"));
+	$('#calendar').fullCalendar({
 
-	function myFunction() {
-    	var eventTitle = document.getElementById("nameOne").value;
-    	if (eventTitle) {
-        	// This one adds all exams for the input
-            {% if netid %}
-        		var dataurl = 'http://localhost:5000/cal/' + '{{ netid }}' + '/' + eventTitle;
-				window.location.replace(dataurl);
-			{% else %}
-				$("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/exams/' + eventTitle});
-            	$("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/courses/' + eventTitle});
-            	events.push(eventTitle);
-            	localStorage.setItem("events", JSON.stringify(events));
-            	console.log(events);
-			{% endif %}
-        }
-        var modal = document.getElementById('myModal');
-        modal.style.display = "none";
-	}
+		eventClick : function(event) {
+			var modal = document.getElementById('eventDetailsModal');
+			var infoDiv = document.getElementById('information');
 
-	// OAUTH
+			var tagTitle = document.createElement("h5");
+			if (event.tag === 'undefined'){
+				tagTitle.append(document.createTextNode("No tag"));
+			}
+			else{
+				tagTitle.append(document.createTextNode(event.tag));
+			}
+			infoDiv.append(tagTitle);
 
-	// Client ID and API key from the Developer Console
-	var CLIENT_ID = '197302358001-s09lnod2vb7rltrkj9qn906tte1u4esp.apps.googleusercontent.com';
+			var t = document.createElement("h4");
+			if (event.title === 'undefined'){
+				t.append(document.createTextNode("No title"));
+			}
+			else{
+				t.append(document.createTextNode(event.title));
+			}
+			infoDiv.append(t);
 
-	// Array of API discovery doc URLs for APIs used by the quickstart
-	var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
+			var t = document.createElement("h6");
 
-	// Authorization scopes required by the API; multiple scopes can be
-	// included, separated by spaces.
-	var SCOPES = "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.email";
+			if (event.end === 'undefined'){
+				t.append(document.createTextNode("No end date"));
+			}
+			else{
+				t.append(document.createTextNode(event.end));
+			}
+			infoDiv.append(t);
 
-	var authorizeButton = document.getElementById('login');
-    var signoutButton = document.getElementById('logout');
+			var t = document.createElement("h6");
+			if (event.location === 'undefined'){
+				t.append(document.createTextNode("No location"));
+			}
+			else{
+				t.append(document.createTextNode(event.location));
+			}
+			infoDiv.append(t);
 
-	/**
-	*  On load, called to load the auth2 library and API client library.
-	*/
-	function handleClientLoad() {
-		gapi.load('client:auth2', initClient);
-	}
+			var t = document.createElement("h6");
+			if (event.notes === 'undefined'){
+				t.append(document.createTextNode("No notes"));
+			}
+			else{
+				t.append(document.createTextNode(event.notes));
+			}
+			infoDiv.append(t);
 
-	/**
-	*  Initializes the API client library and sets up sign-in state
-	*  listeners.
-	*/
-	function initClient() {
-		gapi.client.init({
-		  discoveryDocs: DISCOVERY_DOCS,
-		  clientId: CLIENT_ID,
-		  scope: SCOPES
-		}).then(function () {
-		  // Listen for sign-in state changes.
-		  gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+			var button = document.createElement("button");
+			button.setAttribute("style", "float:left");
+			button.setAttribute("id", "removeButtonId");
+			button.append(document.createTextNode("Delete"));
+			infoDiv.append(button);
 
-		  // Handle the initial sign-in state.
-		  updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-		  authorizeButton.onclick = handleAuthClick;
-		  signoutButton.onclick = handleSignoutClick;
-		});
-	}
+			var b = document.getElementById("removeButtonId");
+			b.onclick = function(){
+				// removeEvent(event.eventId);
+				$("#calendar").fullCalendar('removeEvents');
+				addStoredEvents();
+				syncGoogleToFullCalendar();
 
-	function updateSigninStatus(isSignedIn) {
-	    if (isSignedIn) {
-	      authorizeButton.style.display = 'none';
-	      signoutButton.style.display = 'block';
-	      userid = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getEmail().split("@")[0];
-	      console.log(userid);
-	      // location.reload();
-	      prePopToDoList(getTasks(userid));
-	      syncGoogleToFullCalendar();
-	    } else {
-	      authorizeButton.style.display = 'block';
-	      signoutButton.style.display = 'none';
-	    }
-	  }
+				$("#calendar").fullCalendar('rerenderEvents');
+				var info = document.getElementById("information");
+				info.innerHTML = "";
 
-	  function syncGoogleToFullCalendar() {
-        gapi.client.calendar.events.list({
-          'calendarId': 'primary',
-          'showDeleted': false,
-          'singleEvents': true,
-          'orderBy': 'startTime'
-        }).then(function(response) {
-          var events = response.result.items;
-          var eventSource = [];
+				modal.style.display = 'none';
+			}
 
-          if (events.length > 0) {
+			modal.style.display = 'block';
+		},
+		header: {
+			right: 'prev,next,today',
+			// center: 'semester,month,agendaWeek,agendaDay'
+			center: 'month,agendaWeek,agendaDay'
+		},
+		nextDayThreshold: '00:00:00'
+	});
+
+	function syncGoogleToFullCalendar() {
+        var results = syncCalendar();
+        var events = results.items;
+        var eventSource = [];
+        if (events.length > 0) {
             for (i = 0; i < events.length; i++) {
-              var event = events[i];
-              var start = event.start.dateTime;
-              if (!start) {
-                start = event.start.date;
-              }
-              var end = event.end.dateTime;
-              if (!end) {
-                end = event.end.date;
-              }
-
-              var newEvent = {"title" : event.summary, "start" : start, "end" : end}
-              eventSource.push(newEvent);
+                var event = events[i];
+								if (event.start === undefined){
+									continue;
+								}
+								else{
+									var start = event.start.dateTime;
+	                if (!start) {
+	                    start = event.start.date;
+	                }
+	                var end = event.end.dateTime;
+	                if (!end) {
+	                    end = event.end.date;
+	                }
+								}
+                var newEvent = {"title" : event.summary, "start" : start, "end" : end}
+                eventSource.push(newEvent);
             }
-          } else {
+        } else {
             console.log('No upcoming events found.');
-          }
+        }
+        $("#calendar").fullCalendar('addEventSource', eventSource);
+    }
 
-          $("#calendar").fullCalendar('addEventSource', eventSource);
-        });
-      }
+	var events = JSON.parse(localStorage.getItem("events")) == null ? [] : JSON.parse(localStorage.getItem("events"));
+	function myFunction() {
+		var eventTitle = document.getElementById("nameOne").value;
+		if (eventTitle) {
+			// This one adds all exams for the input
+			$("#calendar").fullCalendar('addEventSource', {url: '/exams/' + eventTitle});
+			$("#calendar").fullCalendar('addEventSource', {url: '/courses/' + eventTitle});
+			events.push(eventTitle);
+			localStorage.setItem("events", JSON.stringify(events));
+			console.log(events);
+		}
+		var modal = document.getElementById('myModal');
+		modal.style.display = "none";
+	}
 
-
-      /**
-       *  Sign in the user upon button click.
-       */
-      function handleAuthClick(event) {
-        gapi.auth2.getAuthInstance().signIn();
-      }
-
-      /**
-       *  Sign out the user upon button click.
-       */
-      function handleSignoutClick(event) {
-        gapi.auth2.getAuthInstance().signOut();
-      }
-
-
+    {% if auth %}
+    syncGoogleToFullCalendar();
+		addStoredEvents();
+		var input = document.getElementById("classSearchIntro");
+		var courses = getAllCourses();
+		var awesomplete = new Awesomplete(input);
+		awesomplete.list = courses;
+		populateUserCourses();
+    {% endif %}
 </script>
-
-<script async defer src="https://apis.google.com/js/api.js"
-      onload="this.onload=function(){};handleClientLoad()"
-      onreadystatechange="if (this.readyState === 'complete') this.onload()">
-</script>
-
 </html>

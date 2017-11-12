@@ -72,8 +72,8 @@
     	var eventTitle = document.getElementById("nameOne").value;
     	if (eventTitle) {
         	// This one adds all exams for the input
-        	$("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/exams/' + eventTitle});
-            $("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/courses/' + eventTitle});
+        	$("#calendar").fullCalendar('addEventSource', {url: '/exams/' + eventTitle});
+            $("#calendar").fullCalendar('addEventSource', {url: '/courses/' + eventTitle});
             events.push(eventTitle);
         	localStorage.setItem("events", JSON.stringify(events));
         	console.log(events);

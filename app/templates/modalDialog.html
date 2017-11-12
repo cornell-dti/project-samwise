@@ -1,22 +1,34 @@
 <script type='text/javascript'>
 	$(document).ready(function() {
-
         // page is now ready, initialize the calendar...
 
         var intromodal = document.getElementById('introModal');
-		var modal = document.getElementById('myModal');
-		var modalevent = document.getElementById('eventModal');
-        var desktopmodal = document.getElementById('desktopModal');
-        var projectmodal = document.getElementById('projectModal');
-        var taskmodal = document.getElementById('taskModal');
+				var modal = document.getElementById('myModal');
+				var modalevent = document.getElementById('eventModal');
+        var notModal = document.getElementById('notificationModal');
+				var displayProjectModal = document.getElementById('addProjectModal');
+				var welcomeModal = document.getElementById("welcomeModal");
+				var eventDetailsModal = document.getElementById("eventDetailsModal");
 
-        var spanintro = document.getElementsByClassName('close')[0];
-        var span = document.getElementsByClassName('close')[1];
-        var span2 = document.getElementsByClassName('close')[2];
-        var spandesktop = document.getElementsByClassName('close')[3];
-        var spanproject = document.getElementsByClassName('close')[4];
-        var spantask = document.getElementsByClassName('close')[5];
-
+				var closeDetails = document.getElementById("closeEventDetails");
+				closeDetails.onclick = function(){
+					var info = document.getElementById("information");
+					info.innerHTML = "";
+					eventDetailsModal.style.display = 'none';
+				}
+				var closeIntro = document.getElementById("closeIntro");
+				closeIntro.onclick = function(){
+					document.getElementById("classSearchIntro").value = "";
+					intromodal.style.display = 'none';
+				}
+				var closeProject = document.getElementById("closeProject");
+				closeProject.onclick = function(){
+					displayProjectModal.style.display = 'none';
+				}
+				var closeNot = document.getElementById("closeNotification");
+				closeNot.onclick = function(){
+					notModal.style.display = 'none';
+				}
 
         var courseAddButton = document.getElementById('courseAdd');
         var eventAddButton = document.getElementById('eventAdd');
@@ -26,34 +38,6 @@
 				  autoFirst: true
 				});
 
-        // When the user clicks on <span> (x), close the modal
-        eventAddButton.onclick = function() {
-        	modalevent.style.display = 'none';
-        }
-        spanintro.onclick = function() {
-            intromodal.style.display = 'none';
-        }
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-            modal.style.display = 'none';
-        }
-
-
-        span2.onclick = function() {
-        	modalevent.style.display = 'none';
-        }
-
-
-        spandesktop.onclick = function() {
-            desktopmodal.style.display = 'none';
-        }
-        spanproject.onclick = function() {
-        	projectmodal.style.display = 'none';
-        }
-        spantask.onclick = function() {
-        	taskmodal.style.display = 'none';
-        }
 
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function(event) {
@@ -69,138 +53,18 @@
                 intromodal.style.display = 'none';
             }
 
-            if (event.target == desktopmodal) {
-                desktopmodal.style.display = 'none';
+            if (event.target == notModal) {
+                notModal.style.display = 'none';
             }
-            if (event.target == projectmodal) {
-            	projectmodal.style.display = 'none';
-            }
-            if (event.target == taskmodal) {
-            	taskmodal.style.display = 'none';
-            }
+
+						if (event.target == displayClassModal){
+							displayClassModal.style.display = 'none';
+						}
+
+						if (event.target == displayProjectModal){
+							displayProjectModal.style.display = 'none';
+						}
         }
-
-        {% if netid %}
-        	var dataurl = 'http://localhost:5000/cal/' + '{{ netid }}' + '/getExams';
-			$("#calendar").fullCalendar('addEventSource', {url: dataurl});
-		{% endif %}
-
-		var events = JSON.parse(localStorage.getItem("events")) == null ? [] : JSON.parse(localStorage.getItem("events"));
-		for (var i = 0; i < events.length; i++) {
-			var eventTitle = events[i];
-			$("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/exams/' + eventTitle});
-            $("#calendar").fullCalendar('addEventSource', {url: 'http://localhost:5000/courses/' + eventTitle});
-            $('#calendar').fullCalendar('prev');
-			$('#calendar').fullCalendar('next');
-		}
-
-		var renderedDays = [];
-
-
-        $('#calendar').fullCalendar({
-
-			header: {
-				right: 'prev,next,today',
-				center: 'month,agendaWeek,agendaDay'
-			},
-
-			eventColor: "rgba(0, 0, 0, 0)",
-			eventTextColor: "rgba(0, 0, 0, 0)",
-
-
-			eventAfterAllRender: function(view) {
-		        renderedDays = getDates($('#calendar').fullCalendar('getView').start, $('#calendar').fullCalendar('getView').end);
-
-
-		        $('#calendar').fullCalendar('clientEvents', function(event) {
-
-		          var result = $.grep(renderedDays, function(e) {
-		            return e.id == event.start.format('YYYY-MM-DD');
-		          });
-		          if (result.length > 0) {
-		            result[0].events += 1;
-		          }
-		        });
-
-		        $.each(renderedDays, function(index, value) {
-		        	var td = $('td.fc-day[data-date="' + value.id + '"]');
-		          if (value.events > 0 && value.events < 2) {
-		            td.css("background-color", "#fbf4ad");
-		          }
-		          else if (value.events >= 2 && value.events < 4) {
-		            td.css("background-color", "#fdb373");
-		          }
-		          else if (value.events >= 4 && value.events < 6) {
-		            td.css("background-color", "#f67b8a");
-		          }
-		          else if (value.events >= 6) {
-		          	td.css("background-color", "#f7485f");
-		          }
-
-		          td.addClass('pointer');
-
-		        });
-		      },
-
-		    eventClick: function(calEvent) {
-
-        		var ul = document.getElementById("dayEvents");
-                while (ul.hasChildNodes()) {
-                	ul.removeChild(ul.lastChild);
-                }
-
-                $('#calendar').fullCalendar('clientEvents', function(event) {
-					if(moment(calEvent._start).format('YYYY-MM-DD')==moment(event._start).format('YYYY-MM-DD')) {
-						var li = document.createElement("li");
-						li.appendChild(document.createTextNode(moment(event._start).format('hh:mma') + " " + event.title));
-						ul.appendChild(li);
-					}
-				});
-
-       		 return false;
-    		},
-
-    		dayRender: function( date, cell ) {
-    			cell.addClass('pointer');
-    		},
-
-            // put your options and callbacks here
-            dayClick: function(date) {
-
-                // modal.style.display = "block";
-
-
-				var ul = document.getElementById("dayEvents");
-                while (ul.hasChildNodes()) {
-                	ul.removeChild(ul.lastChild);
-                }
-
-                $('#calendar').fullCalendar('clientEvents', function(event) {
-					if(moment(date).format('YYYY-MM-DD')==moment(event._start).format('YYYY-MM-DD')) {
-						// console.log(event.title);
-						var li = document.createElement("li");
-						li.appendChild(document.createTextNode(moment(event._start).format('hh:mma') + " " + event.title));
-						ul.appendChild(li);
-					}
-				});
-
-            }
-        });
-
-        function getDates(startDate, endDate) {
-		  var now = startDate,
-		    dates = [];
-
-		  while (now.format('YYYY-MM-DD') <= endDate.format('YYYY-MM-DD')) {
-		    dates.push({
-		      id: now.format('YYYY-MM-DD'),
-		      events: 0
-		    });
-		    now.add('days', 1);
-		  }
-		  return dates;
-		};
-
 
     });
 
@@ -232,15 +96,21 @@
         notification.onclick = function () {
           window.open("http://www.cornelldti.org/");
         };
-
       }
-
     }
 
     function introAdd() {
         var modal = document.getElementById('introModal');
+				document.getElementById("classSearchIntro").value = "";
         modal.style.display = 'block';
     }
+
+
+		function displayProjectModal() {
+			var modal = document.getElementById('addProjectModal');
+			populateProjectTagSelect();
+			modal.style.display = 'block';
+		}
 
     function addingClass() {
         var modal = document.getElementById('eventModal');
@@ -260,19 +130,14 @@
         var modal2 = document.getElementById('myModal');
         modal2.style.display = 'block';
 
-		$.getJSON('http://localhost:5000/getAllClasses', function(data) {
+		$.getJSON('/getAllClasses', function(data) {
 		  //data is the JSON string
 		  awesomplete.list = data;
 		});
     }
 
     function desktopToggle() {
-        var modal = document.getElementById('desktopModal');
-        modal.style.display = 'block';
-    }
-
-    function projectToggle() {
-        var modal = document.getElementById('projectModal');
+        var modal = document.getElementById('notificationModal');
         modal.style.display = 'block';
     }
 
@@ -281,455 +146,363 @@
         modal.style.display = 'block';
     }
 
-    function taskToggle() {
-        var modal = document.getElementById('taskModal');
-        modal.style.display = 'block';
-    }
-
-
-
     function goButton(modalType) {
     	var modal = document.getElementById(modalType);
     	modal.style.display = 'none';
     }
 
- //    function addProjectColor(id, projectName, date, tasklist, color) {
 
- //    	var obj = {"userid" : id, "project" : projectName, "duedate" : date, "subtasks" : tasklist, "color" : color};
+		function addProjectToCalendar(){
 
- //    	var xhr = new XMLHttpRequest();
- //    	xhr.open("POST", 'http://localhost:5000/addProjectColor/', true);
- //    	xhr.setRequestHeader("Content-Type", "application/json")
- //    	console.log(JSON.stringify(obj));
- //    	xhr.send(JSON.stringify(obj));
- //    }
+			var name = document.getElementById("projectName").value;
+			var date = document.getElementById("projectDate").value;
+			var course = document.getElementById("selectDropdown").value;
+			var start = document.getElementById("startWorking").value;
+			var realstart = document.getElementById("realstart").value;
+			var pLocation = document.getElementById("projectLocation").value;
+			var notes = document.getElementById("projectNotes").value;
 
- //    function addProjectCourse(id, projectName, date, tasklist, course) {
+			if (name === 'undefined'){
+				name = "Empty"
+			}
+			if (date){
+				date = date.concat(":00");
 
- //    	var obj = {"userid" : id, "project" : projectName, "duedate" : date, "subtasks" : tasklist, "course" : course};
+			}
+			else{
+				var today = new Date();
+				var date = today.toISOString();
+				console.log(date);
+			}
 
- //    	var xhr = new XMLHttpRequest();
- //    	xhr.open("POST", 'http://localhost:5000/addProjectCourse/', true);
- //    	xhr.setRequestHeader("Content-Type", "application/json")
- //    	console.log(JSON.stringify(obj));
- //    	xhr.send(JSON.stringify(obj));
- //    }
+			if (realstart){
+				realstart = realstart.concat(":00");
+			}
+			else{
+				realstart = date;
+			}
+			if (course === 'undefined'){
+				course = "Blank";
+			}
+			// if (start < 1){
+			// 	start = 1;
+			// }
+			var startWorkingDateObj = new Date(realstart);
+			startWorkingDateObj.setDate(startWorkingDateObj.getDate() - start);
+			startWorkingDateObj.setTime(startWorkingDateObj.getTime() - (5 * 60 * 60 * 1000));
+			var startDate = startWorkingDateObj.toISOString();
 
- //    function updateProject(projectid, projectName, date, course, color) {
+			var dateObj = new Date(date);
+			dateObj.setTime(dateObj.getTime() - (5 * 60 * 60 * 1000));
+			date = dateObj.toISOString();
+			console.log(date);
 
- //    	var obj = {"projectid" : projectid, "project" : projectName, "duedate" : date, "course" : course, "color" : color};
+			var c = getUserCourseColor(userid, course);
+			var newEvent = {
+				title : name,
+				start : startDate,
+				end : date,
+				tag : course,
+				color : c,
+				notes : notes,
+				location : pLocation
+			}
 
- //    	var xhr = new XMLHttpRequest();
- //    	xhr.open("POST", 'http://localhost:5000/updateProject/', true);
- //    	xhr.setRequestHeader("Content-Type", "application/json")
- //    	console.log(JSON.stringify(obj));
- //    	xhr.send(JSON.stringify(obj));
- //    }
+			$("#calendar").fullCalendar('addEventSource', [newEvent]);
+			$("#calendar").fullCalendar('rerenderEvents');
 
- //    function removeProject(projectid) {
+			addEvent(userid, name, startDate, date, course, pLocation, notes);
 
- //    	var obj = {"projectid" : projectid};
+			var modal = document.getElementById('addProjectModal');
+			modal.style.display = 'none';
+		}
 
-	// 	var xhr = new XMLHttpRequest();
- //    	xhr.open("POST", 'http://localhost:5000/removeProject/', true);
- //    	xhr.setRequestHeader("Content-Type", "application/json")
- //    	console.log(JSON.stringify(obj));
- //    	xhr.send(JSON.stringify(obj));
-	// }
+		function addStoredEvents(){
 
- //    function addEvent(userid, eventname, date, color) {
+			var exams = getUserExams(userid);
+			if (exams.length < 1){
+				return;
+			}
+			for (k = 0; k < exams.length; k++){
+				for (j = 0; j < exams[k].length; j++){
 
- //    	var obj = {"userid" : userid, "eventname" : eventname, "date" : date, "color" : color};
+					var date = exams[k][j].start;
+					date = date.split(", ");
 
-	// 	var xhr = new XMLHttpRequest();
- //    	xhr.open("POST", 'http://localhost:5000/addEvent/', true);
- //    	xhr.setRequestHeader("Content-Type", "application/json")
- //    	console.log(JSON.stringify(obj));
- //    	xhr.send(JSON.stringify(obj));
- //    }
+					//07 Dec 2017 09:00:00 GMT must become
+					//2010-01-09T12:30:00
 
- //    function removeEvent(eventid) {
+					date = date[1].split(" ");
+					function getMonthFromString(mon){
+					   return new Date(Date.parse(mon +" 1, 2012")).getMonth()+1
+					}
+					var monthNum = getMonthFromString(date[1]);
 
- //    	var obj = {"eventid" : eventid};
+					var dateString = date[2] + "-" + parseInt(monthNum) +
+										"-" + date[0] + "T" + date[3];
 
-	// 	var xhr = new XMLHttpRequest();
- //    	xhr.open("POST", 'http://localhost:5000/removeEvent/', true);
- //    	xhr.setRequestHeader("Content-Type", "application/json")
- //    	console.log(JSON.stringify(obj));
- //    	xhr.send(JSON.stringify(obj));
-	// }
+					if (exams[k][j].courseId === 'undefined'){
+						continue;
+					}
+					else{
+						var startWorkingExam = new Date(dateString);
+						startWorkingExam.setDate(startWorkingExam.getDate() - 7);
+						var startDate = startWorkingExam.toISOString();
+						var c = getUserCourseColor(userid, exams[k][j].courseId);
+						var newEvent = {
+							title : exams[k][j].courseId,
+							start : startDate,
+							end : dateString,
+							tag : exams[k][j].courseId,
+							color : c,
+							location : exams[k][j].location,
+							notes : exams[k][j].notes
+						}
 
-	// function updateEvent(eventid, eventname, date, course, color) {
+						$("#calendar").fullCalendar('addEventSource', [newEvent]);
+					}
 
- //    	var obj = {"eventid" : eventid, "eventname" : eventname, "duedate" : date, "course" : course, "color" : color};
 
- //    	var xhr = new XMLHttpRequest();
- //    	xhr.open("POST", 'http://localhost:5000/updateEvent/', true);
- //    	xhr.setRequestHeader("Content-Type", "application/json")
- //    	console.log(JSON.stringify(obj));
- //    	xhr.send(JSON.stringify(obj));
- //    }
+				}
+			}
 
- //    function addTaskCourse(id, task, course, date, details, taskid) {
 
- //    	var obj = {"userid" : id, "taskname" : task, "course" : course, "date" : date, "details" : details, "taskid" : taskid};
+			var events = getEvents(userid);
+			for (k = 0; k < events.length; k++){
+				var c = getUserCourseColor(userid, events[k].tagId);
+				console.log("TAG" + events[k].eventName + " " + events[k].tagId);
+				var newEvent = {
+					title : events[k].eventName,
+					start : events[k].startTime,
+					end : events[k].endTime,
+					tag : events[k].tagid,
+					color : c,
+					notes : events[k].notes,
+					location : events[k].location
+				}
+				$("#calendar").fullCalendar('addEventSource', [newEvent]);
+			}
+			$("#calendar").fullCalendar('rerenderEvents');
+		}
 
-	// 	var xhr = new XMLHttpRequest();
- //    	xhr.open("POST", 'http://localhost:5000/addTaskCourse/', true);
- //    	xhr.setRequestHeader("Content-Type", "application/json")
- //    	console.log(JSON.stringify(obj));
- //    	xhr.send(JSON.stringify(obj));
- //    }
+		function remove(link) {
+				removeCourse(userid, link.innerHTML);
+		    link.parentNode.parentNode.removeChild(link.parentNode);
+		}
 
- //    function addTaskColor(id, task, color, date, details) {
+		function populateUserCourses(){
+			var userCourses = getUserCourses(userid);
+			console.log(userCourses);
+			if (userCourses.length < 1){
+				return;
+			}
+			var lst = document.getElementById("currentClasses");
+			$('#currentClasses').empty();
+			for (i = 0; i < userCourses.length; i++){
+				var li = document.createElement("li");
+				var a = document.createElement("a");
+				a.setAttribute("href", "#");
+				a.setAttribute("onclick", "remove(this)");
+				var t = document.createTextNode(userCourses[i]);
+				a.append(t);
+				li.append(a);
 
- //    	var obj = {"userid" : id, "taskname" : task, "color" : color, "date" : date, "details" : details};
+				lst.append(li);
+			}
+		}
 
-	// 	var xhr = new XMLHttpRequest();
- //    	xhr.open("POST", 'http://localhost:5000/addTaskColor/', true);
- //    	xhr.setRequestHeader("Content-Type", "application/json")
- //    	console.log(JSON.stringify(obj));
- //    	xhr.send(JSON.stringify(obj));
- //    }
+		function populateProjectTagSelect(){
+			var userCourses = getUserCourses(userid);
+			if (userCourses.length < 1){
+				return;
+			}
+			var dropdown = document.getElementById("selectDropdown");
+			$('#selectDropdown').empty();
+			for (i = 0; i < userCourses.length; i++){
+				var opt = document.createElement("option");
+				opt.setAttribute("value", userCourses[i]);
+				var t = document.createTextNode(userCourses[i]);
+				opt.append(t);
 
-	// function removeTask(taskid) {
+				dropdown.append(opt);
+			}
+		}
 
- //    	var obj = {"taskid" : taskid};
+		function displayIntroModal(){
+			var userCourses = getUserCourses(userid);
+			if (userCourses.length == 0){
+				var introModal = document.getElementById("introModal");
+				introModal.style.display = 'block';
+			}
+		}
 
-	// 	var xhr = new XMLHttpRequest();
- //    	xhr.open("POST", 'http://localhost:5000/removeTask/', true);
- //    	xhr.setRequestHeader("Content-Type", "application/json")
- //    	console.log(JSON.stringify(obj));
- //    	xhr.send(JSON.stringify(obj));
-	// }
+		function addUserClass(){
+			var className = document.getElementById("classSearchIntro").value;
+			var currClasses = getUserCourses(userid);
+			if (currClasses.length > 0){
+				for (i = 0; i < currClasses.length; i++){
+					if (currClasses[i] == className){
+						console.log("already have this class");
+						return;
+					}
+				}
+			}
+			if (className.length > 0){
+				addCourse(userid, className);
+				console.log(className);
+				populateUserCourses();
+			}
+		}
 
-	// function updateTask(taskid, taskname, date, course, color, details) {
+		function updateCalendar(){
+			var events = $("#calendar").fullCalendar('getEventSources');
+			var userEvents = getEvents(userid);
+			var eventObjs = [];
+			for (k = 0; k < events.length; k++){
+				for (x = 0; x < events[k].events.length; x++){
+					eventObjs.push(events[k].events[x]);
+				}
+			}
+			var lst = document.getElementById("currentClasses").getElementsByTagName("li");
+			var lstPrime = [];
+			for (j = 0; j < lst.length; j++){
+				lstPrime.push(lst[j].getElementsByTagName("a")[0].innerHTML);
+			}
 
- //    	var obj = {"taskid" : taskid, "taskname" : taskname, "date" : date, "course" : course, "color" : color, "details" : details};
+			// for (i = 0; i < eventObjs.length; i++){
+			// 	if (eventObjs[i].className.length == 1 && lstPrime.indexOf(eventObjs[i].className[0]) == -1){
+			// 		console.log(eventObjs[i].className[0] + " " + eventObjs[i].title);
+			// 		removeEvent(eventObjs[i].title);
+			// 	}
+			// }
+			for (i = 0; i < userEvents.length; i++){
+				console.log(userEvents[i]);
+				if (userEvents[i].tagId.length > 0 && lstPrime.indexOf(userEvents[i].tagId) == -1){
+					console.log(userEvents[i].eventId + " " + userEvents[i].eventName);
+					removeEvent(userEvents[i].eventId);
+				}
+			}
+			$("#calendar").fullCalendar('removeEvents');
 
- //    	var xhr = new XMLHttpRequest();
- //    	xhr.open("POST", 'http://localhost:5000/updateTask/', true);
- //    	xhr.setRequestHeader("Content-Type", "application/json")
- //    	console.log(JSON.stringify(obj));
- //    	xhr.send(JSON.stringify(obj));
- //  }
+			addStoredEvents();
+			syncGoogleToFullCalendar();
 
- //    function getTasks(id) {
- //    	console.log("ID: " + id);
-	// 		var xhr = new XMLHttpRequest();
-	// 		xhr.open("GET", 'http://localhost:5000/getTasks/' + id, false);
- //    	xhr.setRequestHeader("Content-Type", "application/json");
-	// 		xhr.send(null);
- //    	return xhr.responseText;
- //    }
-
- //    function getProjects(id) {
- //        var userid = id;
- //            var xhr = new XMLHttpRequest();
- //            xhr.open("GET", 'http://localhost:5000/getProjects/' + userid, false);
- //        xhr.setRequestHeader("Content-Type", "application/json");
- //            xhr.send(null);
- //        return xhr.responseText;
- //    }
+			$("#calendar").fullCalendar('rerenderEvents');
+			introModal.style.display = 'none';
+		}
 
 </script>
 
-<div id="introModal" class="modal" style= "display:block;">
+<div id = "eventDetailsModal" class="modal" style="display:none;">
+	<div class = "small-modal" id="eventDetaislModalContent">
+		<div class = "modal-header">
+			<span class="close" id="closeEventDetails">&times;</span>
+ 			<div id = "information"></div>
+		</div>
+	</div>
+</div>
+
+<div id = "addProjectModal" class="modal" style= "display:none;">
+	<div class="modal-content">
+	 <div class="modal-header" style="background-color: rgba(255, 5, 35, 1); opacity: 0.7">
+		 <span class="close" id="closeProject">&times;</span>
+			<div class = "col-sm-12">
+				<h3>Add New</h3>
+				 <input style= "color: white" class= "task_name" type="text" id ="projectName" placeholder="Title"> <br>
+				 <div class = "col-sm-4"></div>
+	 			<br>
+	 		  <br>
+	 			<br>
+	 			<br>
+
+					<div class = "col-sm-2 title">
+						Tag
+					</div>
+					<select style="color: black" id = "selectDropdown"></select>
+
+				<br><br>
+				<div class = "col-sm-2 title">
+					Starts
+				</div>
+				<input type="datetime-local" style="color: black; width:200px"id="realstart">
+				<br>
+				<br>
+				<div class = "col-sm-2 title">
+					Ends
+				</div>
+				<input type="datetime-local" style="color: black; width:200px"id="projectDate">
+				<br>
+				<br>
+				<br>
+				<div class = "col-sm-2 title">
+					Start working
+				</div>
+				<input class = "col-sm-1 start_working" type="number" style="color: black; width:80px" id="startWorking" value="0">
+				<div class = "col-sm-2 title days-ahead">Days Ahead</div>
+				<br><br>
+
+				<br>
+				<div class = "col-sm-2 title">
+					Location
+				</div>
+					<input style= "color: white" class= "project_location" type="text" id ="projectLocation" placeholder="Event Location Here">
+				<div class = "col-sm-2 title">
+					Notes
+				</div>
+					<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" placeholder="Enter Event Notes Here">
+			 </div>
+
+				<button class="btn btn-lg btn-default" style="float:right;" onclick="addProjectToCalendar()">Save</button>
+
+				<br>
+				<br>
+			</div>
+		 </div>
+	 </div>
+</div>
+
+
+
+
+<div id="introModal" class="modal" style= "display:none;">
 
 		      <!-- Modal content -->
 		      <div class="modal-content">
 			<div class="modal-header" style="background-color: #4a4a4a;" >
-			<span class="close">&times;</span>
-			  <h2>Welcome</h2>
-
-			  <div class="col-sm-8">
-					<h4>Integrate With Google Calendar</h3>
-
-					<p><button class="w3-button w3-grey w3-round-xxlarge" style="color:white;">Login</button></p>
-
-					<h4>Pick classes to get exam dates and auto-suggest course work</h3>
-
-					<div class="col-sm-8">
-						<input style="background-color: #4a4a4a;" class= "task_name" type="text" name="classSearch" value="Search Classes at Cornell"> <br>
-						<h4>Add extra tags to organize your life</h3>
-						<input style="background-color: #4a4a4a;" class= "task" type="text" name="tag1" value="CS 1112"> <br>
-						<input style="background-color: #4a4a4a;" class= "task" type="text" name="tag1" value="CHEM 2090"> <br>
-						<input style="background-color: #4a4a4a;" class= "task" type="text" name="tag1" value="SA Tech"> <br>
-						<p>+ New Tag</p>
-					</div>
-
-					<div class="col-sm-4">
-
-					</div>
-				</div>
-
-				<div class="col-sm-4">
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<br>
-					<button class="w3-button w3-green w3-round-xxlarge" style="float:right;" onclick="goButton('introModal')">Let's Go</button>
-				</div>
-
-
-			</div>
-
-		      </div>
-
-		    </div>
-
-<div id="myModal" class="modal">
-
-			    <!-- Modal content -->
-			    <div class="modal-content">
-						<div class="modal-header">
-								<span class="close">&times;</span>
-								<h2>Course Search</h2>
-						</div>
-						<div class="modal-body">
-
-				    <!-- <form name="form1" method="post" id="newGame"> -->
-						<fieldset>
-				        	<label for="Name">Course Name:</label>
-				        	<input id="nameOne" type="text" />
-				    	</fieldset>
-				    	<fieldset class="noHeight">
-	        				<input id="addClass" class="submit" type="submit" onclick="myFunction()" />
-	    				</fieldset>
-				    <!-- </form> -->
-
-						</div>
-		      </div>
-</div>
-
-<div id="eventModal" class="modal">
-
-		      <!-- Modal content -->
-		      <div class="modal-content">
-			<div class="modal-header">
-			  <span class="close">&times;</span>
-			  <h2>Event Search</h2>
-			</div>
-			<div class="modal-body">
-
-			    <form name="form2" method="post" id="newGame">
-				<p id="userInput">
-				  <label>Event Name:</label>
-				  <br />
-				  <input class= "task" type="text" name="event1" placeholder="Enter Event Name">
-				  <br />
-				</p>
-				<br />
-			    </form>
-			    <button class="w3-button w3-green w3-round-xxlarge" id="eventAdd" onclick="javascript:addEvent()" style="float: right;">Add</button>
-
-			</div>
-			<div class="modal-footer">
-			  </div>
-		      </div>
-
-		    </div>
-
-<div id="desktopModal" class="modal">
-
-		      <!-- Modal content -->
-		      <div class="modal-content">
-			<div class="modal-header" style="background-color: #4a4a4a;">
-			  <span class="close">&times;</span>
+			<span class = "close" id = "closeIntro">&times;</span>
 			  <h2>Settings</h2>
-			</div>
-			<div class="modal-body" style="background-color: #4a4a4a;">				
-				
-				<br />
-				<label></label>
-						<h4 class="col-sm-4" style="float:left">Add Classes</h4>
-						<input style="background-color: #4a4a4a;" class= "task_name" type="text" name="classSearch" value="Search Classes at Cornell"> <br>
-						<h4 class="col-sm-4" style="float:left">Manage Your Classes</h4>
-						<input style="background-color: #4a4a4a;float:left" class= "classes" type="text" name="tag1" value="CS 1112"> 
-						<div class="w3-dropdown-click" style ="float: left;">
-							<button class= "w3-button w3-border w3-border-white w3-round-xlarge w3-padding-small" style="float: left">Red</button>
-							<div class="w3-dropdown-content w3-bar-block w3-border">
-							  <a href="#" class="w3-bar-item w3-button w3-blue">Color 1</a>
-							  <a href="#" class="w3-bar-item w3-button w3-red">Color 2</a>
-							  <a href="#" class="w3-bar-item w3-button w3-green">Color 3</a>
-							</div>
-						</div>
-						<!-- Delete icon by Icons8 -->
-						<img src="https://png.icons8.com/delete/win10/32" title="Delete" width="32" height="32" style="float:left">		
-						<br />
-						<input style="background-color: #4a4a4a;float:left" class= "classes" type="text" name="tag2" value="CHEM 2090"> 
-						<button class= "w3-button w3-border w3-border-white w3-round-xlarge w3-padding-small" style="float: left">Blue</button>
-						<img src="https://png.icons8.com/delete/win10/32" title="Delete" width="32" height="32" style="float:left">
-						<br />
-						<input style="background-color: #4a4a4a;float:left" class= "classes" type="text" name="tag3" value="SA Tech"> 
-						<button class= "w3-button w3-border w3-border-white w3-round-xlarge w3-padding-small" style="float: left">Green</button>
-						<img src="https://png.icons8.com/delete/win10/32" title="Delete" width="32" height="32" style="float:left">
-						<br />
-						<input style="background-color: #4a4a4a;float:left" class= "classes" type="text" name="tagNew" value="New Tag">
-						<br />
-					
-					<br />
-					<br />
-				<button class="w3-button w3-white w3-round-xxlarge" onclick="#" style="float: right;">Save</button>
+
+					<h4>Add courses and event tags to your schedule</h3>
+
+						<input style="background-color: white; color: black;" id="classSearchIntro"
+						type="text" placeholder="Search Classes at Cornell"
+						/>
+						<button class="btn btn-sm btn-default" style="float:right;" onclick="addUserClass()">Save</button>
+						<br><br>
+						<h4>Current classes and tags (click to remove):</h4>
+						<ul id = "currentClasses">
+						</ul>
+
+						<button class="btn btn-sm btn-default" style="float:right;" onclick="updateCalendar()">Save tags</button>
 
 			</div>
+
+		      </div>
+
+		    </div>
+
+
+<div id="notificationModal" class="modal">
+		      <!-- Modal content -->
+	  <div class="modal-content">
+			<div class="modal-header" style="background-color: #4a4a4a;">
+			  <span class="close" id="closeNotification">&times;</span>
+			  <h2>Notification Settings</h2>
+				</div>
+				<div class="modal-body" style="background-color: #4a4a4a;">
+				</div>
 			<div class="modal-footer" style="background-color: #4a4a4a;">
-			  </div>
-		      </div>
-
-		    </div>
-
-<div id="projectModal" class="modal">
-
-		      <!-- Modal content -->
-		      <div class="modal-content">
-			<div class="modal-header">
-			  <span class="close">&times;</span>
-			  <h2>New Project</h2>
-
-			  <div class="col-sm-8" style="padding-right:20px; border-right: 2px solid #ccc;">
-					<input id="project_name" type="text" name="Project Name" value="Project Name"><br><br>
-					<div class="col-sm-4">
-						<h4>Tag</h4>
-						<h4>Due Date</h4>
-						<br>
-						<h4>Tasks</h4>
-					</div>
-					<div class="col-sm-8">
-
-						<select id="select_tags" name="tags">
-						  <option value="info2300">INFO 2300</option>
-						  <option value="cs3410">CS 3410</option>
-						  <option value="cs4410">CS 4410</option>
-						  <option value="cs3152">CS 3152</option>
-						</select>
-
-						<br>
-
-						<input type="radio" name="time" value="time"> <p>12:00 PM</p>
-  						<input type="radio" name="date" value="date"> 07/16/2017<br>
-
-						<div>
-							<input class= "task_name" type="text" name="t1_name" value="Task 1"> <br>
-							<input class= "task" type="text" name="t1" value="Some details"> <br>
-						</div>
-						<div>
-							<input class= "task_name" type="text" name="t2_name" value="Task 2"> <br>
-							<input class= "task" type="text" name="t2" value="Some details"> <br>
-						</div>
-						<div>
-							<input class= "task_name" type="text" name="t3_name" value="Task 3"> <br>
-							<input class= "task" type="text" name="t3" value="Some details"> <br>
-						</div>
-					</div>
-				</div>
-
-				<div class="col-sm-4">
-					<h3>Suggested Projects</h3>
-					<div>
-						<input class= "task_name" type="text" name="p1_name" value="Project 1"> <br>
-						<input class= "task" type="text" name="p1" value="Some description"> <br>
-					</div>
-					<div>
-						<input class= "task_name" type="text" name="p2_name" value="Project 2"> <br>
-						<input class= "task" type="text" name="p2" value="Some description"> <br>
-					</div>
-					<div>
-						<input class= "task_name" type="text" name="p3_name" value="Project 3"> <br>
-						<input class= "task" type="text" name="p3" value="Some description"> <br>
-					</div>
-					<div>
-						<input class= "task_name" type="text" name="p4_name" value="Project 4"> <br>
-						<input class= "task" type="text" name="p4" value="Some description"> <br>
-					</div>
-					<button class="w3-button w3-green w3-round-xxlarge" onclick="javascript:getTasks(userid)" style="float:right;">Create</button>
-					<button class="w3-button w3-red w3-round-xxlarge" style="float:right;">Delete</button>
-
-				</div>
-
-
 			</div>
+	  </div>
 
-		      </div>
-
-		    </div>
-
-
-<div id="taskModal" class="modal">
-
-		      <!-- Modal content -->
-		      <div class="modal-content">
-			<div class="modal-header">
-			  <span class="close">&times;</span>
-
-			</div>
-
-			<div class="modal-body">
-				<h2>New Task</h2>
-
-					<input id="myInputTaskName" class = "myInput" type="text" name="Task Name" placeholder="Task Name"><br><br>
-					<input id="myInputCourse" class = "myInput" type="text" name="Course" placeholder="Course"><br><br>
-					<input id="myInputColor" class = "myInput" type="text" name="Color" placeholder="Color"><br><br>
-					<input id="myInputDate" class = "myInput" type="text" name="Date" placeholder="Date"><br><br>
-					<input id="myInputDetails" class = "myInput" type="text" name="Details" placeholder="Details"><br><br>
-					<!-- <div class="col-sm-4">
-						<h4>Tag</h4>
-						<h4>Due Date</h4>
-						<br>
-						<h4>Tasks</h4>
-					</div>
-					<div class="col-sm-8">
-
-						<select id="select_tags" name="tags">
-						  <option value="info2300">INFO 2300</option>
-						  <option value="cs3410">CS 3410</option>
-						  <option value="cs4410">CS 4410</option>
-						  <option value="cs3152">CS 3152</option>
-						</select>
-
-						<br>
-
-						<input type="radio" name="time" value="time"> <p>12:00 PM</p>
-  						<input type="radio" name="date" value="date"> 07/16/2017<br>
-
-						<div>
-							<input class= "task_name" type="text" name="t1_name" value="Task 1"> <br>
-							<input class= "task" type="text" name="t1" value="Some details"> <br>
-						</div>
-						<div>
-							<input class= "task_name" type="text" name="t2_name" value="Task 2"> <br>
-							<input class= "task" type="text" name="t2" value="Some details"> <br>
-						</div>
-						<div>
-							<input class= "task_name" type="text" name="t3_name" value="Task 3"> <br>
-							<input class= "task" type="text" name="t3" value="Some details"> <br>
-						</div>
-					</div> -->
-			  </div>
-
-
-<!-- NOTE: NEEDS TO BE FIXED. HOW DO YOU GET THE TASKID WHEN YOU ADD A NEW ITEM? -->
-
-			<div class="modal-footer">
-					<button onclick="addTask(userid, document.getElementById('myInputTaskName').value,
-					document.getElementById('myInputCourse').value, document.getElementById('myInputColor').value,
-					document.getElementById('myInputDate').value, document.getElementById('myInputDetails').value);
-					newElement(document.getElementById('myInputTaskName').value, document.getElementById('myInputCourse').value,
-					document.getElementById('myInputColor').value, document.getElementById('myInputDate').value,
-					document.getElementById('myInputDetails').value, 999999);
-					goButton('taskModal');" class="w3-button w3-green w3-round-xxlarge" style="float:right;">Create</button>
-					<button class="w3-button w3-red w3-round-xxlarge" style="float:right;">Delete</button>
-			  </div>
-
-		      </div>
-
-		    </div>
+</div>

@@ -309,6 +309,7 @@ def getEvents(userid):
                  'tagId': str(item[5]), 'notes': str(item[6]), 'location': str(item[7])} for
                 item in cursor.fetchall()]
         return jsonify(data)
+    return access_denied()
 
 
 @app.route('/removeEvent/', methods=['POST'])

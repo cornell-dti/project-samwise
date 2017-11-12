@@ -1,6 +1,6 @@
 import os
 
-SECRET_KEY = os.urandom(32)
+SECRET_KEY = os.urandom(32) if 'SECRET_KEY' not in os.environ else os.getenv('SECRET_KEY')
 COLORS = ['4286f4', 'ed4040', 'd33fed', '17b236', '17c2ed']
 
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')

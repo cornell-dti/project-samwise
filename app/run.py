@@ -321,7 +321,7 @@ def removeEvent():
     user_rows = cursor.fetchall()
 
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
-        cursor.execute('DELETE FROM samwisedb.Event WHERE eventId = %s', eventId)
+        cursor.execute('DELETE FROM samwisedb.Event WHERE eventId = %s', (eventId,))
         connection.commit()
         return success()
     return access_denied()

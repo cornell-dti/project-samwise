@@ -184,9 +184,9 @@
 			if (course === 'undefined'){
 				course = "Blank";
 			}
-			if (start < 1){
-				start = 1;
-			}
+			// if (start < 1){
+			// 	start = 1;
+			// }
 			var startWorkingDateObj = new Date(realstart);
 			startWorkingDateObj.setDate(startWorkingDateObj.getDate() - start);
 			startWorkingDateObj.setTime(startWorkingDateObj.getTime() - (5 * 60 * 60 * 1000));
@@ -195,6 +195,7 @@
 			var dateObj = new Date(date);
 			dateObj.setTime(dateObj.getTime() - (5 * 60 * 60 * 1000));
 			date = dateObj.toISOString();
+			console.log(date);
 
 			var c = getUserCourseColor(userid, course);
 			var newEvent = {
@@ -248,7 +249,6 @@
 						startWorkingExam.setDate(startWorkingExam.getDate() - 7);
 						var startDate = startWorkingExam.toISOString();
 						var c = getUserCourseColor(userid, exams[k][j].courseId);
-						console.log("COLOR " + c);
 						var newEvent = {
 							title : exams[k][j].courseId,
 							start : startDate,
@@ -269,8 +269,8 @@
 
 			var events = getEvents(userid);
 			for (k = 0; k < events.length; k++){
-				var c = getUserCourseColor(userid, events[k].tagid);
-				console.log("TAG" + events[k].eventName + " " + events[k].tagid);
+				var c = getUserCourseColor(userid, events[k].tagId);
+				console.log("TAG" + events[k].eventName + " " + events[k].tagId);
 				var newEvent = {
 					title : events[k].eventName,
 					start : events[k].startTime,

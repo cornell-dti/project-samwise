@@ -114,8 +114,6 @@
 			}
 			infoDiv.append(t);
 
-			var eId = event.eventId;
-
 			var button = document.createElement("button");
 			button.setAttribute("style", "float:left");
 			button.setAttribute("id", "removeButtonId");
@@ -124,7 +122,7 @@
 
 			var b = document.getElementById("removeButtonId");
 			b.onclick = function(){
-				removeEvent(eId);
+				// removeEvent(event.eventId);
 				$("#calendar").fullCalendar('removeEvents');
 				addStoredEvents();
 				syncGoogleToFullCalendar();

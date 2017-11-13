@@ -29,6 +29,10 @@ input {
 	background-color: rgba(255, 5, 35, 0.7);
 }
 
+.classSearch{
+	width: 100px;
+}
+
 .project_location, .project_notes, .start_working {
 	background-color: rgba(255, 5, 35, 0.7);
 	color: white;
@@ -54,6 +58,33 @@ input::placeholder{
 }
 .input-group-addon {
 	width: auto;
+}
+
+
+/* Header Bar*/
+
+#header-bar{
+	padding: 25px;
+	background-color: #4a4a4a;
+}
+
+.title-link{
+	float: left;
+	color: #ffffff;
+}
+
+.title{
+	color: #ffffff;
+	font-size: 36px;
+}
+
+.header-bar-links{
+	float: right;
+	padding-top: 15px;
+}
+
+a:hover{
+	text-decoration: none;
 }
 
 
@@ -251,7 +282,6 @@ li a {
 }
 li a:hover,
 li a:focus {
-  background: #3a87ad;
   color: #fff;
 }
 

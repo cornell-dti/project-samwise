@@ -15,7 +15,7 @@
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
   <link rel='stylesheet' href='../static/js/fullcalendar-3.2.0/fullcalendar.css' />
-	<link rel='stylesheet' href='../static/css/stylesheet.css?version=06' />
+	<link rel='stylesheet' href='../static/css/stylesheet.css?version=02' />
 
   <script src='../static/js/fullcalendar-3.2.0/lib/jquery.min.js'></script>
   <script src='../static/js/fullcalendar-3.2.0/lib/moment.min.js'></script>
@@ -28,15 +28,20 @@
 
 
 <body>
-		<div class="col-sm-9">
-			<h1>  Project Samwise</h1>
+	<div id = "header-bar">
+		<ul>
+			<li class = "title-link"><a href="#" class = "title">Samwise</a><li>
+			<li class= "header-bar-links"><a href="#">Sign out</a><li>
+			<li class = "header-bar-links" style = "color: #888; font-size: 20px;">|</li>
+			<li class= "header-bar-links"><a onclick = "introAdd()" href="#settings">Settings</a><li>
+			<br>
+			<br>
+		</ul>
+
+
 		</div>
 
-		<div class="col-sm-3">
-			{% include 'toggleMenu.html' %}
-		</div>
-
-
+	</div>
 				<!-- "HELPER FUNCTIONS" -->
 		    {% include 'modalDialog.html' %}
 

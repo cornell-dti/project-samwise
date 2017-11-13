@@ -31,13 +31,19 @@
 
 
 <body>
-<div class="col-sm-9">
-    <h1> Project Samwise</h1>
-</div>
+	<div id = "header-bar">
+	  <ul>
+	    <li class = "title-link"><a href="#" class = "title">Samwise</a><li>
+	    <li class= "header-bar-links"><a href="#">Sign out</a><li>
+	    <li class = "header-bar-links" style = "color: #888; font-size: 20px;">|</li>
+	    <li class= "header-bar-links"><a onclick = "introAdd()" href="#settings">Settings</a><li>
+	    <br>
+	    <br>
+	  </ul>
 
-<div class="col-sm-3">
-    {% include 'toggleMenu.html' %}
-</div>
+
+	  </div>
+
 
 
 <!-- "HELPER FUNCTIONS" -->

@@ -1,4 +1,12 @@
 
+function syncCalendar() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", 'http://localhost:5000/getCalendarData', false);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send();
+    return JSON.parse(xhr.responseText);
+}
+
 function addProject(user, projectName, dueDate, courseId) {
 
         var obj = {"user" : user, "projectName" : projectName, "dueDate" : dueDate, "courseId" : courseId};
@@ -42,10 +50,17 @@ function getProjects(id) {
     return JSON.parse(xhr.responseText);
 }
 
-function addEvent(user, eventName, startTime, endTime, tagId) {
+function addEvent(user, eventName, startTime, endTime, tagId, pLocation, notes) {
 
-    var obj = {"user" : user, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId};
+    var obj = {"user" : user, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId, "notes" : notes, "location" : pLocation};
 
+    console.log(user);
+    console.log(eventName);
+    console.log(startTime);
+    console.log(endTime);
+    console.log(tagId);
+    console.log(pLocation);
+    console.log(notes);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", 'http://localhost:5000/addEvent/', true);
     xhr.setRequestHeader("Content-Type", "application/json")
@@ -66,7 +81,7 @@ function removeEvent(eventId) {
 
 function updateEvent(eventId, eventName, startTime, endTime, tagId) {
 
-    var obj = {"eventId" : eventId, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId};
+    var obj = {"eventId" : eventId, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId, "notes" : notes, "location" : location};
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", 'http://localhost:5000/updateEvent/', true);

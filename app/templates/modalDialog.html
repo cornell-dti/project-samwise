@@ -8,10 +8,13 @@
         var notModal = document.getElementById('notificationModal');
 				var displayProjectModal = document.getElementById('addProjectModal');
 				var welcomeModal = document.getElementById("welcomeModal");
+				var eventDetailsModal = document.getElementById("eventDetailsModal");
 
-				var closeWelcome = document.getElementById("closeWelcome");
-				closeWelcome.onclick = function(){
-					welcomeModal.style.display = 'none';
+				var closeDetails = document.getElementById("closeEventDetails");
+				closeDetails.onclick = function(){
+					var info = document.getElementById("information");
+					info.innerHTML = "";
+					eventDetailsModal.style.display = 'none';
 				}
 				var closeIntro = document.getElementById("closeIntro");
 				closeIntro.onclick = function(){
@@ -150,11 +153,14 @@
 
 
 		function addProjectToCalendar(){
-			name = document.getElementById("projectName").value;
-			date = document.getElementById("projectDate").value;
-			course = document.getElementById("selectDropdown").value;
-			start = document.getElementById("startWorking").value;
-			realstart = document.getElementById("realstart").value;
+
+			var name = document.getElementById("projectName").value;
+			var date = document.getElementById("projectDate").value;
+			var course = document.getElementById("selectDropdown").value;
+			var start = document.getElementById("startWorking").value;
+			var realstart = document.getElementById("realstart").value;
+			var pLocation = document.getElementById("projectLocation").value;
+			var notes = document.getElementById("projectNotes").value;
 
 			if (name === 'undefined'){
 				name = "Empty"
@@ -178,26 +184,34 @@
 			if (course === 'undefined'){
 				course = "Blank";
 			}
-			if (start < 1){
-				start = 1;
-			}
+			// if (start < 1){
+			// 	start = 1;
+			// }
 			var startWorkingDateObj = new Date(realstart);
 			startWorkingDateObj.setDate(startWorkingDateObj.getDate() - start);
+			startWorkingDateObj.setTime(startWorkingDateObj.getTime() - (5 * 60 * 60 * 1000));
 			var startDate = startWorkingDateObj.toISOString();
+
+			var dateObj = new Date(date);
+			dateObj.setTime(dateObj.getTime() - (5 * 60 * 60 * 1000));
+			date = dateObj.toISOString();
+			console.log(date);
+
 			var c = getUserCourseColor(userid, course);
-			console.log("COLOR " + c);
 			var newEvent = {
 				title : name,
 				start : startDate,
 				end : date,
-				className : course,
-				color : c
+				tag : course,
+				color : c,
+				notes : notes,
+				location : pLocation
 			}
 
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			$("#calendar").fullCalendar('rerenderEvents');
 
-			addEvent(userid, name, startDate, date, course);
+			addEvent(userid, name, startDate, date, course, pLocation, notes);
 
 			var modal = document.getElementById('addProjectModal');
 			modal.style.display = 'none';
@@ -235,13 +249,14 @@
 						startWorkingExam.setDate(startWorkingExam.getDate() - 7);
 						var startDate = startWorkingExam.toISOString();
 						var c = getUserCourseColor(userid, exams[k][j].courseId);
-						console.log("COLOR " + c);
 						var newEvent = {
 							title : exams[k][j].courseId,
 							start : startDate,
 							end : dateString,
-							className : exams[k][j].courseId,
-							color : c
+							tag : exams[k][j].courseId,
+							color : c,
+							location : exams[k][j].location,
+							notes : exams[k][j].notes
 						}
 
 						$("#calendar").fullCalendar('addEventSource', [newEvent]);
@@ -254,13 +269,16 @@
 
 			var events = getEvents(userid);
 			for (k = 0; k < events.length; k++){
-				var c = getUserCourseColor(userid, events[k].tagid);
+				var c = getUserCourseColor(userid, events[k].tagId);
+				console.log("TAG" + events[k].eventName + " " + events[k].tagId);
 				var newEvent = {
 					title : events[k].eventName,
 					start : events[k].startTime,
 					end : events[k].endTime,
-					className : events[k].tagid,
-					color : c
+					tag : events[k].tagid,
+					color : c,
+					notes : events[k].notes,
+					location : events[k].location
 				}
 				$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			}
@@ -274,6 +292,7 @@
 
 		function populateUserCourses(){
 			var userCourses = getUserCourses(userid);
+			console.log(userCourses);
 			if (userCourses.length < 1){
 				return;
 			}
@@ -374,6 +393,14 @@
 
 </script>
 
+<div id = "eventDetailsModal" class="modal" style="display:none;">
+	<div class = "small-modal" id="eventDetaislModalContent">
+		<div class = "modal-header">
+			<span class="close" id="closeEventDetails">&times;</span>
+ 			<div id = "information"></div>
+		</div>
+	</div>
+</div>
 
 <div id = "addProjectModal" class="modal" style= "display:none;">
 	<div class="modal-content">
@@ -388,12 +415,10 @@
 	 			<br>
 	 			<br>
 
-					<!--TODO: Popupate select tag with user tags -->
 					<div class = "col-sm-2 title">
 						Tag
 					</div>
 					<select style="color: black" id = "selectDropdown"></select>
-					<!-- add radio buttons w/ tags extract from backend -->
 
 				<br><br>
 				<div class = "col-sm-2 title">
@@ -482,20 +507,4 @@
 			</div>
 	  </div>
 
-</div>
-
-<div id = "welcomeModal" class="modal" style="display:block;">
-	<div class="modal-content">
-		<div class="modal-header" style="background-color: #4a4a4a;">
-			<span class="close" id="closeWelcome">&times;</span>
-			<center>
-				<br><br><br>
-				<h1 style="font-size: 100px">Samwise.</h1>
-				<button class="loginbutton" id = "login"></button>
-				<br><br><br>
-				<p style="font-size: 25px">Made by D&TI</p>
-				<p style="font-size: 15px">Cornell Design & Tech Initiative</p>
-			</center>
-		</div>
-	</div>
 </div>

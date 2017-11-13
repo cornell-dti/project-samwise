@@ -1,0 +1,24 @@
+<script>
+	$(document).ready(function() {
+		var closeWelcome = document.getElementById("closeWelcome");
+		closeWelcome.onclick = function(){
+			welcomeModal.style.display = 'none';
+		}
+	});
+</script>
+
+<div id = "welcomeModal" class="modal" style="display:block;">
+	<div class="modal-content">
+		<div class="modal-header" style="background-color: #4a4a4a;">
+			<span class="close" id="closeWelcome">&times;</span>
+			<center>
+				<br><br><br>
+				<h1 style="font-size: 100px">Samwise.</h1>
+				<a href="/login"><button class="loginbutton" id="login"></button></a>
+				<br><br><br>
+				<p style="font-size: 25px">Made by D&TI</p>
+				<p style="font-size: 15px">Cornell Design & Tech Initiative</p>
+			</center>
+		</div>
+	</div>
+</div>

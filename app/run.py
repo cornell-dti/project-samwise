@@ -6,7 +6,7 @@ import json
 import mysql.connector
 from flask import Flask, render_template, url_for, redirect, request, session, jsonify, g
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
+from flask_login import LoginManager, login_required, current_user, login_user, logout_user, UserMixin
 from requests_oauthlib import OAuth2Session
 
 app = Flask(__name__)
@@ -91,6 +91,12 @@ def login():
     )
     session['oauth_state'] = state
     return redirect(auth_url)
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    logout_user()
+    session.clear()
+    return redirect(url_for('index'))
 
 
 @app.route('/gauth_callback')

@@ -193,13 +193,28 @@
 	}
 
     {% if auth %}
-    syncGoogleToFullCalendar();
-		addStoredEvents();
-		var input = document.getElementById("classSearchIntro").replace(/ /g,'');
-		var courses = getAllCourses();
-		var awesomplete = new Awesomplete(input);
-		awesomplete.list = courses;
-		populateUserCourses();
+
+    document.addEventListener("DOMContentLoaded", function() {
+      syncGoogleToFullCalendar();
+  		addStoredEvents();
+      var courses = getAllCourses();
+  		var input = document.getElementById("classSearchIntro");
+  		var awesomplete = new Awesomplete(input,{list : courses});
+  		// awesomplete.list = courses;
+  		populateUserCourses();
+    });
+
+    // syncGoogleToFullCalendar();
+    // addStoredEvents();
+    // var courses = getAllCourses();
+    // var input = document.getElementById("classSearchIntro");
+    // if (input != null) {
+    //   var awesomplete = new Awesomplete(input, {list : courses});
+    //   // awesomplete.list = courses;
+    //   populateUserCourses();
+    // }
+
+
     {% endif %}
 </script>
 </html>

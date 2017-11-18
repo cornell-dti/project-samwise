@@ -2,6 +2,7 @@
 	$(document).ready(function() {
         // page is now ready, initialize the calendar...
 
+
         var intromodal = document.getElementById('introModal');
 				var modal = document.getElementById('myModal');
 				var modalevent = document.getElementById('eventModal');
@@ -33,11 +34,13 @@
         var courseAddButton = document.getElementById('courseAdd');
         var eventAddButton = document.getElementById('eventAdd');
         var input = document.getElementById("nameOne");
-        var awesomplete = new Awesomplete(input, {
-				  minChars: 1,
-				  autoFirst: true
-				});
 
+				document.addEventListener("DOMContentLoaded", function() {
+	        var awesomplete = new Awesomplete(input, {
+					  minChars: 0,
+					  autoFirst: true
+					});
+				});
 
         // When the user clicks anywhere outside of the modal, close it
         window.onclick = function(event) {
@@ -67,6 +70,7 @@
         }
 
     });
+
 
     document.addEventListener('DOMContentLoaded', function () {
       if (Notification.permission !== "granted")
@@ -391,6 +395,13 @@
 			introModal.style.display = 'none';
 		}
 
+		function nospaces(t){
+        if(t.value.match(/\s|\./g)){
+            alert('Username Cannot Have Spaces or Full Stops');
+            t.value=t.value.replace(/\s/g,'');
+        }
+    }
+
 </script>
 
 <div id = "eventDetailsModal" class="modal" style="display:none;">
@@ -477,7 +488,7 @@
 					</div>
 
 						<input style="background-color: white; color: black;" id="classSearchIntro"
-						type="text" class = "classSearch" placeholder="Search Classes at Cornell"
+						type="text" class = "classSearch" placeholder="Search Classes at Cornell" onkeyup="nospaces(this)"
 						/>
 						<button class="btn btn-sm btn-default" style="float:right;" onclick="addUserClass()">Save</button>
 						<br><br>

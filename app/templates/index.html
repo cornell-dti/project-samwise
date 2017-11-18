@@ -195,14 +195,28 @@
 		modal.style.display = "none";
 	}
 
-    {% if auth %}
+  {% if auth %}
+  document.addEventListener("DOMContentLoaded", function() {
     syncGoogleToFullCalendar();
-		addStoredEvents();
-		var input = document.getElementById("classSearchIntro");
-		var courses = getAllCourses();
-		var awesomplete = new Awesomplete(input);
-		awesomplete.list = courses;
-		populateUserCourses();
-    {% endif %}
+    addStoredEvents();
+    var courses = getAllCourses();
+    var input = document.getElementById("classSearchIntro");
+    var awesomplete = new Awesomplete(input,{list : courses});
+    document.getElementById('classSearchIntro').addEventListener("awesomplete-selectcomplete", function(event) {
+        addUserClass();
+    });
+    // awesomplete.list = courses;
+    populateUserCourses();
+  });
+  // syncGoogleToFullCalendar();
+  // addStoredEvents();
+  // var courses = getAllCourses();
+  // var input = document.getElementById("classSearchIntro");
+  // if (input != null) {
+  //   var awesomplete = new Awesomplete(input, {list : courses});
+  //   // awesomplete.list = courses;
+  //   populateUserCourses();
+  // }
+  {% endif %}
 </script>
 </html>

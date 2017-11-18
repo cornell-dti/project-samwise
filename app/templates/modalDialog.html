@@ -33,9 +33,11 @@
         var courseAddButton = document.getElementById('courseAdd');
         var eventAddButton = document.getElementById('eventAdd');
         var input = document.getElementById("nameOne");
-        var awesomplete = new Awesomplete(input, {
-				  minChars: 1,
-				  autoFirst: true
+				document.addEventListener("DOMContentLoaded", function() {
+	        var awesomplete = new Awesomplete(input, {
+					  minChars: 0,
+					  autoFirst: true
+					});
 				});
 
 

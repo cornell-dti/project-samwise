@@ -200,6 +200,10 @@
       var courses = getAllCourses();
   		var input = document.getElementById("classSearchIntro");
   		var awesomplete = new Awesomplete(input,{list : courses});
+
+      document.getElementById('classSearchIntro').addEventListener("awesomplete-selectcomplete", function(event) {
+          addUserClass();
+      });
   		// awesomplete.list = courses;
   		populateUserCourses();
     });

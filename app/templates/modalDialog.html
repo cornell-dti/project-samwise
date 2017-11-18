@@ -10,6 +10,7 @@
 				var displayProjectModal = document.getElementById('addProjectModal');
 				var welcomeModal = document.getElementById("welcomeModal");
 				var eventDetailsModal = document.getElementById("eventDetailsModal");
+				var settingsModal = document.getElementById("settingsModal");
 
 				var closeDetails = document.getElementById("closeEventDetails");
 				closeDetails.onclick = function(){
@@ -21,6 +22,11 @@
 				closeIntro.onclick = function(){
 					document.getElementById("classSearchIntro").value = "";
 					intromodal.style.display = 'none';
+				}
+				var closeSettings = document.getElementById("closeSettings");
+				closeSettings.onclick = function(){
+					document.getElementById("classSearchSettings").value = "";
+					settingsModal.style.display = 'none';
 				}
 				var closeProject = document.getElementById("closeProject");
 				closeProject.onclick = function(){
@@ -108,6 +114,12 @@
 				document.getElementById("classSearchIntro").value = "";
         modal.style.display = 'block';
     }
+		function settingsAdd() {
+				var modal = document.getElementById('settingsModal');
+				console.log("Here");
+				document.getElementById("classSearchSettings").value = "";
+				modal.style.display = 'block';
+		}
 
 
 		function displayProjectModal() {
@@ -502,6 +514,31 @@
 		      </div>
 
 		    </div>
+
+<div id="settingsModal" class="modal" style= "display:none;">
+
+		      <!-- Modal content -->
+		      <div class="modal-content">
+			<div class="modal-header" style="background-color: #4a4a4a;" >
+			<span class = "close" id = "closeSettings">&times;</span>
+			  <h2>Modify your classes and tags</h2>
+
+					<div class = "col-sm-2">
+					</div>
+
+						<input style="background-color: white; color: black;" id="classSearchSettings"
+						type="text" class = "classSearch" placeholder="Search Classes at Cornell"
+						/>
+						<button class="btn btn-sm btn-default" style="float:right;" onclick="addUserClassSettings()">Save</button>
+						<br><br>
+						<h4>Current classes and tags (click to remove):</h4>
+						<ul id = "currentClassesSettings">
+						</ul>
+
+						<button class="btn btn-sm btn-default" style="float:right;" onclick="updateCalendarSettings()">Save tags</button>
+			</div>
+		</div>
+</div>
 
 
 <div id="notificationModal" class="modal">

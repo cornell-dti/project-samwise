@@ -326,6 +326,26 @@
 				lst.append(li);
 			}
 		}
+		function populateUserCoursesSettings(){
+			var userCourses = getUserCourses(userid);
+			console.log(userCourses);
+			if (userCourses.length < 1){
+				return;
+			}
+			var lst = document.getElementById("currentClassesSettings");
+			$('#currentClassesSettings').empty();
+			for (i = 0; i < userCourses.length; i++){
+				var li = document.createElement("li");
+				var a = document.createElement("a");
+				a.setAttribute("href", "#");
+				a.setAttribute("onclick", "remove(this)");
+				var t = document.createTextNode(userCourses[i]);
+				a.append(t);
+				li.append(a);
+
+				lst.append(li);
+			}
+		}
 
 		function populateProjectTagSelect(){
 			var userCourses = getUserCourses(userid);
@@ -367,6 +387,24 @@
 				addCourse(userid, className);
 				console.log(className);
 				populateUserCourses();
+			}
+		}
+
+		function addUserClassSettings(){
+			var className = document.getElementById("classSearchSettings").value;
+			var currClasses = getUserCourses(userid);
+			if (currClasses.length > 0){
+				for (i = 0; i < currClasses.length; i++){
+					if (currClasses[i] == className){
+						console.log("already have this class");
+						return;
+					}
+				}
+			}
+			if (className.length > 0){
+				addCourse(userid, className);
+				console.log(className);
+				populateUserCoursesSettings();
 			}
 		}
 

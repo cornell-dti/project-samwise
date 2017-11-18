@@ -128,7 +128,7 @@
 
 			var b = document.getElementById("removeButtonId");
 			b.onclick = function(){
-				// removeEvent(event.eventId);
+				removeEvent(event.id);
 				$("#calendar").fullCalendar('removeEvents');
 				addStoredEvents();
 				syncGoogleToFullCalendar();

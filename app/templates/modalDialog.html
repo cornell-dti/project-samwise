@@ -270,16 +270,18 @@
 			var events = getEvents(userid);
 			for (k = 0; k < events.length; k++){
 				var c = getUserCourseColor(userid, events[k].tagId);
-				console.log("TAG" + events[k].eventName + " " + events[k].tagId);
+				console.log("TAG " + events[k].eventName + " " + events[k].tagId);
 				var newEvent = {
+					id : events[k].eventId,
 					title : events[k].eventName,
 					start : events[k].startTime,
 					end : events[k].endTime,
-					tag : events[k].tagid,
+					tag : events[k].tagId,
 					color : c,
 					notes : events[k].notes,
 					location : events[k].location
 				}
+				console.log('Event id: ' + events[k].eventId);
 				$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			}
 			$("#calendar").fullCalendar('rerenderEvents');

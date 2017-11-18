@@ -195,7 +195,7 @@
     {% if auth %}
     syncGoogleToFullCalendar();
 		addStoredEvents();
-		var input = document.getElementById("classSearchIntro");
+		var input = document.getElementById("classSearchIntro").replace(/ /g,'');
 		var courses = getAllCourses();
 		var awesomplete = new Awesomplete(input);
 		awesomplete.list = courses;

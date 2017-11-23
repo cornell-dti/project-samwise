@@ -6,7 +6,7 @@ import json
 import mysql.connector
 from flask import Flask, render_template, url_for, redirect, request, session, jsonify, g
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_required, current_user, login_user, UserMixin
+from flask_login import LoginManager, login_required, current_user, login_user, logout_user, UserMixin
 from requests_oauthlib import OAuth2Session
 
 app = Flask(__name__)
@@ -20,7 +20,7 @@ login_manager.session_protection = 'strong'
 
 
 class UserData(db.Model, UserMixin):
-    __tablename__ = 'UserData'
+    __tablename__ = 'samwisedb.UserData'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
     name = db.Column(db.String(255), nullable=True)
@@ -91,6 +91,12 @@ def login():
     )
     session['oauth_state'] = state
     return redirect(auth_url)
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    logout_user()
+    session.clear()
+    return redirect(url_for('index'))
 
 
 @app.route('/gauth_callback')
@@ -190,6 +196,7 @@ def getUserCourses(netId):
 @app.route('/addCourse/', methods=['POST'])
 def addCourse():
     data = request.get_json(force=True)
+    print(data)
     courseId = data['courseId']
     user = data['user']
     if current_user.is_authenticated and current_user.netid == user:
@@ -576,4 +583,4 @@ def get_user_from_subtask_id(subtask_id):
 
 if __name__ == '__main__':
     db.create_all()
-    app.run(host='0.0.0.0')
+    app.run(debug=True)

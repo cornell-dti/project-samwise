@@ -34,7 +34,7 @@
 	<div id = "header-bar">
 	  <ul>
 	    <li class = "title-link"><a href="#" class = "title">Samwise</a><li>
-	    <li class= "header-bar-links"><a href="#">Sign out</a><li>
+	    <li class= "header-bar-links"><a href="/logout">Sign out</a><li>
 	    <li class = "header-bar-links" style = "color: #888; font-size: 20px;">|</li>
 	    <li class= "header-bar-links"><a onclick = "introAdd()" href="#settings">Settings</a><li>
 	    <br>
@@ -75,7 +75,7 @@
 			var infoDiv = document.getElementById('information');
 
 			var tagTitle = document.createElement("h5");
-			if (event.tag === 'undefined'){
+			if (event.tag == undefined){
 				tagTitle.append(document.createTextNode("No tag"));
 			}
 			else{
@@ -84,7 +84,7 @@
 			infoDiv.append(tagTitle);
 
 			var t = document.createElement("h4");
-			if (event.title === 'undefined'){
+			if (event.title == undefined){
 				t.append(document.createTextNode("No title"));
 			}
 			else{
@@ -94,16 +94,17 @@
 
 			var t = document.createElement("h6");
 
-			if (event.end === 'undefined'){
+			if (event.end == undefined){
 				t.append(document.createTextNode("No end date"));
 			}
 			else{
-				t.append(document.createTextNode(event.end));
+			    var date = event.end.format("hh:mma on MMM DD, YYYY");
+				t.append(document.createTextNode("Ends at " + date));
 			}
 			infoDiv.append(t);
 
 			var t = document.createElement("h6");
-			if (event.location === 'undefined'){
+			if (event.location == undefined){
 				t.append(document.createTextNode("No location"));
 			}
 			else{
@@ -112,7 +113,7 @@
 			infoDiv.append(t);
 
 			var t = document.createElement("h6");
-			if (event.notes === 'undefined'){
+			if (event.notes == undefined){
 				t.append(document.createTextNode("No notes"));
 			}
 			else{
@@ -128,7 +129,7 @@
 
 			var b = document.getElementById("removeButtonId");
 			b.onclick = function(){
-				// removeEvent(event.eventId);
+				removeEvent(event.id);
 				$("#calendar").fullCalendar('removeEvents');
 				addStoredEvents();
 				syncGoogleToFullCalendar();
@@ -194,14 +195,28 @@
 		modal.style.display = "none";
 	}
 
-    {% if auth %}
+  {% if auth %}
+  document.addEventListener("DOMContentLoaded", function() {
     syncGoogleToFullCalendar();
-		addStoredEvents();
-		var input = document.getElementById("classSearchIntro");
-		var courses = getAllCourses();
-		var awesomplete = new Awesomplete(input);
-		awesomplete.list = courses;
-		populateUserCourses();
-    {% endif %}
+    addStoredEvents();
+    var courses = getAllCourses();
+    var input = document.getElementById("classSearchIntro");
+    var awesomplete = new Awesomplete(input,{list : courses});
+    document.getElementById('classSearchIntro').addEventListener("awesomplete-selectcomplete", function(event) {
+        addUserClass();
+    });
+    // awesomplete.list = courses;
+    populateUserCourses();
+  });
+  // syncGoogleToFullCalendar();
+  // addStoredEvents();
+  // var courses = getAllCourses();
+  // var input = document.getElementById("classSearchIntro");
+  // if (input != null) {
+  //   var awesomplete = new Awesomplete(input, {list : courses});
+  //   // awesomplete.list = courses;
+  //   populateUserCourses();
+  // }
+  {% endif %}
 </script>
 </html>

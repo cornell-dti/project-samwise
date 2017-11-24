@@ -172,7 +172,8 @@
 				realstart = realstart.concat(":00");
 			}
 			else{
-				realstart = date; //should be current date/time
+				var today = new Date();
+				realstart = today.toISOString(); //should be current date/time
 			}
 			//if end date field is filled out
 			if (date){
@@ -181,10 +182,17 @@
 			else{
 				//realstart should be defined at this point
 				//add an hour to realstart - TEST THIS LOCALLY
-				var today = new Date();
-				today.setTime(today.getHours() + 1);
-				var date = today.toISOString();
-				console.log(date);
+				if (realstart){
+					var end = new Date(realstart);
+					end.setHours(end.getHours()+1);
+					var date = end.toISOString();
+					console.log(date);
+				}else{
+					var today = new Date();
+					today.setHours(today.getHours() + 1);
+					var date = today.toISOString();
+					console.log(date);
+				}
 			}
 			if (course === 'undefined'){
 				course = "Blank";
@@ -245,6 +253,7 @@
 
 					var dateString = date[2] + "-" + parseInt(monthNum) +
 										"-" + date[0] + "T" + date[3];
+
 
 					if (exams[k][j].courseId === 'undefined'){
 						continue;
@@ -480,9 +489,9 @@
 			  <h4>Hi! Help us make your calendar.</h4>
 				<h4>Search and add classes that you are currently enrolled in. </h4>
 
-						<input style="background-color: white; color: black;" id="classSearchIntro"
-						type="text" placeholder="Search Classes at Cornell"
-						/>
+				<input style="background-color: white; color: black;" id="classSearchIntro"
+				type="text" placeholder="Search Classes at Cornell"
+				/>
 						<button class="btn btn-sm btn-default" style="float:right;" onclick="addUserClass()">Save</button>
 						<br><br>
 						<h4>Current classes and tags (click to remove):</h4>

@@ -28,10 +28,10 @@ input {
 	border-bottom: 1px solid white;
 	background-color: rgba(255, 5, 35, 0.7);
 }
-
+/*
 .classSearch{
 	width: 100px;
-}
+}*/
 
 .project_location, .project_notes, .start_working {
 	background-color: rgba(255, 5, 35, 0.7);
@@ -315,6 +315,20 @@ li a:focus {
 	height: 46px;
 	border:0 none;
 	/*border: 1px solid #ddd;*/
+}
+
+/* Style the close button */
+.closeClass {
+    position: relative;
+		float: right;
+    top: 0;
+    /*padding: 12px 16px 12px 16px;*/
+}
+
+.colorSelect {
+	position: relative;
+	float: right;
+	left: -50%;
 }
 
 

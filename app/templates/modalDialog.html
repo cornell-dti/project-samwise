@@ -116,7 +116,6 @@
     }
 		function settingsAdd() {
 				var modal = document.getElementById('settingsModal');
-				console.log("Here");
 				document.getElementById("classSearchSettings").value = "";
 				modal.style.display = 'block';
 		}
@@ -326,7 +325,10 @@
 				lst.append(li);
 			}
 		}
+
+
 		function populateUserCoursesSettings(){
+			var colors = ["#F44336", "#FF5722", "#2196F3"];
 			var userCourses = getUserCourses(userid);
 			console.log(userCourses);
 			if (userCourses.length < 1){
@@ -335,15 +337,53 @@
 			var lst = document.getElementById("currentClassesSettings");
 			$('#currentClassesSettings').empty();
 			for (i = 0; i < userCourses.length; i++){
-				var li = document.createElement("li");
-				var a = document.createElement("a");
-				a.setAttribute("href", "#");
-				a.setAttribute("onclick", "remove(this)");
-				var t = document.createTextNode(userCourses[i]);
-				a.append(t);
-				li.append(a);
 
+				var colorSelect = document.createElement("select");
+				colorSelect.setAttribute("style", "color: black;");
+
+				for (h = 0; h < colors.length; h++){
+					var colorCode = colors[h];
+					var opt = document.createElement("option");
+					opt.setAttribute("style", "font-color: black;");
+					opt.setAttribute("value", colors[h]);
+
+					if (h == 0){
+						opt.append(document.createTextNode("Red"));
+					}
+					else if (h == 1){
+						opt.append(document.createTextNode("Orange"));
+					}
+					else{
+						opt.append(document.createTextNode("Blue"));
+					}
+
+
+					colorSelect.append(opt);
+				}
+				var cSpan = document.createElement("span");
+				cSpan.setAttribute("class", "colorSelect");
+				cSpan.append(colorSelect);
+
+				var li = document.createElement("li");
+				var t = document.createTextNode(userCourses[i]);
+				var sp = document.createElement("span");
+				sp.className = "closeClass";
+				sp.appendChild(document.createTextNode("\u2715"));
+
+				li.append(sp);
+				li.append(cSpan);
+				li.append(t);
+				li.append(document.createElement("hr"));
 				lst.append(li);
+			}
+
+			var removeLiList = document.getElementsByClassName("closeClass");
+			for (z = 0; z < removeLiList.length; z++){
+				removeLiList[z].onclick = function(){
+					console.log("here");
+					var div = this.parentElement;
+					div.innerHTML = "";
+				}
 			}
 		}
 
@@ -555,25 +595,64 @@
 
 <div id="settingsModal" class="modal" style= "display:none;">
 
-		      <!-- Modal content -->
-		      <div class="modal-content">
+      <!-- Modal content -->
+      <div class="modal-content">
 			<div class="modal-header" style="background-color: #4a4a4a;" >
 			<span class = "close" id = "closeSettings">&times;</span>
-			  <h2>Modify your classes and tags</h2>
+			  <h2>Settings</h2>
+				<div class = "container-fluid">
+					<div class = "row">
+							<div class = "col-sm-2">
+								<p>Add classes</p>
+							</div>
+							<div class = "col-sm-10">
+								<input style="background-color: white; color: black;" id="classSearchSettings"
+								type="text" class = "classSearch" placeholder="Search Classes at Cornell"/>
+												<button class="btn btn-sm btn-default" style="float:right;" onclick="addUserClassSettings()">Save</button>
 
-					<div class = "col-sm-2">
+								<br><br>
+								<p style="font-size: 7px;">Add classes to get upcoming projects and prelims automatically in your planner</p>
+							</div>
+					</div>
+					<br>
+					<div class = "row">
+							<div class = "col-sm-2">
+								<p>My classes</p>
+							</div>
+							<div class = "col-sm-10">
+								<ul id = "currentClassesSettings">
+								</ul>
+							</div>
 					</div>
 
-						<input style="background-color: white; color: black;" id="classSearchSettings"
-						type="text" class = "classSearch" placeholder="Search Classes at Cornell"
-						/>
-						<button class="btn btn-sm btn-default" style="float:right;" onclick="addUserClassSettings()">Save</button>
-						<br><br>
-						<h4>Current classes and tags (click to remove):</h4>
-						<ul id = "currentClassesSettings">
-						</ul>
+					<div class = "row">
+							<div class = "col-sm-2">
+								<p>Add tags</p>
+							</div>
+							<div class = "col-sm-10">
+								<input style="background-color: white; color: black;" id="addTagBar"
+								type="text" placeholder="Add tag"/>
+												<button class="btn btn-sm btn-default" style="float:right;" onclick="addTagSettings()">Save</button>
 
-						<button class="btn btn-sm btn-default" style="float:right;" onclick="updateCalendarSettings()">Save tags</button>
+								<br><br>
+							</div>
+					</div>
+					<br>
+					<div class = "row">
+							<div class = "col-sm-2">
+								<p>Other tags</p>
+							</div>
+							<div class = "col-sm-4">
+								<ul id = "currentTagsSettings">
+								</ul>
+							</div>
+					</div>
+				</div>
+
+				<br><br>
+
+
+				<button class="btn btn-sm btn-default" style="float:right;" onclick="updateCalendarSettings()">Save</button>
 			</div>
 		</div>
 </div>

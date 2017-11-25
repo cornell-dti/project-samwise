@@ -13,6 +13,15 @@ input {
 		outline: none;
 }
 
+.searchBar {
+    border: none;
+    width: 270%;
+    padding: 10px;
+    float: left;
+    font-size: 12px;
+		outline: none;
+}
+
 .btn-lg{
 	background-color: #ffffff;
 	border-radius: 20px;

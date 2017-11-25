@@ -1,3 +1,7 @@
+.awesomplete > #classSearchIntro {
+    width: 100%;
+}
+
 .awesomplete [hidden] {
     display: none;
 }

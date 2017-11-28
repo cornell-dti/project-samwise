@@ -239,3 +239,45 @@ function getUserCourseColor(userId, courseId) {
   xhr.send(null);
   return JSON.parse(xhr.responseText);
 }
+
+function getTags(user) {
+  var xhr = new XMLHttpRequest();
+  var netId = userId;
+  var course_id = courseId;
+  xhr.open("GET", 'http://localhost:5000/getTags/' + user, false);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.send(null);
+  return JSON.parse(xhr.responseText);
+}
+
+function addTag(user, tagId, color, isCourse) {
+
+    var obj = {"user" : user,  "tagId" : tagId,  "color" : color,  "isCourse" : isCourse };
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", 'http://localhost:5000/addTag/', true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    console.log(JSON.stringify(obj));
+    xhr.send(JSON.stringify(obj));
+}
+
+function removeTag (user, tagId) {
+  var obj = {"user" : user,  "tagId" : tagId };
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", 'http://localhost:5000/removeTag/', true);
+  xhr.setRequestHeader("Content-Type", "application/json")
+  console.log(JSON.stringify(obj));
+  xhr.send(JSON.stringify(obj));
+}
+
+function updateTagColor(user, tagId, color) {
+
+    var obj = {"user" : user, "tagId" : tagId, "color" : color};
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", 'http://localhost:5000/updateTagColor/', true);
+    xhr.setRequestHeader("Content-Type", "application/json")
+    console.log(JSON.stringify(obj));
+    xhr.send(JSON.stringify(obj));
+}

@@ -306,6 +306,7 @@
 		}
 
 		function remove(link) {
+				console.log(link.parentNode.childNode);
 				removeCourse(userid, link.innerHTML);
 		    link.parentNode.parentNode.removeChild(link.parentNode);
 		}
@@ -322,11 +323,21 @@
 				var li = document.createElement("li");
 				var a = document.createElement("a");
 				a.setAttribute("href", "#");
+				a.setAttribute("class", "currentClass");
 				a.setAttribute("onclick", "remove(this)");
 				var t = document.createTextNode(userCourses[i]);
 				a.append(t);
+				var x = document.createElement("a");
+				x.setAttribute("class", "deleteClass");
+				x.setAttribute("href", "#");
+				x.setAttribute("onclick", "remove(this)");
+				var close = document.createTextNode("X");
+				x.append(close);
+				var lineBreak = document.createElement("HR");
 				li.append(a);
-
+				li.append(x);
+				li.append(lineBreak);
+				li.setAttribute("class", "currentClassItem")
 				lst.append(li);
 			}
 		}
@@ -495,7 +506,7 @@
 				<div style="margin: auto 40px;">
 					<h2 style="margin: 0px; margin-top: 40px;">Hi! Help us make your calendar.</h2>
 					<h2 style="margin: 0px;">Search and add classes that you are currently enrolled in:</h2>
-					<input style="margin: 20px 0px; line-height: 2em; font-size: 1.5em; border: 4px solid #ccc; border-radius: 4px; background-color: white; color: #444; width:100%" id="classSearchIntro" type="text" placeholder="Search Classes at Cornell" autocomplete="off" aria-owns="awesomplete_list_1" role="combobox">
+					<input id="classSearchIntro" type="text" placeholder="Search Classes at Cornell" autocomplete="off" aria-owns="awesomplete_list_1" role="combobox">
 					<br><br>
 					<h2>Your Classes:</h2>
 					<ul id="currentClasses" style="min-height: 200px"></ul>

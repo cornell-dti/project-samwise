@@ -187,7 +187,6 @@
 			else{
 				var today = new Date();
 				var date = today.toISOString();
-				console.log(date);
 			}
 
 			if (realstart){
@@ -210,7 +209,6 @@
 			var dateObj = new Date(date);
 			dateObj.setTime(dateObj.getTime() - (5 * 60 * 60 * 1000));
 			date = dateObj.toISOString();
-			console.log(date);
 
 			var c = getUserCourseColor(userid, course);
 			var newEvent = {
@@ -329,7 +327,7 @@
 
 		function populateUserCoursesSettings(){
 			var colors = ["#F44336", "#FF5722", "#2196F3"];
-			var userCourses = getUserCourses(userid);
+			var userCourses = getTags(userid);
 			console.log(userCourses);
 			if (userCourses.length < 1){
 				return;
@@ -337,6 +335,10 @@
 			var lst = document.getElementById("currentClassesSettings");
 			$('#currentClassesSettings').empty();
 			for (i = 0; i < userCourses.length; i++){
+				if (userCourses[i]['isCourse'] == false){
+					console.log("not a course");
+					continue;
+				}
 
 				var colorSelect = document.createElement("select");
 				colorSelect.setAttribute("style", "color: black;");
@@ -365,14 +367,16 @@
 				cSpan.append(colorSelect);
 
 				var li = document.createElement("li");
-				var t = document.createTextNode(userCourses[i]);
+				var pTag = document.createElement("p");
+				var t = document.createTextNode(userCourses[i]['tagId']);
+				pTag.append(t);
 				var sp = document.createElement("span");
 				sp.className = "closeClass";
 				sp.appendChild(document.createTextNode("\u2715"));
 
 				li.append(sp);
 				li.append(cSpan);
-				li.append(t);
+				li.append(pTag);
 				li.append(document.createElement("hr"));
 				lst.append(li);
 			}
@@ -380,8 +384,75 @@
 			var removeLiList = document.getElementsByClassName("closeClass");
 			for (z = 0; z < removeLiList.length; z++){
 				removeLiList[z].onclick = function(){
-					console.log("here");
 					var div = this.parentElement;
+					var removedTagName = div.getElementsByTagName('p')[0].innerHTML;
+					removeTag(userid, removedTagName);
+					div.innerHTML = "";
+				}
+			}
+		}
+		function populateUserTagsSettings(){
+			var colors = ["#F44336", "#FF5722", "#2196F3"];
+			var userCourses = getTags(userid);
+			console.log(userCourses);
+			if (userCourses.length < 1){
+				return;
+			}
+			var lst = document.getElementById("currentTagsSettings");
+			$('#currentTagsSettings').empty();
+			for (i = 0; i < userCourses.length; i++){
+				if (userCourses[i]['isCourse'] == true){
+					console.log("couse, not tag");
+					continue;
+				}
+
+				var colorSelect = document.createElement("select");
+				colorSelect.setAttribute("style", "color: black;");
+
+				for (h = 0; h < colors.length; h++){
+					var colorCode = colors[h];
+					var opt = document.createElement("option");
+					opt.setAttribute("style", "font-color: black;");
+					opt.setAttribute("value", colors[h]);
+
+					if (h == 0){
+						opt.append(document.createTextNode("Red"));
+					}
+					else if (h == 1){
+						opt.append(document.createTextNode("Orange"));
+					}
+					else{
+						opt.append(document.createTextNode("Blue"));
+					}
+
+
+					colorSelect.append(opt);
+				}
+				var cSpan = document.createElement("span");
+				cSpan.setAttribute("class", "colorSelect");
+				cSpan.append(colorSelect);
+
+				var li = document.createElement("li");
+				var pTag = document.createElement("p");
+				var t = document.createTextNode(userCourses[i]['tagId']);
+				pTag.append(t);
+				var sp = document.createElement("span");
+				sp.className = "closeTag";
+				sp.appendChild(document.createTextNode("\u2715"));
+
+				li.append(sp);
+				li.append(cSpan);
+				li.append(pTag);
+				li.append(document.createElement("hr"));
+				lst.append(li);
+			}
+
+			var removeLiList = document.getElementsByClassName("closeTag");
+			for (z = 0; z < removeLiList.length; z++){
+				removeLiList[z].onclick = function(){
+					var div = this.parentElement;
+					var removedTagName = div.getElementsByTagName('p')[0].innerHTML;
+					removeTag(userid, removedTagName);
 					div.innerHTML = "";
 				}
 			}
@@ -432,20 +503,40 @@
 
 		function addUserClassSettings(){
 			var className = document.getElementById("classSearchSettings").value;
-			var currClasses = getUserCourses(userid);
+			var currClasses = getTags(userid);
 			if (currClasses.length > 0){
 				for (i = 0; i < currClasses.length; i++){
-					if (currClasses[i] == className){
+					if (currClasses[i]['tagId'] == className && currClasses[i]['isCourse'] == true){
 						console.log("already have this class");
 						return;
 					}
 				}
 			}
 			if (className.length > 0){
-				addCourse(userid, className);
+				addTag(userid, className, "#F44336", true);
 				console.log(className);
 				populateUserCoursesSettings();
 			}
+		}
+
+		function addNewTagSettings(){
+			var newtagId = document.getElementById("addTagBarSettings").value;
+			var allusertags = getTags(userid);
+			if (allusertags.length > 0){
+				for (i = 0; i < allusertags.length; i++){
+					if (currClasses[i]['tagId'] == newtagId && currClasses[i]['isCourse'] == false){
+						console.log("already have this tag");
+						return;
+					}
+				}
+			}
+			if (newtagId.length > 0){
+				addTag(userid, newtagId, "#FF336", false);
+				console.log(newtagId);
+				populateUserTagsSettings();
+
+			}
+
 		}
 
 		function updateCalendar(){
@@ -483,6 +574,35 @@
 
 			$("#calendar").fullCalendar('rerenderEvents');
 			introModal.style.display = 'none';
+		}
+
+		function updateCalendarSettings(){
+			var events = $("#calendar").fullCalendar('getEventSources');
+			var userEvents = getEvents(userid);
+			var eventObjs = [];
+			for (k = 0; k < events.length; k++){
+				for (x = 0; x < events[k].events.length; x++){
+					eventObjs.push(events[k].events[x]);
+				}
+			}
+
+			var lst = document.getElementById("currentTagsSettings").getElementsByTagName("li");
+			var lstPrime = [];
+			for (j = 0; j < lst.length; j++){
+				lstPrime.push(lst[j].getElementsByTagName("a")[0].innerHTML);
+			}
+			for (i = 0; i < userEvents.length; i++){
+				if (userEvents[i].tagId.length > 0 && lstPrime.indexOf(userEvents[i].tagId) == -1){
+					removeEvent(userEvents[i].eventId);
+				}
+			}
+			$("#calendar").fullCalendar('removeEvents');
+
+			addStoredEvents();
+			syncGoogleToFullCalendar();
+
+			$("#calendar").fullCalendar('rerenderEvents');
+			settingsModal.style.display = 'none';
 		}
 
 		function nospaces(t){
@@ -585,7 +705,7 @@
 						<ul id = "currentClasses">
 						</ul>
 
-						<button class="btn btn-sm btn-default" style="float:right;" onclick="updateCalendar()">Save tags</button>
+						<button class="btn btn-sm btn-default" style="float:right;" onclick="updateCalendar();">Save tags</button>
 
 			</div>
 
@@ -645,8 +765,9 @@
 								<p>Add tags</p>
 							</div>
 							<div class = "col-sm-4">
-								<input class="w3-input w3-border w3-round-large" style="background-color: #4a4a4a; color: #ffffff;" id="addTagBar"
-								type="text" placeholder="Add tag"/>
+								<input class="w3-input w3-border w3-round-large" style="background-color: #4a4a4a; color: #ffffff;" id="addTagBarSettings"
+								type="text" placeholder="New tag"/>
+								<button class="w3-button w3-green w3-round-xxlarge" style="float:right;" onclick="addNewTagSettings();">Add</button>
 
 								<br><br>
 							</div>
@@ -657,7 +778,7 @@
 				<br><br>
 
 
-				<button class="w3-button w3-green w3-round-xxlarge" style="float:right;" onclick="updateCalendarSettings();addUserClassSettings();addTagSettings()">Save</button>
+				<button class="w3-button w3-green w3-round-xxlarge" style="float:right;" onclick="updateCalendarSettings();">Save</button>
 			</div>
 		</div>
 </div>

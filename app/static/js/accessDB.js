@@ -242,8 +242,7 @@ function getUserCourseColor(userId, courseId) {
 
 function getTags(user) {
   var xhr = new XMLHttpRequest();
-  var netId = userId;
-  var course_id = courseId;
+  var netId = user;
   xhr.open("GET", 'http://localhost:5000/getTags/' + user, false);
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.send(null);

@@ -158,7 +158,7 @@ def getUserExams(netId):
     if current_user.netid == netId:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
+        cursor.execute('SELECT tagId FROM samwisedb.Tag WHERE user = %s', (netId,))
         courses = [item[0] for item in cursor.fetchall()]
         data = []
         for courseId in courses:
@@ -542,7 +542,7 @@ def updateSubtask():
 @app.route('/getTags/<user>', methods=['GET'])
 @login_required
 def getTags(user):
-    if current_user.netid == userId:
+    if current_user.netid == user:
         connection = get_db()
         cursor = connection.cursor()
         cursor.execute('SELECT DISTINCT * FROM samwisedb.Tag WHERE user = %s', (user,))

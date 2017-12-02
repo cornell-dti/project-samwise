@@ -569,7 +569,7 @@ def addTag():
         cursor = connection.cursor()
         cursor.execute('SELECT * from samwisedb.Tag WHERE (user, tagId) = (%s, %s)', (user, tagId))
         if len(cursor.fetchall()) == 0:
-            cursor.execute('INSERT INTO samwisedb.Tag(user, tagId, color, isCourse) VALUES (%s, %s, %s, %r)', (user, tagId, color, isCourse))
+            cursor.execute('INSERT INTO samwisedb.Tag(user, tagId, color, isCourse) VALUES (%s, %s, %s, %s)', (user, tagId, color, isCourse))
         connection.commit()
         return success()
     return access_denied()

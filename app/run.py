@@ -604,6 +604,21 @@ def updateTagColor():
         return jsonify([subtaskName])
     return access_denied()
 
+@app.route('/updateTagId/', methods=['POST'])
+def updateTagId():
+    data = request.get_json(force=True)
+    user = data['user']
+    tagId = data['tagId']
+    newTagId = data['newTagId']
+    connection = get_db()
+    cursor = connection.cursor()
+    user = get_user_from_subtask_id(subtaskId)
+    if current_user.is_authenticated and user and current_user.netid == user:
+        cursor.execute('UPDATE samwisedb.Tag SET tagId = %s WHERE user = %s AND tagId = %s', (newTagId, user, tagId))
+        connection.commit()
+        return jsonify([subtaskName])
+    return access_denied()
+
 
 
 @app.route('/getColor/<name>')

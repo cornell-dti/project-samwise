@@ -280,3 +280,14 @@ function updateTagColor(user, tagId, color) {
     console.log(JSON.stringify(obj));
     xhr.send(JSON.stringify(obj));
 }
+
+function updateTagId(user, tagId, newTagId) {
+
+    var obj = {"user" : user, "tagId" : tagId, "newTagId" : newTagId};
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", 'http://localhost:5000/updateTagId/', true);
+    xhr.setRequestHeader("Content-Type", "application/json")
+    console.log(JSON.stringify(obj));
+    xhr.send(JSON.stringify(obj));
+}

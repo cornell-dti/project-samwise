@@ -249,9 +249,9 @@ function getTags(user) {
   return JSON.parse(xhr.responseText);
 }
 
-function addTag(user, tagId, color, isCourse) {
+function addTag(user, tagId, color) {
 
-    var obj = {"user" : user,  "tagId" : tagId,  "color" : color,  "isCourse" : isCourse };
+    var obj = {"user" : user,  "tagId" : tagId,  "color" : color};
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", 'http://localhost:5000/addTag/', true);

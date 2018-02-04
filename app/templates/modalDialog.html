@@ -524,7 +524,7 @@
 			var allusertags = getTags(userid);
 			if (allusertags.length > 0){
 				for (i = 0; i < allusertags.length; i++){
-					if (currClasses[i]['tagId'] == newtagId && currClasses[i]['isCourse'] == false){
+					if (allusertags[i]['tagId'] == newtagId){
 						console.log("already have this tag");
 						return;
 					}
@@ -690,7 +690,7 @@
 		      <div class="modal-content">
 			<div class="modal-header" style="background-color: #4a4a4a;" >
 			<span class = "close" id = "closeIntro">&times;</span>
-			  <h2>Settings</h2>
+			  <h2>Welcome</h2>
 
 					<div class = "col-sm-2">
 						<h4>Add classes</h4>
@@ -701,7 +701,7 @@
 						/>
 						<button class="btn btn-sm btn-default" style="float:right;" onclick="addUserClass()">Save</button>
 						<br><br>
-						<h4>Current classes and tags (click to remove):</h4>
+						<h4>Current classes (click to remove):</h4>
 						<ul id = "currentClasses">
 						</ul>
 

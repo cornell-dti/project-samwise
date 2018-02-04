@@ -550,7 +550,6 @@ def getTags(user):
             'user': item[0],
             'tagId': item[1],
             'color': item[2],
-            'isCourse': item[3],
         } for item in cursor.fetchall()]
         return jsonify(data)
     return access_denied()
@@ -563,13 +562,12 @@ def addTag():
     user = data['user']
     tagId = data['tagId']
     color = data['color']
-    isCourse = data['isCourse']
     if current_user.is_authenticated and current_user.netid == user:
         connection = get_db()
         cursor = connection.cursor()
         cursor.execute('SELECT * from samwisedb.Tag WHERE (user, tagId) = (%s, %s)', (user, tagId))
         if len(cursor.fetchall()) == 0:
-            cursor.execute('INSERT INTO samwisedb.Tag(user, tagId, color, isCourse) VALUES (%s, %s, %s, %s)', (user, tagId, color, isCourse))
+            cursor.execute('INSERT INTO samwisedb.Tag(user, tagId, color) VALUES (%s, %s, %s)', (user, tagId, color))
         connection.commit()
         return success()
     return access_denied()

@@ -493,7 +493,6 @@
 			}
 			if (className.length > 0){
 				addCourse(userid, className);
-				console.log(className);
 				populateUserCourses();
 			}
 		}
@@ -511,7 +510,6 @@
 			}
 			if (className.length > 0){
 				addCourse(userid, className);
-				console.log(className);
 				populateUserCoursesSettings();
 			}
 		}
@@ -528,7 +526,7 @@
 				}
 			}
 			if (newtagId.length > 0){
-				addTag(userid, newtagId, "#FF336", false);
+				addTag(userid, newtagId, "#FF336");
 				console.log(newtagId);
 				populateUserTagsSettings();
 

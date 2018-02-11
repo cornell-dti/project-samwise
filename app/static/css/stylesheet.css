@@ -347,9 +347,9 @@ li a:focus {
 	margin-right: 20%;
 }
 
-  /*onboarding*/
+/*onboarding*/
 
-  #classSearchIntro{
+#classSearchIntro{
     margin: 20px 0px;
     line-height: 2em;
     font-size: 1.5em;
@@ -358,18 +358,26 @@ li a:focus {
     background-color:white;
     color: #444;
     width:100%;
-  }
+}
 
-  .currentClassItem{
+.currentClassItem{
     padding: 10px;
-  }
-  .currentClass{
+}
+.currentClass{
     color: #ffffff;
     font-size: 15px;
     display: inline;
-  }
+}
 
-  .deleteClass{
+.deleteClass{
     float: right;
     color: #ffffff;
-  }
+}
+
+#onboarding-modal-div > .awesomplete {
+    width: 100%;
+}
+
+#onboarding-modal-div > .awesomplete > ul {
+    margin-top: 6em;
+}

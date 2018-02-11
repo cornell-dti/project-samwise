@@ -117,6 +117,7 @@
 				var modal = document.getElementById('settingsModal');
 				document.getElementById("classSearchSettings").value = "";
 				modal.style.display = 'block';
+				populateUserCoursesSettings();
 				populateUserTagsSettings();
 		}
 
@@ -347,18 +348,12 @@
 		function populateUserCoursesSettings(){
 			var colors = ["#F44336", "#FF5722", "#2196F3"];
 			var userCourses = getUserCourses(userid);
-			console.log(userCourses);
 			if (userCourses.length < 1){
 				return;
 			}
 			var lst = document.getElementById("currentClassesSettings");
 			$('#currentClassesSettings').empty();
 			for (i = 0; i < userCourses.length; i++){
-				if (userCourses[i]['isCourse'] == false){
-					console.log("not a course");
-					continue;
-				}
-
 				var colorSelect = document.createElement("select");
 				colorSelect.setAttribute("style", "color: black;");
 
@@ -377,8 +372,6 @@
 					else{
 						opt.append(document.createTextNode("Blue"));
 					}
-
-
 					colorSelect.append(opt);
 				}
 				var cSpan = document.createElement("span");
@@ -387,7 +380,7 @@
 
 				var li = document.createElement("li");
 				var pTag = document.createElement("p");
-				var t = document.createTextNode(userCourses[i]['tagId']);
+				var t = document.createTextNode(userCourses[i]);
 				pTag.append(t);
 				var sp = document.createElement("span");
 				sp.className = "closeClass";

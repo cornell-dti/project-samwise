@@ -318,13 +318,14 @@
 
 			for (i = 0; i < userCourses.length; i++){
 				var li = document.createElement("li");
-				li.setAttribute("style", "margin-bottom: 5px");
+				li.setAttribute("style", "margin-bottom: 5px;");
 
 				var div = document.createElement("div");
-				div.setAttribute("style", "line-height: 2em; padding: 10px; border: 2px white solid; overflow: auto");
+				div.setAttribute("style",
+					"line-height: 2em; padding: 10px; border-bottom: 1px white solid; overflow: auto");
 
 				var span = document.createElement("span");
-				span.setAttribute("style", "float: left; display: inline-block");
+				span.setAttribute("style", "float: left; display: inline-block; font-size: 1.5em; font-weight: 300;");
 				var t = document.createTextNode(userCourses[i]);
 				span.append(t);
 
@@ -701,7 +702,7 @@
 	<div class="modal-content">
 		<div class="modal-header" style="background-color: #4a4a4a;">
 			<span class="close" id="closeIntro">&times;</span>
-				<div id="onboarding-modal-div" style="margin: auto 40px;">
+				<div id="onboarding-modal-div" style="margin: auto 40px; font-family: Open Sans;">
 					<h2 style="margin: 0px; margin-top: 40px;">Hi! Help us make your calendar.</h2>
 					<h2 style="margin: 0px;">Search and add classes that you are currently enrolled in:</h2>
 					<input style="color: #000" id="classSearchIntro" type="text" placeholder="Search Classes at Cornell"

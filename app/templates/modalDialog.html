@@ -118,6 +118,7 @@
 				var modal = document.getElementById('settingsModal');
 				document.getElementById("classSearchSettings").value = "";
 				modal.style.display = 'block';
+				populateUserTagsSettings();
 		}
 
 
@@ -303,8 +304,11 @@
 		    link.parentNode.parentNode.removeChild(link.parentNode);
 		}
 
-		function populateUserCourses(){
+		function populateUserCourses(className){
 			var userCourses = getUserCourses(userid);
+			if (className != null && userCourses.indexOf(className) == -1) {
+				userCourses.push(className);
+			}
 			console.log(userCourses);
 			if (userCourses.length < 1){
 				return;
@@ -327,7 +331,7 @@
 
 		function populateUserCoursesSettings(){
 			var colors = ["#F44336", "#FF5722", "#2196F3"];
-			var userCourses = getTags(userid);
+			var userCourses = getUserCourses(userid);
 			console.log(userCourses);
 			if (userCourses.length < 1){
 				return;
@@ -393,18 +397,14 @@
 		}
 		function populateUserTagsSettings(){
 			var colors = ["#F44336", "#FF5722", "#2196F3"];
-			var userCourses = getTags(userid);
-			console.log(userCourses);
-			if (userCourses.length < 1){
+			var userTags = getTags(userid);
+			// console.log(userTags);
+			if (userTags.length < 1){
 				return;
 			}
 			var lst = document.getElementById("currentTagsSettings");
 			$('#currentTagsSettings').empty();
-			for (i = 0; i < userCourses.length; i++){
-				if (userCourses[i]['isCourse'] == true){
-					console.log("couse, not tag");
-					continue;
-				}
+			for (i = 0; i < userTags.length; i++){
 
 				var colorSelect = document.createElement("select");
 				colorSelect.setAttribute("style", "color: black;");
@@ -434,7 +434,7 @@
 
 				var li = document.createElement("li");
 				var pTag = document.createElement("p");
-				var t = document.createTextNode(userCourses[i]['tagId']);
+				var t = document.createTextNode(userTags[i]['tagId']);
 				pTag.append(t);
 				var sp = document.createElement("span");
 				sp.className = "closeTag";
@@ -495,15 +495,16 @@
 				}
 			}
 			if (className.length > 0){
+				console.log(className);
 				addCourse(userid, className);
 				console.log(className);
-				populateUserCourses();
+				populateUserCourses(className);
 			}
 		}
 
 		function addUserClassSettings(){
 			var className = document.getElementById("classSearchSettings").value;
-			var currClasses = getTags(userid);
+			var currClasses = getUserCourses(userid);
 			if (currClasses.length > 0){
 				for (i = 0; i < currClasses.length; i++){
 					if (currClasses[i]['tagId'] == className && currClasses[i]['isCourse'] == true){
@@ -513,7 +514,7 @@
 				}
 			}
 			if (className.length > 0){
-				addTag(userid, className, "#F44336", true);
+				addCourse(userid, className);
 				console.log(className);
 				populateUserCoursesSettings();
 			}
@@ -681,37 +682,30 @@
 	 </div>
 </div>
 
+<div id="introModal" class="modal" style="display: block;">
+	<!--ONBOARDING MODAL -->
+	<!-- Modal content -->
+	<div class="modal-content">
+		<div class="modal-header" style="background-color: #4a4a4a;">
+			<span class="close" id="closeIntro">&times;</span>
+				<div style="margin: auto 40px;">
+					<h2 style="margin: 0px; margin-top: 40px;">Hi! Help us make your calendar.</h2>
+					<h2 style="margin: 0px;">Search and add classes that you are currently enrolled in:</h2>
+					<input style="color: #000" id="classSearchIntro" type="text" placeholder="Search Classes at Cornell"
+						   autocomplete="off" aria-owns="awesomplete_list_1" role="combobox">
+					<button class="btn btn-sm btn-default" style="float:right;" onclick="addUserClass()">Save</button>
+					<br><br>
+					<h2>Your Classes:</h2>
+					<ul id="currentClasses" style="min-height: 200px"></ul>
+					<button class="btn btn-sm btn-default"
+							style="margin-bottom: 40px; float: right; clear: both; font-size: 1.5em; width: 120px;
+							line-height: 2em; border-width: 0px; background-color: #6fd301; border-radius: 56px;"
+							onclick="updateCalendar()">Done</button>
+				</div>
+		</div>
+	</div>
+</div>
 
-
-
-<div id="introModal" class="modal" style= "display:none;">
-
-		      <!-- Modal content -->
-		      <div class="modal-content">
-			<div class="modal-header" style="background-color: #4a4a4a;" >
-			<span class = "close" id = "closeIntro">&times;</span>
-			  <h2>Welcome</h2>
-
-					<div class = "col-sm-2">
-						<h4>Add classes</h4>
-					</div>
-
-						<input style="background-color: white; color: black;" id="classSearchIntro"
-						type="text" class = "classSearch" placeholder="Search Classes at Cornell" onkeyup="nospaces(this)"
-						/>
-						<button class="btn btn-sm btn-default" style="float:right;" onclick="addUserClass()">Save</button>
-						<br><br>
-						<h4>Current classes (click to remove):</h4>
-						<ul id = "currentClasses">
-						</ul>
-
-						<button class="btn btn-sm btn-default" style="float:right;" onclick="updateCalendar();">Save tags</button>
-
-			</div>
-
-		      </div>
-
-		    </div>
 
 <div id="settingsModal" class="modal" style= "display:none;">
 

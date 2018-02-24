@@ -75,16 +75,15 @@
 			var infoDiv = document.getElementById('information');
 
 			var tagTitle = document.createElement("h5");
-			if (event.tag === 'undefined'){
-				tagTitle.append(document.createTextNode("No tag"));
-			}
-			else{
+			tagTitle.id = "modal-tag-title";
+			if (event.tag != null) {
 				tagTitle.append(document.createTextNode(event.tag));
 			}
 			infoDiv.append(tagTitle);
 
 			var t = document.createElement("h4");
-			if (event.title === 'undefined'){
+			t.id = "modal-event-title";
+			if (event.title == null){
 				t.append(document.createTextNode("No title"));
 			}
 			else{
@@ -93,8 +92,8 @@
 			infoDiv.append(t);
 
 			var t = document.createElement("h6");
-
-			if (event.end === 'undefined'){
+			t.id = "modal-deadline-title";
+			if (event.end == null){
 				t.append(document.createTextNode("No end date"));
 			}
 			else{
@@ -103,7 +102,8 @@
 			infoDiv.append(t);
 
 			var t = document.createElement("h6");
-			if (event.location === 'undefined'){
+			t.id = "modal-location-title";
+			if (event.location == null){
 				t.append(document.createTextNode("No location"));
 			}
 			else{
@@ -112,7 +112,8 @@
 			infoDiv.append(t);
 
 			var t = document.createElement("h6");
-			if (event.notes === 'undefined'){
+			t.id = "modal-notes-title";
+			if (event.notes == null){
 				t.append(document.createTextNode("No notes"));
 			}
 			else{
@@ -120,25 +121,29 @@
 			}
 			infoDiv.append(t);
 
-			var button = document.createElement("button");
-			button.setAttribute("style", "float:left");
-			button.setAttribute("id", "removeButtonId");
-			button.append(document.createTextNode("Delete"));
-			infoDiv.append(button);
+            var courses = getUserCourses(userid);
+            if (courses.indexOf(event.tag) != -1) {
 
-			var b = document.getElementById("removeButtonId");
-			b.onclick = function(){
-				// removeEvent(event.eventId);
-				$("#calendar").fullCalendar('removeEvents');
-				addStoredEvents();
-				syncGoogleToFullCalendar();
+                var button = document.createElement("button");
+                button.setAttribute("style", "float:left");
+                button.setAttribute("id", "removeButtonId");
+                button.append(document.createTextNode("Delete"));
+                infoDiv.append(button);
 
-				$("#calendar").fullCalendar('rerenderEvents');
-				var info = document.getElementById("information");
-				info.innerHTML = "";
+                var b = document.getElementById("removeButtonId");
+                b.onclick = function(){
+                    // removeEvent(event.eventId);
+                    $("#calendar").fullCalendar('removeEvents');
+                    addStoredEvents();
+                    syncGoogleToFullCalendar();
 
-				modal.style.display = 'none';
-			}
+                    $("#calendar").fullCalendar('rerenderEvents');
+                    var info = document.getElementById("information");
+                    info.innerHTML = "";
+
+                    modal.style.display = 'none';
+                }
+            }
 
 			modal.style.display = 'block';
 		},

@@ -20,9 +20,11 @@
 				}
 				var closeIntro = document.getElementById("closeIntro");
 				closeIntro.onclick = function(){
+					console.log("test");
 					document.getElementById("classSearchIntro").value = "";
 					intromodal.style.display = 'none';
 				}
+
 				var closeSettings = document.getElementById("closeSettings");
 				closeSettings.onclick = function(){
 					document.getElementById("classSearchSettings").value = "";
@@ -347,7 +349,7 @@
 
 
 		function populateUserCoursesSettings(){
-			var colors = ["#F44336", "#FF5722", "#2196F3"];
+			var colors = ["Red", "Orange", "Blue"];
 			var userCourses = getUserCourses(userid);
 			if (userCourses.length < 1){
 				return;
@@ -355,6 +357,7 @@
 			var lst = document.getElementById("currentClassesSettings");
 			$('#currentClassesSettings').empty();
 			for (i = 0; i < userCourses.length; i++){
+				var dbColor = getUserCourseColor(userid, userCourses[i]);
 				var colorSelect = document.createElement("select");
 				colorSelect.setAttribute("style", "color: black;");
 
@@ -365,12 +368,21 @@
 					opt.setAttribute("value", colors[h]);
 
 					if (h == 0){
+						if (dbColor == "Red"){
+							opt.setAttribute("selected", "selected");
+						}
 						opt.append(document.createTextNode("Red"));
 					}
 					else if (h == 1){
+						if (dbColor == "Orange"){
+							opt.setAttribute("selected", "selected");
+						}
 						opt.append(document.createTextNode("Orange"));
 					}
 					else{
+						if (dbColor == "Blue"){
+							opt.setAttribute("selected", "selected");
+						}
 						opt.append(document.createTextNode("Blue"));
 					}
 					colorSelect.append(opt);
@@ -405,7 +417,7 @@
 			}
 		}
 		function populateUserTagsSettings(){
-			var colors = ["#F44336", "#FF5722", "#2196F3"];
+			var colors = ["Red", "Orange", "Blue"];
 			var userTags = getTags(userid);
 			// console.log(userTags);
 			if (userTags.length < 1){
@@ -539,7 +551,7 @@
 				}
 			}
 			if (newtagId.length > 0){
-				addTag(userid, newtagId, "#FF336");
+				addTag(userid, newtagId, "Red");
 				console.log(newtagId);
 				populateUserTagsSettings();
 
@@ -707,7 +719,7 @@
 					<button class="btn btn-sm btn-default"
 							style="margin-bottom: 40px; float: right; clear: both; font-size: 1.5em; width: 120px;
 							line-height: 2em; border-width: 0px; background-color: #6fd301; border-radius: 56px;"
-							onclick="updateCalendar()">Done</button>
+							onclick="updateCalendar();">Done</button>
 				</div>
 		</div>
 	</div>

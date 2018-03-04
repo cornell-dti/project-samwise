@@ -640,6 +640,19 @@ def getUserCourseColor(userId, courseId):
         return jsonify(data)
     return access_denied()
 
+@app.route('/getUserTagColor/<userId>/<tagId>')
+@login_required
+def getUserTagColor(userId, tagId):
+    if current_user.netid == userId:
+        # Open the connection to database
+        connection = get_db()
+        cursor = connection.cursor()
+        cursor.execute('SELECT netId, tagId, color FROM samwisedb.Tag WHERE netId = %s AND tagId = %s',
+                       (userId, courseId))
+        data = [item[2] for item in cursor.fetchall()]
+        return jsonify(data)
+    return access_denied()
+
 
 @app.route('/getCalendarData')
 @login_required

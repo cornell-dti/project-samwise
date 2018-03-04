@@ -597,7 +597,6 @@ def updateTagColor():
     color = data['color']
     connection = get_db()
     cursor = connection.cursor()
-    user = get_user_from_subtask_id(subtaskId)
     if current_user.is_authenticated and user and current_user.netid == user:
         cursor.execute('UPDATE samwisedb.Tag SET color = %s WHERE user = %s AND tagId = %s', (color, user, tagId))
         connection.commit()
@@ -612,9 +611,23 @@ def updateTagId():
     newTagId = data['newTagId']
     connection = get_db()
     cursor = connection.cursor()
-    user = get_user_from_subtask_id(subtaskId)
     if current_user.is_authenticated and user and current_user.netid == user:
         cursor.execute('UPDATE samwisedb.Tag SET tagId = %s WHERE user = %s AND tagId = %s', (newTagId, user, tagId))
+        connection.commit()
+        return jsonify([subtaskName])
+    return access_denied()
+
+
+@app.route('/updateCourseColor/', methods=['POST'])
+def updateCourseColor():
+    data = request.get_json(force=True)
+    netId = data['netId']
+    courseId = data['courseId']
+    color = data['color']
+    connection = get_db()
+    cursor = connection.cursor()
+    if current_user.is_authenticated and user and current_user.netid == user:
+        cursor.execute('UPDATE samwisedb.User SET color = %s WHERE netId = %s AND courseId = %s', (color, netId, courseId))
         connection.commit()
         return jsonify([subtaskName])
     return access_denied()

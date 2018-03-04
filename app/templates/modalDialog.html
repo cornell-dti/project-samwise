@@ -644,23 +644,21 @@
 				}
 			}
 
-			var currentTagsSettings = document.getElementById("currentClassesSettings");
-			var classes = currentClassesSettings.getElementsByTagName("li");
+			var currentTagsSettings = document.getElementById("currentTagsSettings");
+			var tags = currentTagsSettings.getElementsByTagName("li");
 
-			var currentClasses = getUserCourses(userid);
-			console.log(classes);
-			for (i = 0; i < classes.length; i++){
-				var new_color = classes[i].getElementsByTagName("select")[0].value;
+			var currentTags = getTags(userid);
+			for (i = 0; i < tags.length; i++){
+				var new_color = tags[i].getElementsByTagName("select")[0].value;
 
-				var course_id = classes[i].getElementsByTagName("p")[0].innerHTML;
+				var tag_id = tags[i].getElementsByTagName("p")[0].innerHTML;
 
 				//if it exists
-				if (currentClasses.indexOf(course_id) >= 0){
-					updateCourseColor(userid, course_id, new_color);
+				if (currentTags.indexOf(tag_id) >= 0){
+					updateTagColor(userid, tag_id, new_color);
 				}
 				else{
-					addCourse(userid, course_id);
-					updateCourseColor(userid, course_id, new_color);
+					addTag(userid, tag_id, new_color);
 				}
 			}
 

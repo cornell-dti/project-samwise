@@ -556,37 +556,31 @@
 		}
 
 		function updateCalendar(){
-			var events = $("#calendar").fullCalendar('getEventSources');
-			var userEvents = getEvents(userid);
-			var eventObjs = [];
-			for (k = 0; k < events.length; k++){
-				for (x = 0; x < events[k].events.length; x++){
-					eventObjs.push(events[k].events[x]);
-				}
-			}
-			var lst = document.getElementById("currentClasses").getElementsByTagName("li");
-			var lstPrime = [];
-			for (j = 0; j < lst.length; j++){
-				lstPrime.push(lst[j].getElementsByTagName("div")[0].getElementsByTagName("span")[0].innerHTML);
-			}
-
-			// for (i = 0; i < eventObjs.length; i++){
-			// 	if (eventObjs[i].className.length == 1 && lstPrime.indexOf(eventObjs[i].className[0]) == -1){
-			// 		console.log(eventObjs[i].className[0] + " " + eventObjs[i].title);
-			// 		removeEvent(eventObjs[i].title);
+			// var events = $("#calendar").fullCalendar('getEventSources');
+			// var userEvents = getEvents(userid);
+			// var eventObjs = [];
+			// for (k = 0; k < events.length; k++){
+			// 	for (x = 0; x < events[k].events.length; x++){
+			// 		eventObjs.push(events[k].events[x]);
 			// 	}
 			// }
-			for (i = 0; i < userEvents.length; i++){
-				console.log(userEvents[i]);
-				if (userEvents[i].tagId.length > 0 && lstPrime.indexOf(userEvents[i].tagId) == -1){
-					console.log(userEvents[i].eventId + " " + userEvents[i].eventName);
-					removeEvent(userEvents[i].eventId);
-				}
-			}
-			$("#calendar").fullCalendar('removeEvents');
-
-			addStoredEvents();
-			syncGoogleToFullCalendar();
+			// var lst = document.getElementById("currentClasses").getElementsByTagName("li");
+			// var lstPrime = [];
+			// for (j = 0; j < lst.length; j++){
+			// 	lstPrime.push(lst[j].getElementsByTagName("div")[0].getElementsByTagName("span")[0].innerHTML);
+			// }
+      //
+			// for (i = 0; i < userEvents.length; i++){
+			// 	console.log(userEvents[i]);
+			// 	if (userEvents[i].tagId.length > 0 && lstPrime.indexOf(userEvents[i].tagId) == -1){
+			// 		console.log(userEvents[i].eventId + " " + userEvents[i].eventName);
+			// 		removeEvent(userEvents[i].eventId);
+			// 	}
+			// }
+			// $("#calendar").fullCalendar('removeEvents');
+      //
+			// addStoredEvents();
+			// syncGoogleToFullCalendar();
 
 			$("#calendar").fullCalendar('rerenderEvents');
 			introModal.style.display = 'none';

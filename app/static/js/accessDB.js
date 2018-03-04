@@ -292,13 +292,23 @@ function updateTagId(user, tagId, newTagId) {
     xhr.send(JSON.stringify(obj));
 }
 
-function updateCourseColor(netId, courseId, color) {
+function updateCourseColor(netId, courseId, new_color) {
 
-    var obj = {"netId" : netId, "courseId" : courseId, "color" : color};
+    var obj = {"netId" : netId, "courseId" : courseId, "color" : new_color};
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", 'http://localhost:5000/updateCourseColor/', true);
     xhr.setRequestHeader("Content-Type", "application/json")
     console.log(JSON.stringify(obj));
     xhr.send(JSON.stringify(obj));
+}
+
+function getUserTagColor(netid, tagId){
+  var xhr = new XMLHttpRequest();
+  var netId = userId;
+  var tag_id = tagId;
+  xhr.open("GET", 'http://localhost:5000/getUserTagColor/' + netId + '/' + tagId, false);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.send(null);
+  return JSON.parse(xhr.responseText);
 }

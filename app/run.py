@@ -597,10 +597,10 @@ def updateTagColor():
     color = data['color']
     connection = get_db()
     cursor = connection.cursor()
-    if current_user.is_authenticated and user and current_user.netid == user:
+    if current_user.is_authenticated:
         cursor.execute('UPDATE samwisedb.Tag SET color = %s WHERE user = %s AND tagId = %s', (color, user, tagId))
         connection.commit()
-        return jsonify([subtaskName])
+        return success()
     return access_denied()
 
 @app.route('/updateTagId/', methods=['POST'])
@@ -626,10 +626,10 @@ def updateCourseColor():
     color = data['color']
     connection = get_db()
     cursor = connection.cursor()
-    if current_user.is_authenticated and user and current_user.netid == user:
+    if current_user.is_authenticated:
         cursor.execute('UPDATE samwisedb.User SET color = %s WHERE netId = %s AND courseId = %s', (color, netId, courseId))
         connection.commit()
-        return jsonify([subtaskName])
+        return success()
     return access_denied()
 
 

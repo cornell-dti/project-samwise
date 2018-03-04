@@ -623,6 +623,27 @@
 
 			//TODO - use Kevin's updateCourseColor endpoint
 
+			var currentClassesSettings = document.getElementById("currentClassesSettings");
+			var classes = currentClassesSettings.getElementsByTagName("li");
+
+			var currentClasses = getUserCourses(userid);
+			console.log(classes);
+			for (i = 0; i < classes.length; i++){
+				var new_color = classes[i].getElementsByTagName("select")[0].value;
+
+				var course_id = classes[i].getElementsByTagName("p")[0].innerHTML;
+
+				//if it exists
+				if (currentClasses.indexOf(course_id) >= 0){
+					updateCourseColor(userid, course_id, new_color);
+				}
+				else{
+					addCourse(userid, course_id);
+					updateCourseColor(userid, course_id, new_color);
+				}
+			}
+
+
 			$("#calendar").fullCalendar('rerenderEvents');
 			settingsModal.style.display = 'none';
 		}

@@ -291,3 +291,14 @@ function updateTagId(user, tagId, newTagId) {
     console.log(JSON.stringify(obj));
     xhr.send(JSON.stringify(obj));
 }
+
+function updateCourseColor(netId, courseId, color) {
+
+    var obj = {"netId" : netId, "courseId" : courseId, "color" : color};
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", 'http://localhost:5000/updateCourseColor/', true);
+    xhr.setRequestHeader("Content-Type", "application/json")
+    console.log(JSON.stringify(obj));
+    xhr.send(JSON.stringify(obj));
+}

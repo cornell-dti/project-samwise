@@ -545,14 +545,19 @@ def getTags(user):
     if current_user.netid == user:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT DISTINCT * FROM samwisedb.Tag WHERE user = %s', (user,))
-        data = [{
-            'user': item[0],
-            'tagId': item[1],
-            'color': item[2],
-        } for item in cursor.fetchall()]
+        cursor.execute('SELECT DISTINCT tagId FROM samwisedb.Tag WHERE user = %s', (user,))
+        data = [item[0] for item in cursor.fetchall()]
         return jsonify(data)
     return access_denied()
+
+    # if current_user.netid == netId:
+    #     # Open the connection to database
+    #     connection = get_db()
+    #     cursor = connection.cursor()
+    #     cursor.execute('SELECT DISTINCT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
+    #     data = [item[0] for item in cursor.fetchall()]
+    #     return jsonify(data)
+    # return access_denied()
 
 
 @app.route('/addTag/', methods=['POST'])
@@ -660,8 +665,8 @@ def getUserTagColor(userId, tagId):
         # Open the connection to database
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT netId, tagId, color FROM samwisedb.Tag WHERE netId = %s AND tagId = %s',
-                       (userId, courseId))
+        cursor.execute('SELECT user, tagId, color FROM samwisedb.Tag WHERE user = %s AND tagId = %s',
+                       (userId, tagId))
         data = [item[2] for item in cursor.fetchall()]
         return jsonify(data)
     return access_denied()

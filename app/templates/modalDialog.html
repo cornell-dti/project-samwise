@@ -420,7 +420,8 @@
 		function populateUserTagsSettings(){
 			var colors = ["Red", "Orange", "Blue"];
 			var userTags = getTags(userid);
-			// console.log(userTags);
+			console.log("tags" + userTags);
+
 			if (userTags.length < 1){
 				return;
 			}
@@ -465,7 +466,7 @@
 
 				var li = document.createElement("li");
 				var pTag = document.createElement("p");
-				var t = document.createTextNode(userTags[i]['tagId']);
+				var t = document.createTextNode(userTags[i]);
 				pTag.append(t);
 				var sp = document.createElement("span");
 				sp.className = "closeTag";
@@ -624,6 +625,26 @@
 			//TODO - use Kevin's updateCourseColor endpoint
 
 			var currentClassesSettings = document.getElementById("currentClassesSettings");
+			var classes = currentClassesSettings.getElementsByTagName("li");
+
+			var currentClasses = getUserCourses(userid);
+			console.log(classes);
+			for (i = 0; i < classes.length; i++){
+				var new_color = classes[i].getElementsByTagName("select")[0].value;
+
+				var course_id = classes[i].getElementsByTagName("p")[0].innerHTML;
+
+				//if it exists
+				if (currentClasses.indexOf(course_id) >= 0){
+					updateCourseColor(userid, course_id, new_color);
+				}
+				else{
+					addCourse(userid, course_id);
+					updateCourseColor(userid, course_id, new_color);
+				}
+			}
+
+			var currentTagsSettings = document.getElementById("currentClassesSettings");
 			var classes = currentClassesSettings.getElementsByTagName("li");
 
 			var currentClasses = getUserCourses(userid);

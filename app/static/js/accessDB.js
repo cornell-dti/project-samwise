@@ -247,6 +247,13 @@ function getTags(user) {
   xhr.setRequestHeader("Content-Type", "application/json");
   xhr.send(null);
   return JSON.parse(xhr.responseText);
+
+  // var userid = id;
+  // var xhr = new XMLHttpRequest();
+  // xhr.open("GET", 'http://localhost:5000/getUserCourses/' + userid, false);
+  // xhr.setRequestHeader("Content-Type", "application/json");
+  // xhr.send(null);
+  // return JSON.parse(xhr.responseText);
 }
 
 function addTag(user, tagId, color) {
@@ -305,7 +312,7 @@ function updateCourseColor(netId, courseId, new_color) {
 
 function getUserTagColor(netid, tagId){
   var xhr = new XMLHttpRequest();
-  var netId = userId;
+  var netId = userid;
   var tag_id = tagId;
   xhr.open("GET", 'http://localhost:5000/getUserTagColor/' + netId + '/' + tagId, false);
   xhr.setRequestHeader("Content-Type", "application/json");

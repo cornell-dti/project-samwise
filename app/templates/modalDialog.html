@@ -174,14 +174,15 @@
 
 			var name = document.getElementById("projectName").value;
 			var dueDate = document.getElementById("projectDate").value;
+			console.log(dueDate);
 			var course = document.getElementById("selectDropdown").value;
-			var start = document.getElementById("startWorking").value;
+			var start = parseInt(document.getElementById("startWorking").value);
 			var pLocation = document.getElementById("projectLocation").value;
 			var notes = document.getElementById("projectNotes").value;
 
 			var dueDate_object = new Date(dueDate);
-			console.log(dueDate_object);
-			var offset = 24*60*60*1000*start;
+			dueDate_object.setTime(dueDate_object.getTime() + 5);
+			var offset = 24*60*60*1000*(start);
 			var startDate_object = new Date();
 			startDate_object.setTime(dueDate_object.getTime() - offset);
 			console.log(startDate_object);
@@ -199,11 +200,12 @@
 			var newEvent = {
 				title : name,
 				start : startDate_object.toISOString(),
-				end : dueDate_object.toISOString(),
+				allDay: true,
 				tag : course,
 				color : color,
 				notes : notes,
 				location : pLocation,
+				notify: dueDate_object.toISOString(),
 			}
 
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
@@ -693,7 +695,7 @@
 						<p>
 							Start working
 						</p>
-						<input class = "col-sm-1 start_working" type="number" style="color: white; width:80px" id="startWorking" value="0" required />
+						<input class = "col-sm-1 start_working" type="number" style="color: white; width:80px" id="startWorking" min="0" value="0" required />
 
 						<br><br><br>
 						<p>

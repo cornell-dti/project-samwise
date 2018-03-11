@@ -492,6 +492,8 @@
 
 		function populateProjectTagSelect(){
 			var userCourses = getUserCourses(userid);
+			var userTags = getTags(userid);
+			userCourses = userCourses.concat(userTags);
 			if (userCourses.length < 1){
 				return;
 			}
@@ -697,42 +699,43 @@
 	 			<br>
 	 			<br>
 
-					<div class = "col-sm-2 title">
+					<p>
 						Tag
-					</div>
+					</p>
 					<select style="color: black" id = "selectDropdown"></select>
 
 				<br><br>
-				<div class = "col-sm-2 title">
+				<p>
 					Starts
-				</div>
+				</p>
 				<input type="datetime-local" style="color: black; width:200px"id="realstart">
 				<br>
 				<br>
-				<div class = "col-sm-2 title">
+				<p>
 					Ends
-				</div>
+				</p>
 				<input type="datetime-local" style="color: black; width:200px"id="projectDate">
 				<br>
 				<br>
 				<br>
-				<div class = "col-sm-2 title">
+				<p>
 					Start working
-				</div>
-				<input class = "col-sm-1 start_working" type="number" style="color: black; width:80px" id="startWorking" value="0">
-				<div class = "col-sm-2 title days-ahead">Days Ahead</div>
-				<br><br>
+				</p>
+				<input class = "col-sm-1 start_working" type="number" style="color: white; width:80px" id="startWorking" value="0">
+				<p>Days Ahead</p>
 
 				<br>
-				<div class = "col-sm-2 title">
+				<p>
 					Location
-				</div>
+				</p>
 					<input style= "color: white" class= "project_location" type="text" id ="projectLocation" placeholder="Event Location Here">
-				<div class = "col-sm-2 title">
+					<br>
+					<br>
+				<p>
 					Notes
-				</div>
+				</p>
 					<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" placeholder="Enter Event Notes Here">
-			 </div>
+			 </p>
 
 				<button class="btn btn-lg btn-default" style="float:right;" onclick="addProjectToCalendar()">Save</button>
 

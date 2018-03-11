@@ -381,3 +381,7 @@ li a:focus {
 #onboarding-modal-div > .awesomplete > ul {
     margin-top: 6em;
 }
+
+button.fc-state-disabled {
+    cursor: not-allowed;
+}

@@ -173,63 +173,50 @@
 		function addProjectToCalendar(){
 
 			var name = document.getElementById("projectName").value;
-			var date = document.getElementById("projectDate").value;
+			var dueDate = document.getElementById("projectDate").value;
 			var course = document.getElementById("selectDropdown").value;
 			var start = document.getElementById("startWorking").value;
-			var realstart = document.getElementById("realstart").value;
 			var pLocation = document.getElementById("projectLocation").value;
 			var notes = document.getElementById("projectNotes").value;
 
-			if (name === 'undefined'){
-				name = "Empty"
-			}
-			if (date){
-				date = date.concat(":00");
-
-			}
-			else{
-				var today = new Date();
-				var date = today.toISOString();
-			}
-
-			if (realstart){
-				realstart = realstart.concat(":00");
-			}
-			else{
-				realstart = date;
-			}
-			if (course === 'undefined'){
-				course = "Blank";
-			}
-			// if (start < 1){
-			// 	start = 1;
-			// }
-			var startWorkingDateObj = new Date(realstart);
-			startWorkingDateObj.setDate(startWorkingDateObj.getDate() - start);
-			startWorkingDateObj.setTime(startWorkingDateObj.getTime() - (5 * 60 * 60 * 1000));
-			var startDate = startWorkingDateObj.toISOString();
-
-			var dateObj = new Date(date);
-			dateObj.setTime(dateObj.getTime() - (5 * 60 * 60 * 1000));
-			date = dateObj.toISOString();
+			var dueDate_object = new Date(dueDate);
+			console.log(dueDate_object);
+			var offset = 24*60*60*1000*start;
+			var startDate_object = new Date();
+			startDate_object.setTime(dueDate_object.getTime() - offset);
+			console.log(startDate_object);
 
 			var c = getUserCourseColor(userid, course);
+			var c_prime = getUserTagColor(userid, course);
+			if (c.length == 0){
+				color = c_prime[0];
+			}
+			else{
+				color = c[0];
+			}
+			console.log(color);
+
 			var newEvent = {
 				title : name,
-				start : startDate,
-				end : date,
+				start : startDate_object.toISOString(),
+				end : dueDate_object.toISOString(),
 				tag : course,
-				color : c,
+				color : color,
 				notes : notes,
-				location : pLocation
+				location : pLocation,
 			}
 
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			$("#calendar").fullCalendar('rerenderEvents');
 
-			addEvent(userid, name, startDate, date, course, pLocation, notes);
+			addEvent(userid, name, startDate_object.toISOString(), dueDate_object.toISOString(), course, pLocation, notes);
 
 			var modal = document.getElementById('addProjectModal');
+			document.getElementById("projectName").value = "";
+			document.getElementById("projectDate").value = "";
+			document.getElementById("startWorking").value = "";
+			document.getElementById("projectLocation").value = "";
+			document.getElementById("projectNotes").value = "";
 			modal.style.display = 'none';
 		}
 
@@ -691,8 +678,40 @@
 	 <div class="modal-header" style="background-color: rgba(255, 5, 35, 1); opacity: 0.7">
 		 <span class="close" id="closeProject">&times;</span>
 			<div class = "col-sm-12">
-				<h3>Add New</h3>
-				 <input style= "color: white" class= "task_name" type="text" id ="projectName" placeholder="Title"> <br>
+				<h3>Add New Project</h3>
+
+					<form id="project_form" action="javascript:addProjectToCalendar()">
+				    <input style="color: white" class="task_name" type="text" id="projectName" placeholder="Title" required/>
+						<br><br><br>
+						<p>Tag</p>
+						<select style="color: black" id = "selectDropdown"></select>
+
+						<p>Due</p>
+				    <input type="date" style="color: black; width:200px" id="projectDate" required />
+
+						<br><br><br>
+						<p>
+							Start working
+						</p>
+						<input class = "col-sm-1 start_working" type="number" style="color: white; width:80px" id="startWorking" value="0" required />
+
+						<br><br><br>
+						<p>
+							Location
+						</p>
+						<input style= "color: white" class= "project_location" type="text" id ="projectLocation" placeholder="Event Location Here" />
+
+						<br><br><br>
+						<p>
+							Notes
+						</p>
+						<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" placeholder="Enter Event Notes Here" />
+
+						<br><br><br>
+						<input type="submit" class="btn btn-lg btn-default" style="float:right;">Save</button>
+				  </form>
+				 <!-- <input style= "color: white" class= "task_name" type="text" id ="projectName" placeholder="Title">
+				 <br>
 				 <div class = "col-sm-4"></div>
 	 			<br>
 	 		  <br>
@@ -703,16 +722,10 @@
 						Tag
 					</p>
 					<select style="color: black" id = "selectDropdown"></select>
-
-				<br><br>
-				<p>
-					Starts
-				</p>
-				<input type="datetime-local" style="color: black; width:200px"id="realstart">
 				<br>
 				<br>
 				<p>
-					Ends
+					Due
 				</p>
 				<input type="datetime-local" style="color: black; width:200px"id="projectDate">
 				<br>
@@ -740,7 +753,7 @@
 				<button class="btn btn-lg btn-default" style="float:right;" onclick="addProjectToCalendar()">Save</button>
 
 				<br>
-				<br>
+				<br> -->
 			</div>
 		 </div>
 	 </div>

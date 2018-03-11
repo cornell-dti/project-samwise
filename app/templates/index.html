@@ -152,6 +152,10 @@
 			// center: 'semester,month,agendaWeek,agendaDay'
 			center: 'month,agendaWeek,agendaDay'
 		},
+		dayClick: function(date, jsEvent, view) {
+            $('#calendar').fullCalendar('changeView', 'agendaDay');
+            $('#calendar').fullCalendar('gotoDate', date);
+        },
 		nextDayThreshold: '00:00:00'
 	});
 

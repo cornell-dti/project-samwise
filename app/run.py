@@ -89,7 +89,6 @@ def login():
         app.config['AUTH_URI'],
         access_type='offline'
     )
-    print '\n\n\n[DEBUG]:', app.config['REDIRECT_URI'], '\n', state, '\n', auth_url, '\n\n\n'
     session['oauth_state'] = state
     return redirect(auth_url)
 

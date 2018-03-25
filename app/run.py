@@ -110,9 +110,6 @@ def callback():
     if 'code' not in request.args and 'state' not in request.args:
         print('error while logging in: %s' % request['error'])
         return redirect(url_for('login'))
-    if 'oauth_state' not in session:
-        print('oauth_state not in session')
-        return redirect(url_for('logout'))
     google = google_auth(state=session['oauth_state'])
     try:
         token = google.fetch_token(

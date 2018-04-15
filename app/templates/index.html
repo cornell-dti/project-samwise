@@ -186,27 +186,27 @@
     {% if auth %}
 
     document.addEventListener("DOMContentLoaded", function() {
-      syncGoogleToFullCalendar();
+        syncGoogleToFullCalendar();
   		addStoredEvents();
-      var courses = getAllCourses();
+        var courses = getAllCourses();
   		var input = document.getElementById("classSearchIntro");
-  		var awesomplete = new Awesomplete(input,{list : courses});
+  		var awesomplete = new Awesomplete(input, {list : courses});
 
-      document.getElementById('classSearchIntro').addEventListener("awesomplete-selectcomplete", function(event) {
-          addUserClassSettings();
-      });
+        document.getElementById('classSearchIntro').addEventListener("awesomplete-selectcomplete", function(event) {
+            addUserClassSettings();
+        });
 
 
-      var input2 = document.getElementById("classSearchSettings");
-  		var awesomplete2 = new Awesomplete(input2,{list : courses});
+        var input2 = document.getElementById("classSearchSettings");
+        var awesomplete2 = new Awesomplete(input2, {list : courses});
 
-      document.getElementById('classSearchSettings').addEventListener("awesomplete-selectcomplete", function(event) {
-          addUserClassSettings();
-      });
+        document.getElementById('classSearchSettings').addEventListener("awesomplete-selectcomplete", function(event) {
+            addUserClassSettings();
+        });
 
   		// awesomplete.list = courses;
   		populateUserCourses();
-      populateUserCoursesSettings();
+        populateUserCoursesSettings();
     });
 
     // syncGoogleToFullCalendar();

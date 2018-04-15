@@ -212,6 +212,7 @@
 				notes : notes,
 				location : pLocation,
 				notify: startDate_object.toISOString(),
+				can_remove : true
 			};
 
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
@@ -265,7 +266,8 @@
 							tag : exams[k][j].courseId,
 							color : c,
 							location : exams[k][j].location,
-							notes : exams[k][j].notes
+							notes : exams[k][j].notes,
+							can_remove : false
 						}
 
 						$("#calendar").fullCalendar('addEventSource', [newEvent]);
@@ -288,7 +290,8 @@
 					tag : events[k].tagid,
 					color : c,
 					notes : events[k].notes,
-					location : events[k].location
+					location : events[k].location,
+					can_remove : true
 				}
 				$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			}

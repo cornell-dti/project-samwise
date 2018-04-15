@@ -216,6 +216,10 @@
 			};
 
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
+
+			var events = $("#calendar").fullCalendar('clientEvents');
+			sortEvents(events);
+
 			$("#calendar").fullCalendar('rerenderEvents');
 
 			var modal = document.getElementById('addProjectModal');
@@ -226,6 +230,25 @@
 			document.getElementById("projectNotes").value = "";
 			modal.style.display = 'none';
 		}
+
+		function sortEvents(events){
+		   	//grab list of courses so can check when displaying
+		    var courses = getUserCourses(userid);
+		    //assign displayorder to event object
+		    events.forEach(function(event){
+		    // activate allDay when time field is added to events
+		      // if (event.allDay){
+		      //   event.displayOrder = 1;
+		      // } else
+		      if ((event.title).includes("Prelim")){
+		        event.displayOrder = 2;
+		      } else if (courses.indexOf(event.tag) >= 0){
+		        event.displayOrder = 3;
+		      } else{
+		        event.displayOrder = 4;
+		      }
+		    })
+		  }
 
 		function addStoredEvents(){
 
@@ -295,6 +318,10 @@
 				}
 				$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			}
+
+			var events = $("#calendar").fullCalendar('clientEvents');
+			sortEvents(events);
+			
 			$("#calendar").fullCalendar('rerenderEvents');
 		}
 

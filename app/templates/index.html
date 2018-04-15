@@ -74,16 +74,26 @@
 
     eventClick : function(event) {
 
-      if (event.can_remove == true){
+      console.log("Event: ");
+      console.log(event);
 
-        console.log("Event: ");
-        console.log(event);
+      var modal = document.getElementById('eventDetailsModal');
+      var infoDiv = document.getElementById('information');
 
-  			var modal = document.getElementById('eventDetailsModal');
-  			var infoDiv = document.getElementById('information');
+      var tagTitle = document.createElement("h5");
+      tagTitle.appendChild(document.createTextNode(event.title));
 
-  			var tagTitle = document.createElement("h5");
-  			tagTitle.appendChild(document.createTextNode(event.title));
+      var button = document.createElement("button");
+      button.setAttribute("type", "button");
+      button.onclick = function(){
+        removeEvent(event.db_id);
+        $('#calendar').fullCalendar('removeEventSource', event.source);
+        infoDiv.innerHTML = '';
+        modal.style.display = 'none';
+      }
+
+      if (event.className[0] != "google") {
+
 
         infoDiv.appendChild(tagTitle);
 
@@ -96,20 +106,24 @@
         infoDiv.appendChild(document.createElement("br"));
         infoDiv.appendChild(document.createElement("br"));
 
-
-          var button = document.createElement("button");
-          button.setAttribute("type", "button");
-          button.onclick = function(){
-            removeEvent(event.db_id);
-            $('#calendar').fullCalendar('removeEventSource', event.source);
-            infoDiv.innerHTML = '';
-            modal.style.display = 'none';
-          }
-          button.appendChild(document.createTextNode("Remove"));
-          infoDiv.appendChild(button);
+        button.appendChild(document.createTextNode("Remove"));
+        infoDiv.appendChild(button);
 
   			modal.style.display = 'block';
       }
+      else {
+
+        infoDiv.appendChild(tagTitle);
+
+        // infoDiv.appendChild(document.createTextNode("Location: " + event.location));
+        //
+        // infoDiv.appendChild(document.createElement("br"));
+        //
+        // infoDiv.appendChild(document.createTextNode("Notes: " + event.notes));
+
+  			modal.style.display = 'block';
+      }
+
 		},
 		header: {
 			right: 'prev,next,today',
@@ -143,7 +157,7 @@
 	                    end = event.end.date;
 	                }
 								}
-                var newEvent = {"title" : event.summary, "start" : start, "end" : end, "can_remove" : false}
+                var newEvent = {"title" : event.summary, "start" : start, "end" : end, "className" : "google"};
                 eventSource.push(newEvent);
             }
         } else {

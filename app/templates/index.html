@@ -79,11 +79,11 @@
       console.log("Event: ");
       console.log(event);
 
-			var modal = document.getElementById('eventDetailsModal');
-			var infoDiv = document.getElementById('information');
+      var modal = document.getElementById('eventDetailsModal');
+      var infoDiv = document.getElementById('information');
 
-			var tagTitle = document.createElement("h5");
-			tagTitle.appendChild(document.createTextNode(event.title));
+      var tagTitle = document.createElement("h5");
+      tagTitle.appendChild(document.createTextNode(event.title));
 
       var button = document.createElement("button");
       button.setAttribute("type", "button");
@@ -94,22 +94,38 @@
         modal.style.display = 'none';
       }
 
+      if (event.className[0] != "google") {
 
-      infoDiv.appendChild(tagTitle);
 
-      infoDiv.appendChild(document.createTextNode("Location: " + event.location));
+        infoDiv.appendChild(tagTitle);
 
-      infoDiv.appendChild(document.createElement("br"));
+        infoDiv.appendChild(document.createTextNode("Location: " + event.location));
 
-      infoDiv.appendChild(document.createTextNode("Notes: " + event.notes));
+        infoDiv.appendChild(document.createElement("br"));
 
-      infoDiv.appendChild(document.createElement("br"));
-      infoDiv.appendChild(document.createElement("br"));
+        infoDiv.appendChild(document.createTextNode("Notes: " + event.notes));
 
-      button.appendChild(document.createTextNode("Remove"));
-      infoDiv.appendChild(button);
+        infoDiv.appendChild(document.createElement("br"));
+        infoDiv.appendChild(document.createElement("br"));
 
-			modal.style.display = 'block';
+        button.appendChild(document.createTextNode("Remove"));
+        infoDiv.appendChild(button);
+
+  			modal.style.display = 'block';
+      }
+      else {
+
+        infoDiv.appendChild(tagTitle);
+
+        // infoDiv.appendChild(document.createTextNode("Location: " + event.location));
+        //
+        // infoDiv.appendChild(document.createElement("br"));
+        //
+        // infoDiv.appendChild(document.createTextNode("Notes: " + event.notes));
+
+  			modal.style.display = 'block';
+      }
+
 		},
 		header: {
 			right: 'prev,next,today',
@@ -143,7 +159,7 @@
 	                    end = event.end.date;
 	                }
 								}
-                var newEvent = {"title" : event.summary, "start" : start, "end" : end}
+                var newEvent = {"title" : event.summary, "start" : start, "end" : end, "className" : "google"};
                 eventSource.push(newEvent);
             }
         } else {

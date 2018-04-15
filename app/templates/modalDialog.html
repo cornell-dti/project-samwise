@@ -203,6 +203,7 @@
 			var highest_id = es[es.length - 1].eventId;
 
 			var newEvent = {
+				allDay : true,
 				db_id : highest_id,
 				title : name,
 				start : startDate_object.toISOString(),
@@ -306,6 +307,7 @@
 				var c = getUserCourseColor(userid, events[k].tagId);
 				console.log("TAG" + events[k].eventName + " " + events[k].tagId);
 				var newEvent = {
+					allDay: true,
 					db_id : events[k].eventId,
 					title : events[k].eventName,
 					start : events[k].startTime,
@@ -321,7 +323,7 @@
 
 			var events = $("#calendar").fullCalendar('clientEvents');
 			sortEvents(events);
-			
+
 			$("#calendar").fullCalendar('rerenderEvents');
 		}
 

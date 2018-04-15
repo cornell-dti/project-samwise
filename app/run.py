@@ -18,6 +18,8 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.session_protection = 'strong'
 
+test_acc = 'me382'
+
 
 class UserData(db.Model, UserMixin):
     __tablename__ = 'samwisedb.UserData'
@@ -94,6 +96,8 @@ def login():
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
+    if current_user.is_authenticated and current_user.netid == test_acc:
+        clear_user(test_acc)
     logout_user()
     session.clear()
     return redirect(url_for('index'))
@@ -709,6 +713,14 @@ def get_user_from_subtask_id(subtask_id):
     cursor.execute('SELECT user FROM samwisedb.Project WHERE projectId = %s', (projectId,))
     user_rows = cursor.fetchall()
     return None if len(user_rows) == 0 else user_rows[0][0]
+
+
+def clear_user(user_id):
+    connection = get_db()
+    cursor = connection.cursor()
+    cursor.execute('DELETE FROM samwisedb.Event where user = %s', user_id)
+    cursor.execute('DELETE FROM samwisedb.Tag where user = %s', user_id)
+    cursor.execute('DELETE FROM samwisedb.User where user = %s', user_id)
 
 
 if __name__ == '__main__':

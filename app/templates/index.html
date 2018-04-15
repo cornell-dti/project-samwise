@@ -68,83 +68,30 @@
 
 </body>
 <script>
+
+  // function deleteEvent(x){
+  //   console.log(x);
+  // }
 	$('#calendar').fullCalendar({
 
-		eventClick : function(event) {
+    eventClick : function(event) {
 			var modal = document.getElementById('eventDetailsModal');
 			var infoDiv = document.getElementById('information');
 
 			var tagTitle = document.createElement("h5");
 			tagTitle.id = "modal-tag-title";
-			// if (event.tag != null) {
-			// 	tagTitle.append(document.createTextNode(event.tag));
-			// }
-			// infoDiv.append(tagTitle);
-      //
-			// var t = document.createElement("h4");
-			// t.id = "modal-event-title";
-			// if (event.title == null){
-			// 	t.append(document.createTextNode("No title"));
-			// }
-			// else{
-			// 	t.append(document.createTextNode(event.title));
-			// }
-			// infoDiv.append(t);
-      //
-			// var t = document.createElement("h6");
-			// t.id = "modal-deadline-title";
-			// if (event.end == null){
-			// 	t.append(document.createTextNode("No end date"));
-			// }
-			// else{
-			// 	t.append(document.createTextNode(event.end));
-			// }
-			// infoDiv.append(t);
-      //
-			// var t = document.createElement("h6");
-			// t.id = "modal-location-title";
-			// if (event.location == null){
-			// 	t.append(document.createTextNode("No location"));
-			// }
-			// else{
-			// 	t.append(document.createTextNode(event.location));
-			// }
-			// infoDiv.append(t);
-      //
-			// var t = document.createElement("h6");
-			// t.id = "modal-notes-title";
-			// if (event.notes == null){
-			// 	t.append(document.createTextNode("No notes"));
-			// }
-			// else{
-			// 	t.append(document.createTextNode(event.notes));
-			// }
-			// infoDiv.append(t);
-      //
-      //       var courses = getUserCourses(userid);
-      //       if (courses.indexOf(event.tag) != -1) {
-      //
-      //           var button = document.createElement("button");
-      //           button.setAttribute("style", "float:left");
-      //           button.setAttribute("id", "removeButtonId");
-      //           button.append(document.createTextNode("Delete"));
-      //           infoDiv.append(button);
-      //
-      //           var b = document.getElementById("removeButtonId");
-      //           b.onclick = function(){
-      //               // removeEvent(event.eventId);
-      //               $("#calendar").fullCalendar('removeEvents');
-      //               addStoredEvents();
-      //               syncGoogleToFullCalendar();
-      //
-      //               $("#calendar").fullCalendar('rerenderEvents');
-      //               var info = document.getElementById("information");
-      //               info.innerHTML = "";
-      //
-      //               modal.style.display = 'none';
-      //           }
-      //       }
-      //
+
+      var button = document.createElement("button");
+      button.setAttribute("type", "button");
+      button.onclick = function(){
+        removeEvent(event.id);
+        $('#calendar').fullCalendar('removeEventSource', event.source);
+        infoDiv.innerHTML = '';
+        modal.style.display = 'none';
+      }
+      button.appendChild(document.createTextNode("Remove"));
+      infoDiv.appendChild(button);
+
 			modal.style.display = 'block';
 		},
 		header: {

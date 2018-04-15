@@ -321,6 +321,7 @@ def getEvents(userid):
 @app.route('/removeEvent/', methods=['POST'])
 def removeEvent():
     data = request.get_json(force=True)
+    print data
     eventId = data['eventId']
     connection = get_db()
     cursor = connection.cursor()
@@ -332,6 +333,22 @@ def removeEvent():
         connection.commit()
         return success()
     return access_denied()
+
+# def removeTag():
+#     data = request.get_json(force=True)
+#     user = data['user']
+#     tagId = data['tagId']
+#
+#     connection = get_db()
+#     cursor = connection.cursor()
+#     cursor.execute('SELECT user FROM samwisedb.Tag WHERE user = %s AND tagId = %s', (user, tagId))
+#     user_rows = cursor.fetchall()
+#
+#     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
+#         cursor.execute('DELETE FROM samwisedb.Tag WHERE user = %s AND tagId = %s', (user, tagId))
+#         connection.commit()
+#         return success()
+#     return access_denied()
 
 
 @app.route('/addEvent/', methods=['POST'])
@@ -374,7 +391,7 @@ def updateEvent():
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute(
             'UPDATE samwisedb.Event SET eventName=%s, startTime=%s, endTime=%s, tagId=%s, notes=%s, location=%s WHERE eventId=%s',
-            (eventName, startTime, endTime, tagId, eventId, notes, location))
+            (eventName, startTime, endTime, tagId, notes, location, eventId))
         connection.commit()
         return success()
     return access_denied()

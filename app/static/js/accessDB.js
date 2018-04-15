@@ -79,6 +79,17 @@ function removeEvent(eventId) {
     xhr.send(JSON.stringify(obj));
 }
 
+// function removeTag (user, tagId) {
+//   var obj = {"user" : user,  "tagId" : tagId };
+//
+//   var xhr = new XMLHttpRequest();
+//   xhr.open("POST", 'http://localhost:5000/removeTag/', true);
+//   xhr.setRequestHeader("Content-Type", "application/json")
+//   console.log(JSON.stringify(obj));
+//   xhr.send(JSON.stringify(obj));
+// }
+
+
 function updateEvent(eventId, eventName, startTime, endTime, tagId) {
 
     var obj = {"eventId" : eventId, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId, "notes" : notes, "location" : location};

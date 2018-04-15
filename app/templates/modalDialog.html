@@ -197,7 +197,12 @@
 			}
 			console.log(color);
 
+			addEvent(userid, name, startDate_object.toISOString(), dueDate_object.toISOString(), course, pLocation, notes);
+			var es = getEvents(userid);
+			var highest_id = es[es.length - 1].eventId;
+
 			var newEvent = {
+				id : highest_id,
 				title : name,
 				start : startDate_object.toISOString(),
 				allDay: true,
@@ -206,12 +211,10 @@
 				notes : notes,
 				location : pLocation,
 				notify: dueDate_object.toISOString(),
-			}
+			};
 
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			$("#calendar").fullCalendar('rerenderEvents');
-
-			addEvent(userid, name, startDate_object.toISOString(), dueDate_object.toISOString(), course, pLocation, notes);
 
 			var modal = document.getElementById('addProjectModal');
 			document.getElementById("projectName").value = "";

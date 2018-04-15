@@ -120,8 +120,14 @@
             $('#calendar').fullCalendar('changeView', 'agendaDay');
             $('#calendar').fullCalendar('gotoDate', date);
         },
-		nextDayThreshold: '00:00:00'
+		nextDayThreshold: '00:00:00',
+
+    // event display order
+    eventOrder: "displayOrder"
+
 	});
+
+  
 
 	function syncGoogleToFullCalendar() {
         var results = syncCalendar();
@@ -152,7 +158,29 @@
         $("#calendar").fullCalendar('addEventSource', eventSource);
     }
 
+//sort events, add display order so eventOrder knows what order to render in
+//questions: where to call this? where are events being added to calendar?
+//how to add an event to calendar to test this?
+  // function sortEvents(events){
+  //   //grab list of courses ?? how
+  //   var courses;
+
+  //   events.forEach(function(event){
+  //     if (event.allDay){
+  //       event.displayOrder = 1;
+  //     } else if ((event.title).includes("Prelim")){
+  //       event.displayOrder = 2;
+  //     } else if (courses.indexOf(event.tag) >= 0){
+  //       event.displayOrder = 3;
+  //     } else{
+  //       event.displayOrder = 4;
+  //     }
+  //   })
+  //   console.log("sorted");
+  // }  
+
 	var events = JSON.parse(localStorage.getItem("events")) == null ? [] : JSON.parse(localStorage.getItem("events"));
+
 	function myFunction() {
 		var eventTitle = document.getElementById("nameOne").value;
 		if (eventTitle) {
@@ -171,7 +199,13 @@
 
     document.addEventListener("DOMContentLoaded", function() {
       syncGoogleToFullCalendar();
+      //get events & sort
+      // var events = getEvents(userid);
+      // sortEvents(events);
+      console.log(events);
+
   		addStoredEvents();
+
       var courses = getAllCourses();
   		var input = document.getElementById("classSearchIntro");
   		var awesomplete = new Awesomplete(input,{list : courses});

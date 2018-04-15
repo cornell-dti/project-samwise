@@ -85,16 +85,6 @@
 			var tagTitle = document.createElement("h5");
 			tagTitle.appendChild(document.createTextNode(event.title));
 
-      var button = document.createElement("button");
-      button.setAttribute("type", "button");
-      button.onclick = function(){
-        removeEvent(event.db_id);
-        $('#calendar').fullCalendar('removeEventSource', event.source);
-        infoDiv.innerHTML = '';
-        modal.style.display = 'none';
-      }
-
-
       infoDiv.appendChild(tagTitle);
 
       infoDiv.appendChild(document.createTextNode("Location: " + event.location));
@@ -106,8 +96,20 @@
       infoDiv.appendChild(document.createElement("br"));
       infoDiv.appendChild(document.createElement("br"));
 
-      button.appendChild(document.createTextNode("Remove"));
-      infoDiv.appendChild(button);
+      if (event.can_remove == true){
+        var button = document.createElement("button");
+        button.setAttribute("type", "button");
+        button.onclick = function(){
+          removeEvent(event.db_id);
+          $('#calendar').fullCalendar('removeEventSource', event.source);
+          infoDiv.innerHTML = '';
+          modal.style.display = 'none';
+        }
+        button.appendChild(document.createTextNode("Remove"));
+        infoDiv.appendChild(button);
+      }
+
+
 
 			modal.style.display = 'block';
 		},
@@ -143,7 +145,7 @@
 	                    end = event.end.date;
 	                }
 								}
-                var newEvent = {"title" : event.summary, "start" : start, "end" : end}
+                var newEvent = {"title" : event.summary, "start" : start, "end" : end, "can_remove" : false}
                 eventSource.push(newEvent);
             }
         } else {

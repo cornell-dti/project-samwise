@@ -94,9 +94,11 @@ def login():
     session['oauth_state'] = state
     return redirect(auth_url)
 
+
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     if current_user.is_authenticated and current_user.netid == test_acc:
+        print('Clearing data for', test_acc)
         clear_user(test_acc)
     logout_user()
     session.clear()
@@ -337,6 +339,7 @@ def removeEvent():
         connection.commit()
         return success()
     return access_denied()
+
 
 # def removeTag():
 #     data = request.get_json(force=True)
@@ -598,6 +601,7 @@ def addTag():
         return success()
     return access_denied()
 
+
 @app.route('/removeTag/', methods=['POST'])
 def removeTag():
     data = request.get_json(force=True)
@@ -615,6 +619,7 @@ def removeTag():
         return success()
     return access_denied()
 
+
 @app.route('/updateTagColor/', methods=['POST'])
 def updateTagColor():
     data = request.get_json(force=True)
@@ -628,6 +633,7 @@ def updateTagColor():
         connection.commit()
         return success()
     return access_denied()
+
 
 @app.route('/updateTagId/', methods=['POST'])
 def updateTagId():
@@ -653,11 +659,11 @@ def updateCourseColor():
     connection = get_db()
     cursor = connection.cursor()
     if current_user.is_authenticated:
-        cursor.execute('UPDATE samwisedb.User SET color = %s WHERE netId = %s AND courseId = %s', (color, netId, courseId))
+        cursor.execute('UPDATE samwisedb.User SET color = %s WHERE netId = %s AND courseId = %s',
+                       (color, netId, courseId))
         connection.commit()
         return success()
     return access_denied()
-
 
 
 @app.route('/getColor/<name>')
@@ -678,6 +684,7 @@ def getUserCourseColor(userId, courseId):
         data = [item[2] for item in cursor.fetchall()]
         return jsonify(data)
     return access_denied()
+
 
 @app.route('/getUserTagColor/<userId>/<tagId>')
 @login_required
@@ -703,7 +710,6 @@ def getCalendarData():
     return jsonify(json.loads(res.read()))
 
 
-
 def get_user_from_subtask_id(subtask_id):
     connection = get_db()
     cursor = connection.cursor()
@@ -718,9 +724,10 @@ def get_user_from_subtask_id(subtask_id):
 def clear_user(user_id):
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM samwisedb.Event where user = %s', user_id)
-    cursor.execute('DELETE FROM samwisedb.Tag where user = %s', user_id)
-    cursor.execute('DELETE FROM samwisedb.User where user = %s', user_id)
+    cursor.execute('DELETE FROM samwisedb.Event where user = %s', (user_id,))
+    cursor.execute('DELETE FROM samwisedb.Tag where user = %s', (user_id,))
+    cursor.execute('DELETE FROM samwisedb.User where netId = %s', (user_id,))
+    connection.commit()
 
 
 if __name__ == '__main__':

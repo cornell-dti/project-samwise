@@ -88,7 +88,7 @@
       var button = document.createElement("button");
       button.setAttribute("type", "button");
       button.onclick = function(){
-        removeEvent(event.id);
+        removeEvent(event.db_id);
         $('#calendar').fullCalendar('removeEventSource', event.source);
         infoDiv.innerHTML = '';
         modal.style.display = 'none';

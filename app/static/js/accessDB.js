@@ -12,7 +12,7 @@ function addProject(user, projectName, dueDate, courseId) {
         var obj = {"user" : user, "projectName" : projectName, "dueDate" : dueDate, "courseId" : courseId};
 
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", '/addProject/', true);
+        xhr.open("POST", '/addProject/', false);
         xhr.setRequestHeader("Content-Type", "application/json")
         console.log(JSON.stringify(obj));
         xhr.send(JSON.stringify(obj));
@@ -23,7 +23,7 @@ function updateProject(projectId, projectName, dueDate, courseId) {
         var obj = {"projectId" : projectId, "projectName" : projectName, "dueDate" : dueDate, "courseId" : courseId};
 
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", '/updateProject/', true);
+        xhr.open("POST", '/updateProject/', false);
         xhr.setRequestHeader("Content-Type", "application/json")
         console.log(JSON.stringify(obj));
         xhr.send(JSON.stringify(obj));
@@ -51,18 +51,13 @@ function getProjects(id) {
 }
 
 function addEvent(user, eventName, startTime, endTime, tagId, pLocation, notes) {
-
+    console.log('In addEvent');
     var obj = {"user" : user, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId, "notes" : notes, "location" : pLocation};
+    console.log('Object:');
+    console.log(obj);
 
-    console.log(user);
-    console.log(eventName);
-    console.log(startTime);
-    console.log(endTime);
-    console.log(tagId);
-    console.log(pLocation);
-    console.log(notes);
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", '/addEvent/', true);
+    xhr.open("POST", '/addEvent/', false);
     xhr.setRequestHeader("Content-Type", "application/json")
     console.log(JSON.stringify(obj));
     xhr.send(JSON.stringify(obj));

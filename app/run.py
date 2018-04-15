@@ -321,7 +321,7 @@ def getEvents(userid):
 @app.route('/removeEvent/', methods=['POST'])
 def removeEvent():
     data = request.get_json(force=True)
-    print data
+    print(data)
     eventId = data['eventId']
     connection = get_db()
     cursor = connection.cursor()

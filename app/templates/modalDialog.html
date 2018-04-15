@@ -196,8 +196,9 @@
 				color = c[0];
 			}
 			console.log(color);
-
+			console.log('Calling addEvent');
 			addEvent(userid, name, startDate_object.toISOString(), dueDate_object.toISOString(), course, pLocation, notes);
+			console.log('Finished addEvent');
 			var es = getEvents(userid);
 			var highest_id = es[es.length - 1].eventId;
 

@@ -76,42 +76,42 @@
 
     eventClick : function(event) {
 
-      console.log("Event: ");
-      console.log(event);
-
-			var modal = document.getElementById('eventDetailsModal');
-			var infoDiv = document.getElementById('information');
-
-			var tagTitle = document.createElement("h5");
-			tagTitle.appendChild(document.createTextNode(event.title));
-
-      infoDiv.appendChild(tagTitle);
-
-      infoDiv.appendChild(document.createTextNode("Location: " + event.location));
-
-      infoDiv.appendChild(document.createElement("br"));
-
-      infoDiv.appendChild(document.createTextNode("Notes: " + event.notes));
-
-      infoDiv.appendChild(document.createElement("br"));
-      infoDiv.appendChild(document.createElement("br"));
-
       if (event.can_remove == true){
-        var button = document.createElement("button");
-        button.setAttribute("type", "button");
-        button.onclick = function(){
-          removeEvent(event.db_id);
-          $('#calendar').fullCalendar('removeEventSource', event.source);
-          infoDiv.innerHTML = '';
-          modal.style.display = 'none';
-        }
-        button.appendChild(document.createTextNode("Remove"));
-        infoDiv.appendChild(button);
+
+        console.log("Event: ");
+        console.log(event);
+
+  			var modal = document.getElementById('eventDetailsModal');
+  			var infoDiv = document.getElementById('information');
+
+  			var tagTitle = document.createElement("h5");
+  			tagTitle.appendChild(document.createTextNode(event.title));
+
+        infoDiv.appendChild(tagTitle);
+
+        infoDiv.appendChild(document.createTextNode("Location: " + event.location));
+
+        infoDiv.appendChild(document.createElement("br"));
+
+        infoDiv.appendChild(document.createTextNode("Notes: " + event.notes));
+
+        infoDiv.appendChild(document.createElement("br"));
+        infoDiv.appendChild(document.createElement("br"));
+
+
+          var button = document.createElement("button");
+          button.setAttribute("type", "button");
+          button.onclick = function(){
+            removeEvent(event.db_id);
+            $('#calendar').fullCalendar('removeEventSource', event.source);
+            infoDiv.innerHTML = '';
+            modal.style.display = 'none';
+          }
+          button.appendChild(document.createTextNode("Remove"));
+          infoDiv.appendChild(button);
+
+  			modal.style.display = 'block';
       }
-
-
-
-			modal.style.display = 'block';
 		},
 		header: {
 			right: 'prev,next,today',

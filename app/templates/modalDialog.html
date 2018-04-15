@@ -181,7 +181,7 @@
 			var notes = document.getElementById("projectNotes").value;
 
 			var dueDate_object = new Date(dueDate);
-			dueDate_object.setTime(dueDate_object.getTime() + 5);
+			dueDate_object.setTime(dueDate_object.getTime() + 1000);
 			var offset = 24*60*60*1000*(start);
 			var startDate_object = new Date();
 			startDate_object.setTime(dueDate_object.getTime() - offset);
@@ -205,8 +205,8 @@
 			var newEvent = {
 				db_id : highest_id,
 				title : name,
-				start : dueDate_object.toISOString(),
-				allDay: true,
+				start : startDate_object.toISOString(),
+				end : dueDate_object.toISOString(),
 				tag : course,
 				color : color,
 				notes : notes,
@@ -259,7 +259,6 @@
 						var startDate = startWorkingExam.toISOString();
 						var c = getUserCourseColor(userid, exams[k][j].courseId);
 						var newEvent = {
-
 							title : exams[k][j].courseId,
 							start : startDate,
 							end : dateString,
@@ -284,8 +283,8 @@
 				var newEvent = {
 					db_id : events[k].eventId,
 					title : events[k].eventName,
-					start : events[k].endTime,
-					allDay : true,
+					start : events[k].startTime,
+					end : events[k].endTime,
 					tag : events[k].tagid,
 					color : c,
 					notes : events[k].notes,

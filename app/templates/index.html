@@ -75,11 +75,15 @@
 	$('#calendar').fullCalendar({
 
     eventClick : function(event) {
+
+      console.log("Event: ");
+      console.log(event);
+
 			var modal = document.getElementById('eventDetailsModal');
 			var infoDiv = document.getElementById('information');
 
 			var tagTitle = document.createElement("h5");
-			tagTitle.id = "modal-tag-title";
+			tagTitle.appendChild(document.createTextNode(event.title));
 
       var button = document.createElement("button");
       button.setAttribute("type", "button");
@@ -89,6 +93,19 @@
         infoDiv.innerHTML = '';
         modal.style.display = 'none';
       }
+
+
+      infoDiv.appendChild(tagTitle);
+
+      infoDiv.appendChild(document.createTextNode("Location: " + event.location));
+
+      infoDiv.appendChild(document.createElement("br"));
+
+      infoDiv.appendChild(document.createTextNode("Notes: " + event.notes));
+
+      infoDiv.appendChild(document.createElement("br"));
+      infoDiv.appendChild(document.createElement("br"));
+
       button.appendChild(document.createTextNode("Remove"));
       infoDiv.appendChild(button);
 

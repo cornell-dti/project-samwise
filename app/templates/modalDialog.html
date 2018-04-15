@@ -204,13 +204,13 @@
 			var newEvent = {
 				db_id : highest_id,
 				title : name,
-				start : startDate_object.toISOString(),
+				start : dueDate_object.toISOString(),
 				allDay: true,
 				tag : course,
 				color : color,
 				notes : notes,
 				location : pLocation,
-				notify: dueDate_object.toISOString(),
+				notify: startDate_object.toISOString(),
 			};
 
 			$("#calendar").fullCalendar('addEventSource', [newEvent]);
@@ -258,6 +258,7 @@
 						var startDate = startWorkingExam.toISOString();
 						var c = getUserCourseColor(userid, exams[k][j].courseId);
 						var newEvent = {
+
 							title : exams[k][j].courseId,
 							start : startDate,
 							end : dateString,
@@ -280,9 +281,10 @@
 				var c = getUserCourseColor(userid, events[k].tagId);
 				console.log("TAG" + events[k].eventName + " " + events[k].tagId);
 				var newEvent = {
+					db_id : events[k].eventId,
 					title : events[k].eventName,
-					start : events[k].startTime,
-					end : events[k].endTime,
+					start : events[k].endTime,
+					allDay : true,
 					tag : events[k].tagid,
 					color : c,
 					notes : events[k].notes,

@@ -162,8 +162,9 @@
 		nextDayThreshold: '00:00:00',
     editable: true,
     eventRender: function(event, element) {
+      console.log(event);
     element.qtip({
-      content: event.description
+      content: event.title
     });
   }
 	});

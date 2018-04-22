@@ -172,6 +172,18 @@
 
 		function addProjectToCalendar(){
 
+			var colorsWithHex = {
+				"Blue": "4990E2",
+				"Light green": "7ED321",
+				"Red": "FF0523",
+				"Orange": "FF8D10",
+				"Magenta": "BD0FE1",
+				"Purple": "9013FE",
+				"Yellow": "F8E71C",
+				"Teal": "00A0BC",
+				"Green": "10A627"
+			};
+
 			var name = document.getElementById("projectName").value;
 			var dueDate = document.getElementById("projectDate").value;
 			console.log(dueDate);
@@ -190,10 +202,10 @@
 			var c = getUserCourseColor(userid, course);
 			var c_prime = getUserTagColor(userid, course);
 			if (c.length == 0){
-				color = c_prime[0];
+				color = "#" + colorsWithHex[c_prime[0]];
 			}
 			else{
-				color = c[0];
+				color = "#" + colorsWithHex[c[0]];
 			}
 			console.log(color);
 			console.log('Calling addEvent');
@@ -252,6 +264,17 @@
 		  }
 
 		function addStoredEvents(){
+			var colorsWithHex = {
+				"Blue": "4990E2",
+				"Light green": "7ED321",
+				"Red": "FF0523",
+				"Orange": "FF8D10",
+				"Magenta": "BD0FE1",
+				"Purple": "9013FE",
+				"Yellow": "F8E71C",
+				"Teal": "00A0BC",
+				"Green": "10A627"
+			};
 
 			var exams = getUserExams(userid);
 			if (exams.length < 1){
@@ -282,7 +305,7 @@
 						var startWorkingExam = new Date(dateString);
 						startWorkingExam.setDate(startWorkingExam.getDate() - 7);
 						var startDate = startWorkingExam.toISOString();
-						var c = getUserCourseColor(userid, exams[k][j].courseId);
+						var c = "#" + colorsWithHex[getUserCourseColor(userid, exams[k][j].courseId)];
 						var newEvent = {
 							title : exams[k][j].courseId,
 							start : startDate,
@@ -304,7 +327,8 @@
 
 			var events = getEvents(userid);
 			for (k = 0; k < events.length; k++){
-				var c = getUserCourseColor(userid, events[k].tagId);
+				var c = "#" + colorsWithHex[getUserCourseColor(userid, events[k].tagId)];
+				console.log("COLOR " + c);
 				console.log("TAG" + events[k].eventName + " " + events[k].tagId);
 				var newEvent = {
 					allDay: true,
@@ -375,7 +399,7 @@
 
 
 		function populateUserCoursesSettings(){
-			var colors = ["Red", "Orange", "Blue"];
+			var colors = ["Blue", "Light green", "Red", "Orange", "Magenta", "Purple", "Yellow", "Teal", "Green"];
 			var userCourses = getUserCourses(userid);
 			if (userCourses.length < 1){
 				return;
@@ -393,25 +417,11 @@
 					var opt = document.createElement("option");
 					opt.setAttribute("style", "font-color: black;");
 					opt.setAttribute("value", colors[h]);
+					if (dbColor[0] == colors[h]){
+						opt.setAttribute("selected", "selected");
+					}
+					opt.append(document.createTextNode(colors[h]));
 
-					if (h == 0){
-						if (dbColor[0] == "Red"){
-							opt.setAttribute("selected", "selected");
-						}
-						opt.append(document.createTextNode("Red"));
-					}
-					else if (h == 1){
-						if (dbColor[0] == "Orange"){
-							opt.setAttribute("selected", "selected");
-						}
-						opt.append(document.createTextNode("Orange"));
-					}
-					else{
-						if (dbColor[0] == "Blue"){
-							opt.setAttribute("selected", "selected");
-						}
-						opt.append(document.createTextNode("Blue"));
-					}
 					colorSelect.append(opt);
 				}
 				var cSpan = document.createElement("span");
@@ -444,7 +454,7 @@
 			}
 		}
 		function populateUserTagsSettings(){
-			var colors = ["Red", "Orange", "Blue"];
+			var colors = ["Blue", "Light green", "Red", "Orange", "Magenta", "Purple", "Yellow", "Teal", "Green"];
 			var userTags = getTags(userid);
 			console.log("tags" + userTags);
 
@@ -465,25 +475,11 @@
 					var opt = document.createElement("option");
 					opt.setAttribute("style", "font-color: black;");
 					opt.setAttribute("value", colors[h]);
+					if (dbColor[0] == colors[h]){
+						opt.setAttribute("selected", "selected");
+					}
+					opt.append(document.createTextNode(colors[h]));
 
-					if (h == 0){
-						if (dbColor[0] == "Red"){
-							opt.setAttribute("selected", "selected");
-						}
-						opt.append(document.createTextNode("Red"));
-					}
-					else if (h == 1){
-						if (dbColor[0] == "Orange"){
-							opt.setAttribute("selected", "selected");
-						}
-						opt.append(document.createTextNode("Orange"));
-					}
-					else{
-						if (dbColor[0] == "Blue"){
-							opt.setAttribute("selected", "selected");
-						}
-						opt.append(document.createTextNode("Blue"));
-					}
 					colorSelect.append(opt);
 				}
 				var cSpan = document.createElement("span");
@@ -629,29 +625,6 @@
 		}
 
 		function updateCalendarSettings(){
-			// var events = $("#calendar").fullCalendar('getEventSources');
-			// var userEvents = getEvents(userid);
-			// var eventObjs = [];
-			// for (k = 0; k < events.length; k++){
-			// 	for (x = 0; x < events[k].events.length; x++){
-			// 		eventObjs.push(events[k].events[x]);
-			// 	}
-			// }
-      //
-			// var lst = document.getElementById("currentTagsSettings").getElementsByTagName("li");
-			// var lstPrime = [];
-			// for (j = 0; j < lst.length; j++){
-			// 	lstPrime.push(lst[j].getElementsByTagName("a")[0].innerHTML);
-			// }
-			// for (i = 0; i < userEvents.length; i++){
-			// 	if (userEvents[i].tagId.length > 0 && lstPrime.indexOf(userEvents[i].tagId) == -1){
-			// 		removeEvent(userEvents[i].eventId);
-			// 	}
-			// }
-			// $("#calendar").fullCalendar('removeEvents');
-      //
-			// addStoredEvents();
-			// syncGoogleToFullCalendar();
 
 			//TODO - use Kevin's updateCourseColor endpoint
 
@@ -693,7 +666,9 @@
 				}
 			}
 
-
+			$("#calendar").fullCalendar('removeEvents');
+			syncGoogleToFullCalendar();
+			addStoredEvents();
 			$("#calendar").fullCalendar('rerenderEvents');
 			settingsModal.style.display = 'none';
 		}

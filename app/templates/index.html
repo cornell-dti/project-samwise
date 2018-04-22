@@ -18,11 +18,27 @@
     <link rel='stylesheet' href='../static/css/stylesheet.css?version=07'/>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
+    <link rel="stylesheet" href="http://cdn.jsdelivr.net/qtip2/3.0.3/jquery.qtip.min.css">
+
+
     <script src='../static/js/fullcalendar-3.9.0/lib/jquery.min.js'></script>
     <script src='../static/js/fullcalendar-3.9.0/lib/moment.min.js'></script>
     <script src='../static/js/fullcalendar-3.9.0/fullcalendar.js'></script>
+
+    <script src='../static/js/jquery.qtip-1.0.js'></script>
+
     <script>
 		var userid = "{{ userid }}";
+
+    jQuery.browser = {};
+      (function () {
+          jQuery.browser.msie = false;
+          jQuery.browser.version = 0;
+          if (navigator.userAgent.match(/MSIE ([0-9]+)\./)) {
+              jQuery.browser.msie = true;
+              jQuery.browser.version = RegExp.$1;
+          }
+      })();
 
 
     </script>
@@ -71,6 +87,15 @@
   //   console.log(x);
   // }
 	$('#calendar').fullCalendar({
+
+    events: [
+    {
+      title: 'My Event',
+      start: '2018-04-20',
+      description: 'This is a cool event'
+    }
+    // more events here
+  ],
 
     eventClick : function(event) {
 
@@ -135,7 +160,12 @@
             $('#calendar').fullCalendar('gotoDate', date);
         },
 		nextDayThreshold: '00:00:00',
-    editable: true
+    editable: true,
+    eventRender: function(event, element) {
+    element.qtip({
+      content: event.description
+    });
+  }
 	});
 
 	function syncGoogleToFullCalendar() {

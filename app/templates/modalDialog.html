@@ -626,29 +626,6 @@
 		}
 
 		function updateCalendarSettings(){
-			// var events = $("#calendar").fullCalendar('getEventSources');
-			// var userEvents = getEvents(userid);
-			// var eventObjs = [];
-			// for (k = 0; k < events.length; k++){
-			// 	for (x = 0; x < events[k].events.length; x++){
-			// 		eventObjs.push(events[k].events[x]);
-			// 	}
-			// }
-      //
-			// var lst = document.getElementById("currentTagsSettings").getElementsByTagName("li");
-			// var lstPrime = [];
-			// for (j = 0; j < lst.length; j++){
-			// 	lstPrime.push(lst[j].getElementsByTagName("a")[0].innerHTML);
-			// }
-			// for (i = 0; i < userEvents.length; i++){
-			// 	if (userEvents[i].tagId.length > 0 && lstPrime.indexOf(userEvents[i].tagId) == -1){
-			// 		removeEvent(userEvents[i].eventId);
-			// 	}
-			// }
-			// $("#calendar").fullCalendar('removeEvents');
-      //
-			// addStoredEvents();
-			// syncGoogleToFullCalendar();
 
 			//TODO - use Kevin's updateCourseColor endpoint
 
@@ -690,7 +667,9 @@
 				}
 			}
 
-
+			$("#calendar").fullCalendar('removeEvents');
+			syncGoogleToFullCalendar();
+			addStoredEvents();
 			$("#calendar").fullCalendar('rerenderEvents');
 			settingsModal.style.display = 'none';
 		}

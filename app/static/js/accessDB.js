@@ -89,7 +89,7 @@ function removeEvent(eventId) {
 function updateEvent(eventId, eventName, startTime, endTime, tagId, notes, loc) {
 
     var obj = {"eventId" : eventId, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId, "notes" : notes, "location" : loc};
-
+    console.log(obj);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", '/updateEvent/', true);
     xhr.setRequestHeader("Content-Type", "application/json")

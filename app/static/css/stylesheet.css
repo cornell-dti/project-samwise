@@ -156,6 +156,12 @@ a:hover{
   border-width: 0px;
 }*/
 
+.fc-day-grid-event{
+  border-radius: 7px;
+}
+
+/*class="fc-day-grid-event fc-h-event fc-event fc-start fc-end fc-draggable fc-resizable"*/
+
 .modal-header {
     padding: 2px 16px;
     background-color: #3a87ad;

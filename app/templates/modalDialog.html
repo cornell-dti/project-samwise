@@ -20,7 +20,6 @@
 				}
 				var closeIntro = document.getElementById("closeIntro");
 				closeIntro.onclick = function(){
-					console.log("test");
 					document.getElementById("classSearchIntro").value = "";
 					intromodal.style.display = 'none';
 				}
@@ -652,17 +651,21 @@
 
 			var currentTags = getTags(userid);
 			for (i = 0; i < tags.length; i++){
-				var new_color = tags[i].getElementsByTagName("select")[0].value;
 
-				var tag_id = tags[i].getElementsByTagName("p")[0].innerHTML;
+				if (tags[i].innerHTML != ""){
+					var new_color = tags[i].getElementsByTagName("select")[0].value;
 
-				//if it exists
-				if (currentTags.indexOf(tag_id) >= 0){
-					updateTagColor(userid, tag_id, new_color);
+					var tag_id = tags[i].getElementsByTagName("p")[0].innerHTML;
+
+					//if it exists
+					if (currentTags.indexOf(tag_id) >= 0){
+						updateTagColor(userid, tag_id, new_color);
+					}
+					else{
+						addTag(userid, tag_id, new_color);
+					}
 				}
-				else{
-					addTag(userid, tag_id, new_color);
-				}
+
 			}
 
 			$("#calendar").fullCalendar('removeEvents');
@@ -683,7 +686,7 @@
 <div id = "eventDetailsModal" class="modal" style="display:none;">
 	<div class = "small-modal" id="eventDetaislModalContent">
 		<div class = "modal-header">
-			<span class="close" id="closeEventDetails">&times;</span>
+			<span class="close" id="closeEventDetails">&#10005;</span>
  			<div id = "information"></div>
 		</div>
 	</div>
@@ -692,11 +695,11 @@
 <div id = "addProjectModal" class="modal" style= "display:none;">
 	<div class="modal-content">
 	 <div class="modal-header" style="background-color: #4a4a4a;">
-		 <span class="close" id="closeProject">&times;</span>
+		 <span class="close" id="closeProject">&#10005;</span>
 			<div class = "col-sm-12">
 				<h3 style = "padding-left: 3px;">Add New Event/Task</h3>
 
-					<form id="project_form" action="javascript:addProjectToCalendar()">
+					<form id="project_form" action="javascript:addProjectToCalendar()" autocomplete = "off">
 				    <input style="color: white" class="task_name" type="text" id="projectName" placeholder="Title (eg. Term Paper, Guest Lecture)" required/>
 						<br><br><br>
 						<p>Tag</p>
@@ -717,13 +720,13 @@
 						<p>
 							Location
 						</p>
-						<input style= "color: white;" class= "project_location" type="text" id ="projectLocation" placeholder="Event Location Here" />
+						<input style= "color: white;" class= "project_location" type="text" id ="projectLocation" autocomplete = "off" placeholder="Event Location Here" />
 
 						<br><br><br>
 						<p>
 							Notes
 						</p>
-						<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" placeholder="Enter Event Notes Here" />
+						<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" autocomplete = "off" placeholder="Enter Event Notes Here" />
 
 						<br><br><br>
 						<input type="submit" class="btn btn-lg btn-default submit-btn" style="float:right;"></button>
@@ -733,12 +736,12 @@
 	 </div>
 </div>
 
-<div id="introModal" class="modal" style="display: block;">
+<div id="introModal" class="modal" style="display: none;">
 	<!--ONBOARDING MODAL -->
 	<!-- Modal content -->
 	<div class="modal-content">
 		<div class="modal-header" style="background-color: #4a4a4a;">
-			<span class="close" id="closeIntro">&times;</span>
+			<span class="close" id="closeIntro">&#10005;</span>
 				<div id="onboarding-modal-div" style="margin: auto 40px; font-family: Open Sans;">
 					<h2 style="margin: 0px; margin-top: 40px;">Hi! Help us make your calendar.</h2>
 					<h2 style="margin: 0px;">Search and add classes that you are currently enrolled in:</h2>
@@ -763,7 +766,7 @@
       <!-- Modal content -->
       <div class="modal-content">
 			<div class="modal-header" style="background-color: #4a4a4a;" >
-			<span class = "close" id = "closeSettings">&times;</span>
+			<span class = "close" id = "closeSettings">&#10005;</span>
 			  <h2>Settings</h2>
 				<div class = "container-fluid">
 					<div class = "row">

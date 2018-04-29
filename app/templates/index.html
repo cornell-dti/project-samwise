@@ -71,7 +71,7 @@
     <div class="topnav">
 
         <!--ADD CLASS FUNCTIONALITY-->
-        <a onclick="introAdd()">+</a>
+        <!-- <a onclick="introAdd()">+</a> -->
         <a onclick="displayProjectModal()">Add Event</a>
     </div>
 
@@ -242,6 +242,8 @@
         document.getElementById('classSearchSettings').addEventListener("awesomplete-selectcomplete", function(event) {
             addUserClassSettings();
         });
+
+        displayIntroModal();
 
   		// awesomplete.list = courses;
   		populateUserCourses();

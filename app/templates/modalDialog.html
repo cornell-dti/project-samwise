@@ -187,7 +187,7 @@
 			var name = document.getElementById("projectName").value;
 			var dueDate = document.getElementById("projectDate").value;
 			console.log(dueDate);
-			var course = document.getElementById("selectDropdown").value;
+			var course = $("input[name=tagSelect]:checked").val();
 			var start = parseInt(document.getElementById("startWorking").value);
 			var pLocation = document.getElementById("projectLocation").value;
 			var notes = document.getElementById("projectNotes").value;
@@ -277,9 +277,6 @@
 			};
 
 			var exams = getUserExams(userid);
-			if (exams.length < 1){
-				return;
-			}
 			for (k = 0; k < exams.length; k++){
 				for (j = 0; j < exams[k].length; j++){
 
@@ -336,12 +333,13 @@
 					title : events[k].eventName,
 					start : events[k].startTime,
 					end : events[k].endTime,
-					tag : events[k].tagid,
+					tag : events[k].tagId,
 					color : c,
 					notes : events[k].notes,
 					location : events[k].location,
 					can_remove : true
-				}
+				};
+                console.log(events[k].startTime)
 				$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			}
 
@@ -523,7 +521,7 @@
 			$('#selectDropdown').empty();
 			for (i = 0; i < userCourses.length; i++){
 				var opt = document.createElement("label");
-				var radioBtn = $('<div class = "radio radio-tag"><label><input type="radio" name="radiobtn" >'+userCourses[i]+'</label></div>');
+				var radioBtn = $('<div class = "radio radio-tag"><label><input type="radio" name="tagSelect" value="' + userCourses[i] + '">'+userCourses[i]+'</label></div>');
 				// opt.setAttribute("value", userCourses[i]);
 				// var t = document.createTextNode(userCourses[i]);
 				// radioBtn.append(opt);

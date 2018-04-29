@@ -320,12 +320,14 @@ def getEvents(userid):
         data = [{'eventId': str(item[1]), 'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]),
                  'tagId': str(item[5]), 'notes': str(item[6]), 'location': str(item[7])} for
                 item in cursor.fetchall()]
+        print(data)
         return jsonify(data)
     return access_denied()
 
 
 @app.route('/removeEvent/', methods=['POST'])
 def removeEvent():
+    print(request)
     data = request.get_json(force=True)
     print(data)
     eventId = data['eventId']

@@ -111,6 +111,8 @@
       var button = document.createElement("button");
       button.setAttribute("type", "button");
       button.onclick = function(){
+      console.log(event);
+      console.log(event.id);
         removeEvent(event.db_id);
         $('#calendar').fullCalendar('removeEventSource', event.source);
         infoDiv.innerHTML = '';
@@ -159,14 +161,22 @@
             $('#calendar').fullCalendar('changeView', 'agendaDay');
             $('#calendar').fullCalendar('gotoDate', date);
         },
-		nextDayThreshold: '00:00:00',
+    nextDayThreshold: '00:00:00',
     editable: true,
     eventRender: function(event, element) {
       console.log(event);
-    element.qtip({
-      content: event.title
-    });
-  }
+      element.qtip({
+        content: event.title
+      });
+    },
+    eventDrop: function(event, delta, revertFunc) {
+      if (event.className[0] != "google") {
+        console.log(event);
+        updateEvent(event.db_id, event.title, event.start, event.end, event.tag, event.notes, event.location);
+      } else {
+        revertFunc();
+      }
+    }
 	});
 
 	function syncGoogleToFullCalendar() {

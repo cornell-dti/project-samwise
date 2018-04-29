@@ -696,7 +696,7 @@
 			<div class = "col-sm-12">
 				<h3 style = "padding-left: 3px;">Add New Event/Task</h3>
 
-					<form id="project_form" action="javascript:addProjectToCalendar()">
+					<form id="project_form" action="javascript:addProjectToCalendar()" autocomplete = "off">
 				    <input style="color: white" class="task_name" type="text" id="projectName" placeholder="Title (eg. Term Paper, Guest Lecture)" required/>
 						<br><br><br>
 						<p>Tag</p>
@@ -717,13 +717,13 @@
 						<p>
 							Location
 						</p>
-						<input style= "color: white;" class= "project_location" type="text" id ="projectLocation" placeholder="Event Location Here" />
+						<input style= "color: white;" class= "project_location" type="text" id ="projectLocation" autocomplete = "off" placeholder="Event Location Here" />
 
 						<br><br><br>
 						<p>
 							Notes
 						</p>
-						<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" placeholder="Enter Event Notes Here" />
+						<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" autocomplete = "off" placeholder="Enter Event Notes Here" />
 
 						<br><br><br>
 						<input type="submit" class="btn btn-lg btn-default submit-btn" style="float:right;"></button>

@@ -652,17 +652,21 @@
 
 			var currentTags = getTags(userid);
 			for (i = 0; i < tags.length; i++){
-				var new_color = tags[i].getElementsByTagName("select")[0].value;
 
-				var tag_id = tags[i].getElementsByTagName("p")[0].innerHTML;
+				if (tags[i].innerHTML != ""){
+					var new_color = tags[i].getElementsByTagName("select")[0].value;
 
-				//if it exists
-				if (currentTags.indexOf(tag_id) >= 0){
-					updateTagColor(userid, tag_id, new_color);
+					var tag_id = tags[i].getElementsByTagName("p")[0].innerHTML;
+
+					//if it exists
+					if (currentTags.indexOf(tag_id) >= 0){
+						updateTagColor(userid, tag_id, new_color);
+					}
+					else{
+						addTag(userid, tag_id, new_color);
+					}
 				}
-				else{
-					addTag(userid, tag_id, new_color);
-				}
+
 			}
 
 			$("#calendar").fullCalendar('removeEvents');

@@ -153,11 +153,22 @@
     nextDayThreshold: '00:00:00',
     editable: true,
     eventRender: function(event, element) {
-      element.qtip({
-        content: {
-          text: "<b>" + event.title + "</b>" + "<br>" + "Location: " + event.location + "<br>" + "Notes: " + event.notes
-        }
-      });
+      if (event.className[0] != "google") {
+        element.qtip({
+          content: {
+            text: "<b>" + event.title + "</b>" + "<br>" + "Location: " + event.location + "<br>" + "Notes: " + event.notes
+          },
+          trigger: 'hover'
+        });
+      }
+      else {
+        element.qtip({
+          content: {
+            text: "<b>" + event.title + "</b>" 
+          },
+          trigger: 'hover'
+        });
+      }
 
     },
     eventDrop: function(event, delta, revertFunc) {

@@ -94,19 +94,19 @@ def update_term(term):
 
     for subj in subjects:
         sub = subj['sub']
- 
+
         raw_data_subj = make_api_call('search/classes.json', {'roster': term, 'subject': sub})
 
         for cls in raw_data_subj['classes']:
             course_parser.parse(cls)
-        
+
         print('Done.')
         # break # test: only one subject
 
         gc.collect()
 
     courses = course_parser.courses
-    
+
     course_by_number = defaultdict(list)
     for course in courses:
         course_by_number[course['sub'] + str(course['nbr'])].append(course)
@@ -131,11 +131,9 @@ def update_term(term):
                 finally:
                     print "DONE"
             except Exception, e:
-                print dir(e)           
-            
+                print dir(e)
+
     connection.close()
 
 if __name__ == "__main__":
   update_term(roster_slug)
-
-

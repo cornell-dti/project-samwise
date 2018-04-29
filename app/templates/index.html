@@ -72,7 +72,7 @@
     <div class="topnav">
 
         <!--ADD CLASS FUNCTIONALITY-->
-        <a onclick="introAdd()">+</a>
+        <!-- <a onclick="introAdd()">+</a> -->
         <a onclick="displayProjectModal()">Add Event</a>
     </div>
 
@@ -153,10 +153,23 @@
     nextDayThreshold: '00:00:00',
     editable: true,
     eventRender: function(event, element) {
-      console.log(event);
-      element.qtip({
-        content: event.title
-      });
+      if (event.className[0] != "google") {
+        element.qtip({
+          content: {
+            text: "<b>" + event.title + "</b>" + "<br>" + "Location: " + event.location + "<br>" + "Notes: " + event.notes
+          },
+          trigger: 'hover'
+        });
+      }
+      else {
+        element.qtip({
+          content: {
+            text: "<b>" + event.title + "</b>" 
+          },
+          trigger: 'hover'
+        });
+      }
+
     },
     eventDrop: function(event, delta, revertFunc) {
       if (event.className[0] != "google") {
@@ -240,6 +253,8 @@
         document.getElementById('classSearchSettings').addEventListener("awesomplete-selectcomplete", function(event) {
             addUserClassSettings();
         });
+
+        displayIntroModal();
 
   		// awesomplete.list = courses;
   		populateUserCourses();

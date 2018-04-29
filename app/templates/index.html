@@ -200,7 +200,7 @@
 	                    end = event.end.date;
 	                }
 								}
-                var newEvent = {"title" : event.summary, "start" : start, "end" : end, "className" : "google"};
+                var newEvent = {"title" : event.summary, "start" : start, "end" : end, "className" : "google", "editable": false};
                 eventSource.push(newEvent);
             }
         } else {

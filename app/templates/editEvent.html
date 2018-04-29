@@ -1,0 +1,62 @@
+<div id = "editEvent" class="modal" style= "display:none;">
+	<div class="modal-content">
+	 <div class="modal-header" style="background-color: #4a4a4a;">
+		 <span class="close" id="closeEditEvent">&times;</span>
+			<div class = "col-sm-12">
+				<h3 style = "padding-left: 3px;">Edit Event</h3>
+
+					<div id="editEventForm">
+				    <input style="color: white" class="task_name" type="text" id="eventName" placeholder="Title" required/>
+						<br><br><br>
+						<p>Tag</p>
+
+
+						<div style="color: white" id = "editEventTagDropdown"></div>
+
+						<p>Due</p>
+				    <input type="date" style="color: black; width:200px" id="eventDate" required />
+
+						<br><br><br>
+						<p>
+							Start working
+						</p>
+						<input class = "col-sm-1 start_working" type="number" style="color: white; width:80px" id="eventStartWorking" min="0" value="0" required />
+
+						<br><br><br>
+						<p>
+							Location
+						</p>
+						<input style= "color: white;" class= "project_location" type="text" id ="eventLocation" placeholder="Event Location Here" />
+
+						<br><br><br>
+						<p>
+							Notes
+						</p>
+						<input style= "color: white" class= "project_notes" type="text" id ="eventNotes" placeholder="Enter Event Notes Here" />
+                        <input type="hidden" id="eventId" />
+
+						<br><br><br>
+						<button class="btn btn-lg btn-default submit-btn" style="float:right;" id="submitEditEvent">Submit</button>
+                        <button class="btn btn-lg btn-default submit-btn" style="float:left;" id="submitRemoveEvent">Remove</button>
+				  </div>
+			</div>
+		 </div>
+	 </div>
+</div>
+
+<script type="text/javascript">
+    function populateEventTags(){
+        var userCourses = getUserCourses(userid);
+        var userTags = getTags(userid);
+        userCourses = userCourses.concat(userTags);
+        $('#editEventTagDropdown').empty();
+        for (i = 0; i < userCourses.length; i++){
+            var radioBtn = $('<div class = "radio radio-tag"><label><input type="radio" name="tagSelect" value="' + userCourses[i] + '">'+userCourses[i]+'</label></div>');
+            $("#editEventTagDropdown").append(radioBtn);
+        }
+    }
+    var closeEditEvent = document.getElementById("closeEditEvent");
+    closeEditEvent.onclick = function(){
+        $("#editEvent").css("display", "none");
+    };
+</script>

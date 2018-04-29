@@ -20,7 +20,6 @@
 				}
 				var closeIntro = document.getElementById("closeIntro");
 				closeIntro.onclick = function(){
-					console.log("test");
 					document.getElementById("classSearchIntro").value = "";
 					intromodal.style.display = 'none';
 				}
@@ -358,10 +357,6 @@
 			var userCourses = getUserCourses(userid);
 			if (className != null && userCourses.indexOf(className) == -1) {
 				userCourses.push(className);
-			}
-			// console.log(userCourses);
-			if (userCourses.length < 1){
-				return;
 			}
 			var lst = document.getElementById("currentClasses");
 			$('#currentClasses').empty();
@@ -737,7 +732,7 @@
 	 </div>
 </div>
 
-<div id="introModal" class="modal" style="display: block;">
+<div id="introModal" class="modal" style="display: none;">
 	<!--ONBOARDING MODAL -->
 	<!-- Modal content -->
 	<div class="modal-content">

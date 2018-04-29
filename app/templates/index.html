@@ -72,7 +72,7 @@
 
         <!--ADD CLASS FUNCTIONALITY-->
         <a onclick="introAdd()">+</a>
-        <a onclick="displayProjectModal()">Add Project</a>
+        <a onclick="displayProjectModal()">Add Event</a>
     </div>
 
 <div id='calendar'>
@@ -87,15 +87,6 @@
   //   console.log(x);
   // }
 	$('#calendar').fullCalendar({
-
-    events: [
-    {
-      title: 'My Event',
-      start: '2018-04-20',
-      description: 'This is a cool event'
-    }
-    // more events here
-  ],
 
     eventClick : function(event) {
 
@@ -153,9 +144,11 @@
 
 		},
 		header: {
-			right: 'prev,next,today',
-			// center: 'semester,month,agendaWeek,agendaDay'
-			center: 'month,agendaWeek,agendaDay'
+			//right: 'prev,next,today',
+      right: 'next',
+			center: 'title',
+      left: 'prev'
+			// center: 'month,agendaWeek,agendaDay'
 		},
 		dayClick: function(date, jsEvent, view) {
             $('#calendar').fullCalendar('changeView', 'agendaDay');
@@ -170,6 +163,14 @@
       });
     },
     eventDrop: function(event, delta, revertFunc) {
+      if (event.className[0] != "google") {
+        console.log(event);
+        updateEvent(event.db_id, event.title, event.start, event.end, event.tag, event.notes, event.location);
+      } else {
+        revertFunc();
+      }
+    },
+    eventResize: function(event, delta, revertFunc) {
       if (event.className[0] != "google") {
         console.log(event);
         updateEvent(event.db_id, event.title, event.start, event.end, event.tag, event.notes, event.location);

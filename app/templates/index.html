@@ -88,15 +88,6 @@
   // }
 	$('#calendar').fullCalendar({
 
-    events: [
-    {
-      title: 'My Event',
-      start: '2018-04-20',
-      description: 'This is a cool event'
-    }
-    // more events here
-  ],
-
     eventClick : function(event) {
 
       console.log("Event: ");
@@ -170,6 +161,14 @@
       });
     },
     eventDrop: function(event, delta, revertFunc) {
+      if (event.className[0] != "google") {
+        console.log(event);
+        updateEvent(event.db_id, event.title, event.start, event.end, event.tag, event.notes, event.location);
+      } else {
+        revertFunc();
+      }
+    },
+    eventResize: function(event, delta, revertFunc) {
       if (event.className[0] != "google") {
         console.log(event);
         updateEvent(event.db_id, event.title, event.start, event.end, event.tag, event.notes, event.location);

@@ -88,15 +88,6 @@
   // }
 	$('#calendar').fullCalendar({
 
-    events: [
-    {
-      title: 'My Event',
-      start: '2018-04-20',
-      description: 'This is a cool event'
-    }
-    // more events here
-  ],
-
     eventClick : function(event) {
 
       console.log("Event: ");
@@ -159,10 +150,6 @@
       left: 'prev'
 			// center: 'month,agendaWeek,agendaDay'
 		},
-		dayClick: function(date, jsEvent, view) {
-            $('#calendar').fullCalendar('changeView', 'agendaDay');
-            $('#calendar').fullCalendar('gotoDate', date);
-        },
     nextDayThreshold: '00:00:00',
     editable: true,
     eventRender: function(event, element) {
@@ -172,6 +159,14 @@
       });
     },
     eventDrop: function(event, delta, revertFunc) {
+      if (event.className[0] != "google") {
+        console.log(event);
+        updateEvent(event.db_id, event.title, event.start, event.end, event.tag, event.notes, event.location);
+      } else {
+        revertFunc();
+      }
+    },
+    eventResize: function(event, delta, revertFunc) {
       if (event.className[0] != "google") {
         console.log(event);
         updateEvent(event.db_id, event.title, event.start, event.end, event.tag, event.notes, event.location);
@@ -201,7 +196,7 @@
 	                    end = event.end.date;
 	                }
 								}
-                var newEvent = {"title" : event.summary, "start" : start, "end" : end, "className" : "google"};
+                var newEvent = {"title" : event.summary, "start" : start, "end" : end, "className" : "google", "editable": false};
                 eventSource.push(newEvent);
             }
         } else {

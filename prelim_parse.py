@@ -5,8 +5,11 @@ import requests
 stores a single date entry of the prelim time for a given courseID
 precondition: courseID is a properly formatted courseID in the form 'XXX ####'.
 Arguments to pass: the courseID to find (raw input), and the url to parse.
+Note: also works for final exam parsing.
 """
-def prelim_parser(course_id, url):
+
+
+def prelim_and_exam_parse(course_id, url):
     page = requests.get(url)
     tree = html.fromstring(page.content)
 
@@ -40,5 +43,9 @@ exam = [raw_input("enter 1nd class, all caps in form LLLL ####: "),
 
 for clss in exam:
     to_print = prelim_parser(clss, 'https://registrar.cornell.edu/exams/spring-prelim-schedule')
+    print to_print
+
+for clss in exam:
+    to_print = prelim_parser(clss, 'https://registrar.cornell.edu/exams/spring-final-exam-schedule')
     print to_print
 

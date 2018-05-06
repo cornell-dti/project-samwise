@@ -64,7 +64,8 @@ function addEvent(user, eventName, startTime, endTime, tagId, pLocation, notes) 
 }
 
 function removeEvent(eventId) {
-
+    console.log('Event id to remove');
+    console.log(eventId);
     var obj = {"eventId" : eventId};
 
     var xhr = new XMLHttpRequest();
@@ -85,10 +86,10 @@ function removeEvent(eventId) {
 // }
 
 
-function updateEvent(eventId, eventName, startTime, endTime, tagId) {
+function updateEvent(eventId, eventName, startTime, endTime, tagId, notes, loc) {
 
-    var obj = {"eventId" : eventId, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId, "notes" : notes, "location" : location};
-
+    var obj = {"eventId" : eventId, "eventName" : eventName, "startTime" : startTime, "endTime" : endTime, "tagId" : tagId, "notes" : notes, "location" : loc};
+    console.log(obj);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", '/updateEvent/', true);
     xhr.setRequestHeader("Content-Type", "application/json")

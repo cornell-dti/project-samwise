@@ -14,15 +14,31 @@
     <script src="../static/js/awesomplete.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <link rel='stylesheet' href='../static/js/fullcalendar-3.2.0/fullcalendar.css'/>
+    <link rel='stylesheet' href='../static/js/fullcalendar-3.9.0/fullcalendar.css'/>
     <link rel='stylesheet' href='../static/css/stylesheet.css?version=07'/>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
-    <script src='../static/js/fullcalendar-3.2.0/lib/jquery.min.js'></script>
-    <script src='../static/js/fullcalendar-3.2.0/lib/moment.min.js'></script>
-    <script src='../static/js/fullcalendar-3.2.0/fullcalendar.js'></script>
+    <link rel="stylesheet" href="http://cdn.jsdelivr.net/qtip2/3.0.3/jquery.qtip.min.css">
+
+
+    <script src='../static/js/fullcalendar-3.9.0/lib/jquery.min.js'></script>
+    <script src='../static/js/fullcalendar-3.9.0/lib/moment.min.js'></script>
+    <script src='../static/js/fullcalendar-3.9.0/fullcalendar.js'></script>
+
+    <script src='../static/js/jquery.qtip-1.0.js'></script>
+
     <script>
 		var userid = "{{ userid }}";
+
+    jQuery.browser = {};
+      (function () {
+          jQuery.browser.msie = false;
+          jQuery.browser.version = 0;
+          if (navigator.userAgent.match(/MSIE ([0-9]+)\./)) {
+              jQuery.browser.msie = true;
+              jQuery.browser.version = RegExp.$1;
+          }
+      })();
 
 
     </script>
@@ -48,6 +64,7 @@
 
 <!-- "HELPER FUNCTIONS" -->
 {% include 'modalDialog.html' %}
+{% include 'editEvent.html' %}
 {% if not auth %}
 {% include 'welcomeModal.html' %}
 {% endif %}
@@ -55,8 +72,8 @@
     <div class="topnav">
 
         <!--ADD CLASS FUNCTIONALITY-->
-        <a onclick="introAdd()">+</a>
-        <a onclick="displayProjectModal()">Add Project</a>
+        <!-- <a onclick="introAdd()">+</a> -->
+        <a onclick="displayProjectModal()">Add Event/Task</a>
     </div>
 
 <div id='calendar'>
@@ -77,64 +94,99 @@
       console.log("Event: ");
       console.log(event);
 
-      var modal = document.getElementById('eventDetailsModal');
-      var infoDiv = document.getElementById('information');
-
-      var tagTitle = document.createElement("h5");
-      tagTitle.appendChild(document.createTextNode(event.title));
-
-      var button = document.createElement("button");
-      button.setAttribute("type", "button");
-      button.onclick = function(){
-        removeEvent(event.db_id);
-        $('#calendar').fullCalendar('removeEventSource', event.source);
-        infoDiv.innerHTML = '';
-        modal.style.display = 'none';
-      }
-
+      var modal = $('#editEvent');
       if (event.className[0] != "google") {
+        $("#eventName").val(event.title);
+        $("#eventDate").val(event.end.format());
+        populateEventTags();
+        $("input[value=" + event.tag + "]").attr("checked", "checked");
+        $("#eventStartWorking").val(event.end.diff(event.start, 'days'));
+        $("#eventLocation").val(event.location);
+        $("#eventNotes").val(event.notes);
+        $("#eventId").val(event.db_id);
+        modal.css("display", "block");
+        
+        $("#submitEditEvent").click(function() {
+            var name = $("#eventName").val();
+            var dueDate = $("#eventDate").val();
+            var tag = $("input[name=tagSelect]:checked").val();
+            var start = parseInt($("#eventStartWorking").val());
+            var loc = $("#eventLocation").val();
+            var notes = $("#eventNotes").val();
+            var eventId = parseInt($("#eventId").val());
 
-
-        infoDiv.appendChild(tagTitle);
-
-        infoDiv.appendChild(document.createTextNode("Location: " + event.location));
-
-        infoDiv.appendChild(document.createElement("br"));
-
-        infoDiv.appendChild(document.createTextNode("Notes: " + event.notes));
-
-        infoDiv.appendChild(document.createElement("br"));
-        infoDiv.appendChild(document.createElement("br"));
-
-        button.appendChild(document.createTextNode("Remove"));
-        infoDiv.appendChild(button);
-
-  			modal.style.display = 'block';
+            var dueDate_object = new Date(dueDate);
+            dueDate_object.setTime(dueDate_object.getTime() + 1000);
+            var offset = 24 * 60 * 60 * 1000 * start;
+            var startDate_object = new Date();
+            startDate_object.setTime(dueDate_object.getTime() - offset);
+            // Update fullCalendar event
+            console.log(startDate_object.toISOString());
+            event.title = name;
+            event.start = startDate_object.toISOString();
+            event.end = dueDate_object.toISOString();
+            event.tag = tag;
+            event.notes = notes;
+            event.loc = loc;
+            event.notify = startDate_object.toISOString();
+            // Update calendar and database
+            $("#calendar").fullCalendar("updateEvent", event);
+            updateEvent(eventId, name, event.start, event.end, tag, notes, loc);
+            $("#editEvent").css("display", "none");
+        });
+        
+        $("#submitRemoveEvent").click(function() {
+            var eventId = parseInt($("#eventId").val());
+            removeEvent(eventId);
+            $("#calendar").fullCalendar("removeEventSource", event.source);
+            $("#editEvent").css("display", "none");
+        });
+      }
+    },
+    header: {
+			//right: 'prev,next,today',
+      right: 'next',
+			center: 'title',
+      left: 'prev'
+			// center: 'month,agendaWeek,agendaDay'
+    },
+    nextDayThreshold: '00:00:00',
+    editable: true,
+    eventRender: function(event, element) {
+      if (event.className[0] != "google") {
+        element.qtip({
+          content: {
+            text: "<b>" + event.title + "</b>" + "<br>" + "Location: " + event.location + "<br>" + "Notes: " + event.notes
+          },
+          trigger: 'hover'
+        });
       }
       else {
-
-        infoDiv.appendChild(tagTitle);
-
-        // infoDiv.appendChild(document.createTextNode("Location: " + event.location));
-        //
-        // infoDiv.appendChild(document.createElement("br"));
-        //
-        // infoDiv.appendChild(document.createTextNode("Notes: " + event.notes));
-
-  			modal.style.display = 'block';
+        element.qtip({
+          content: {
+            text: "<b>" + event.title + "</b>" 
+          },
+          trigger: 'hover'
+        });
       }
 
-		},
-		header: {
-			right: 'prev,next,today',
-			// center: 'semester,month,agendaWeek,agendaDay'
-			center: 'month,agendaWeek,agendaDay'
-		},
-		dayClick: function(date, jsEvent, view) {
-            $('#calendar').fullCalendar('changeView', 'agendaDay');
-            $('#calendar').fullCalendar('gotoDate', date);
-        },
-		nextDayThreshold: '00:00:00',
+    },
+    eventDrop: function(event, delta, revertFunc) {
+      if (event.className[0] != "google") {
+        console.log(event);
+        updateEvent(event.db_id, event.title, event.start, event.end, event.tag, event.notes, event.location);
+      } else {
+        revertFunc();
+      }
+    },
+    eventResize: function(event, delta, revertFunc) {
+      if (event.className[0] != "google") {
+        console.log(event);
+        updateEvent(event.db_id, event.title, event.start, event.end, event.tag, event.notes, event.location);
+      } else {
+        revertFunc();
+      }
+    }
 	});
 
 	function syncGoogleToFullCalendar() {
@@ -157,7 +209,7 @@
 	                    end = event.end.date;
 	                }
 								}
-                var newEvent = {"title" : event.summary, "start" : start, "end" : end, "className" : "google"};
+                var newEvent = {"title" : event.summary, "start" : start, "end" : end, "className" : "google", "editable": false};
                 eventSource.push(newEvent);
             }
         } else {
@@ -201,6 +253,8 @@
         document.getElementById('classSearchSettings').addEventListener("awesomplete-selectcomplete", function(event) {
             addUserClassSettings();
         });
+
+        displayIntroModal();
 
   		// awesomplete.list = courses;
   		populateUserCourses();

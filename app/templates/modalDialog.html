@@ -20,7 +20,6 @@
 				}
 				var closeIntro = document.getElementById("closeIntro");
 				closeIntro.onclick = function(){
-					console.log("test");
 					document.getElementById("classSearchIntro").value = "";
 					intromodal.style.display = 'none';
 				}
@@ -172,10 +171,22 @@
 
 		function addProjectToCalendar(){
 
+			var colorsWithHex = {
+				"Blue": "4990E2",
+				"Light green": "7ED321",
+				"Red": "FF0523",
+				"Orange": "FF8D10",
+				"Magenta": "BD0FE1",
+				"Purple": "9013FE",
+				"Yellow": "F8E71C",
+				"Teal": "00A0BC",
+				"Green": "10A627"
+			};
+
 			var name = document.getElementById("projectName").value;
 			var dueDate = document.getElementById("projectDate").value;
 			console.log(dueDate);
-			var course = document.getElementById("selectDropdown").value;
+			var course = $("input[name=tagSelect]:checked").val();
 			var start = parseInt(document.getElementById("startWorking").value);
 			var pLocation = document.getElementById("projectLocation").value;
 			var notes = document.getElementById("projectNotes").value;
@@ -190,10 +201,10 @@
 			var c = getUserCourseColor(userid, course);
 			var c_prime = getUserTagColor(userid, course);
 			if (c.length == 0){
-				color = c_prime[0];
+				color = "#" + colorsWithHex[c_prime[0]];
 			}
 			else{
-				color = c[0];
+				color = "#" + colorsWithHex[c[0]];
 			}
 			console.log(color);
 			console.log('Calling addEvent');
@@ -252,11 +263,19 @@
 		  }
 
 		function addStoredEvents(){
+			var colorsWithHex = {
+				"Blue": "4990E2",
+				"Light green": "7ED321",
+				"Red": "FF0523",
+				"Orange": "FF8D10",
+				"Magenta": "BD0FE1",
+				"Purple": "9013FE",
+				"Yellow": "F8E71C",
+				"Teal": "00A0BC",
+				"Green": "10A627"
+			};
 
 			var exams = getUserExams(userid);
-			if (exams.length < 1){
-				return;
-			}
 			for (k = 0; k < exams.length; k++){
 				for (j = 0; j < exams[k].length; j++){
 
@@ -282,7 +301,7 @@
 						var startWorkingExam = new Date(dateString);
 						startWorkingExam.setDate(startWorkingExam.getDate() - 7);
 						var startDate = startWorkingExam.toISOString();
-						var c = getUserCourseColor(userid, exams[k][j].courseId);
+						var c = "#" + colorsWithHex[getUserCourseColor(userid, exams[k][j].courseId)];
 						var newEvent = {
 							title : exams[k][j].courseId,
 							start : startDate,
@@ -304,20 +323,22 @@
 
 			var events = getEvents(userid);
 			for (k = 0; k < events.length; k++){
-				var c = getUserCourseColor(userid, events[k].tagId);
-				console.log("TAG" + events[k].eventName + " " + events[k].tagId);
+				var c = "#" + colorsWithHex[getUserCourseColor(userid, events[k].tagId)];
+				// console.log("COLOR " + c);
+				// console.log("TAG" + events[k].eventName + " " + events[k].tagId);
 				var newEvent = {
 					allDay: true,
 					db_id : events[k].eventId,
 					title : events[k].eventName,
 					start : events[k].startTime,
 					end : events[k].endTime,
-					tag : events[k].tagid,
+					tag : events[k].tagId,
 					color : c,
 					notes : events[k].notes,
 					location : events[k].location,
 					can_remove : true
-				}
+				};
+                console.log(events[k].startTime)
 				$("#calendar").fullCalendar('addEventSource', [newEvent]);
 			}
 
@@ -336,10 +357,6 @@
 			var userCourses = getUserCourses(userid);
 			if (className != null && userCourses.indexOf(className) == -1) {
 				userCourses.push(className);
-			}
-			console.log(userCourses);
-			if (userCourses.length < 1){
-				return;
 			}
 			var lst = document.getElementById("currentClasses");
 			$('#currentClasses').empty();
@@ -375,7 +392,7 @@
 
 
 		function populateUserCoursesSettings(){
-			var colors = ["Red", "Orange", "Blue"];
+			var colors = ["Blue", "Light green", "Red", "Orange", "Magenta", "Purple", "Yellow", "Teal", "Green"];
 			var userCourses = getUserCourses(userid);
 			if (userCourses.length < 1){
 				return;
@@ -393,25 +410,11 @@
 					var opt = document.createElement("option");
 					opt.setAttribute("style", "font-color: black;");
 					opt.setAttribute("value", colors[h]);
+					if (dbColor[0] == colors[h]){
+						opt.setAttribute("selected", "selected");
+					}
+					opt.append(document.createTextNode(colors[h]));
 
-					if (h == 0){
-						if (dbColor[0] == "Red"){
-							opt.setAttribute("selected", "selected");
-						}
-						opt.append(document.createTextNode("Red"));
-					}
-					else if (h == 1){
-						if (dbColor[0] == "Orange"){
-							opt.setAttribute("selected", "selected");
-						}
-						opt.append(document.createTextNode("Orange"));
-					}
-					else{
-						if (dbColor[0] == "Blue"){
-							opt.setAttribute("selected", "selected");
-						}
-						opt.append(document.createTextNode("Blue"));
-					}
 					colorSelect.append(opt);
 				}
 				var cSpan = document.createElement("span");
@@ -438,13 +441,13 @@
 				removeLiList[z].onclick = function(){
 					var div = this.parentElement;
 					var removedTagName = div.getElementsByTagName('p')[0].innerHTML;
-					removeTag(userid, removedTagName);
+					removeCourse(userid, removedTagName);
 					div.innerHTML = "";
 				}
 			}
 		}
 		function populateUserTagsSettings(){
-			var colors = ["Red", "Orange", "Blue"];
+			var colors = ["Blue", "Light green", "Red", "Orange", "Magenta", "Purple", "Yellow", "Teal", "Green"];
 			var userTags = getTags(userid);
 			console.log("tags" + userTags);
 
@@ -465,25 +468,11 @@
 					var opt = document.createElement("option");
 					opt.setAttribute("style", "font-color: black;");
 					opt.setAttribute("value", colors[h]);
+					if (dbColor[0] == colors[h]){
+						opt.setAttribute("selected", "selected");
+					}
+					opt.append(document.createTextNode(colors[h]));
 
-					if (h == 0){
-						if (dbColor[0] == "Red"){
-							opt.setAttribute("selected", "selected");
-						}
-						opt.append(document.createTextNode("Red"));
-					}
-					else if (h == 1){
-						if (dbColor[0] == "Orange"){
-							opt.setAttribute("selected", "selected");
-						}
-						opt.append(document.createTextNode("Orange"));
-					}
-					else{
-						if (dbColor[0] == "Blue"){
-							opt.setAttribute("selected", "selected");
-						}
-						opt.append(document.createTextNode("Blue"));
-					}
 					colorSelect.append(opt);
 				}
 				var cSpan = document.createElement("span");
@@ -526,12 +515,15 @@
 			var dropdown = document.getElementById("selectDropdown");
 			$('#selectDropdown').empty();
 			for (i = 0; i < userCourses.length; i++){
-				var opt = document.createElement("option");
-				opt.setAttribute("value", userCourses[i]);
-				var t = document.createTextNode(userCourses[i]);
-				opt.append(t);
+				var opt = document.createElement("label");
+				var radioBtn = $('<div class = "radio radio-tag"><label><input type="radio" name="tagSelect" value="' + userCourses[i] + '">'+userCourses[i]+'</label></div>');
+				// opt.setAttribute("value", userCourses[i]);
+				// var t = document.createTextNode(userCourses[i]);
+				// radioBtn.append(opt);
 
-				dropdown.append(opt);
+				// dropdown.append(radioBtn);
+
+				$("#selectDropdown").append(radioBtn);
 			}
 		}
 
@@ -626,31 +618,6 @@
 		}
 
 		function updateCalendarSettings(){
-			// var events = $("#calendar").fullCalendar('getEventSources');
-			// var userEvents = getEvents(userid);
-			// var eventObjs = [];
-			// for (k = 0; k < events.length; k++){
-			// 	for (x = 0; x < events[k].events.length; x++){
-			// 		eventObjs.push(events[k].events[x]);
-			// 	}
-			// }
-      //
-			// var lst = document.getElementById("currentTagsSettings").getElementsByTagName("li");
-			// var lstPrime = [];
-			// for (j = 0; j < lst.length; j++){
-			// 	lstPrime.push(lst[j].getElementsByTagName("a")[0].innerHTML);
-			// }
-			// for (i = 0; i < userEvents.length; i++){
-			// 	if (userEvents[i].tagId.length > 0 && lstPrime.indexOf(userEvents[i].tagId) == -1){
-			// 		removeEvent(userEvents[i].eventId);
-			// 	}
-			// }
-			// $("#calendar").fullCalendar('removeEvents');
-      //
-			// addStoredEvents();
-			// syncGoogleToFullCalendar();
-
-			//TODO - use Kevin's updateCourseColor endpoint
 
 			var currentClassesSettings = document.getElementById("currentClassesSettings");
 			var classes = currentClassesSettings.getElementsByTagName("li");
@@ -658,18 +625,21 @@
 			var currentClasses = getUserCourses(userid);
 			console.log(classes);
 			for (i = 0; i < classes.length; i++){
-				var new_color = classes[i].getElementsByTagName("select")[0].value;
+				if (classes[i].innerHTML != ""){
+					var new_color = classes[i].getElementsByTagName("select")[0].value;
 
-				var course_id = classes[i].getElementsByTagName("p")[0].innerHTML;
+					var course_id = classes[i].getElementsByTagName("p")[0].innerHTML;
 
-				//if it exists
-				if (currentClasses.indexOf(course_id) >= 0){
-					updateCourseColor(userid, course_id, new_color);
+					//if it exists
+					if (currentClasses.indexOf(course_id) >= 0){
+						updateCourseColor(userid, course_id, new_color);
+					}
+					else{
+						addCourse(userid, course_id);
+						updateCourseColor(userid, course_id, new_color);
+					}
 				}
-				else{
-					addCourse(userid, course_id);
-					updateCourseColor(userid, course_id, new_color);
-				}
+
 			}
 
 			var currentTagsSettings = document.getElementById("currentTagsSettings");
@@ -677,20 +647,26 @@
 
 			var currentTags = getTags(userid);
 			for (i = 0; i < tags.length; i++){
-				var new_color = tags[i].getElementsByTagName("select")[0].value;
 
-				var tag_id = tags[i].getElementsByTagName("p")[0].innerHTML;
+				if (tags[i].innerHTML != ""){
+					var new_color = tags[i].getElementsByTagName("select")[0].value;
 
-				//if it exists
-				if (currentTags.indexOf(tag_id) >= 0){
-					updateTagColor(userid, tag_id, new_color);
+					var tag_id = tags[i].getElementsByTagName("p")[0].innerHTML;
+
+					//if it exists
+					if (currentTags.indexOf(tag_id) >= 0){
+						updateTagColor(userid, tag_id, new_color);
+					}
+					else{
+						addTag(userid, tag_id, new_color);
+					}
 				}
-				else{
-					addTag(userid, tag_id, new_color);
-				}
+
 			}
 
-
+			$("#calendar").fullCalendar('removeEvents');
+			syncGoogleToFullCalendar();
+			addStoredEvents();
 			$("#calendar").fullCalendar('rerenderEvents');
 			settingsModal.style.display = 'none';
 		}
@@ -706,7 +682,7 @@
 <div id = "eventDetailsModal" class="modal" style="display:none;">
 	<div class = "small-modal" id="eventDetaislModalContent">
 		<div class = "modal-header">
-			<span class="close" id="closeEventDetails">&times;</span>
+			<span class="close" id="closeEventDetails">&#10005;</span>
  			<div id = "information"></div>
 		</div>
 	</div>
@@ -714,16 +690,18 @@
 
 <div id = "addProjectModal" class="modal" style= "display:none;">
 	<div class="modal-content">
-	 <div class="modal-header" style="background-color: rgba(255, 5, 35, 1); opacity: 0.7">
-		 <span class="close" id="closeProject">&times;</span>
+	 <div class="modal-header" style="background-color: #4a4a4a;">
+		 <span class="close" id="closeProject">&#10005;</span>
 			<div class = "col-sm-12">
-				<h3>Add New Project</h3>
+				<h3 style = "padding-left: 3px;">Add New Event/Task</h3>
 
-					<form id="project_form" action="javascript:addProjectToCalendar()">
-				    <input style="color: white" class="task_name" type="text" id="projectName" placeholder="Title" required/>
+					<form id="project_form" action="javascript:addProjectToCalendar()" autocomplete = "off">
+				    <input style="color: white" class="task_name" type="text" id="projectName" placeholder="Title (eg. Term Paper, Guest Lecture)" required/>
 						<br><br><br>
 						<p>Tag</p>
-						<select style="color: black" id = "selectDropdown"></select>
+
+
+						<div style="color: white" id = "selectDropdown"></div>
 
 						<p>Due</p>
 				    <input type="date" style="color: black; width:200px" id="projectDate" required />
@@ -738,72 +716,28 @@
 						<p>
 							Location
 						</p>
-						<input style= "color: white" class= "project_location" type="text" id ="projectLocation" placeholder="Event Location Here" />
+						<input style= "color: white;" class= "project_location" type="text" id ="projectLocation" autocomplete = "off" placeholder="Event Location Here" />
 
 						<br><br><br>
 						<p>
 							Notes
 						</p>
-						<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" placeholder="Enter Event Notes Here" />
+						<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" autocomplete = "off" placeholder="Enter Event Notes Here" />
 
 						<br><br><br>
-						<input type="submit" class="btn btn-lg btn-default" style="float:right;">Save</button>
+						<input type="submit" class="btn btn-lg btn-default submit-btn" style="float:right;"></button>
 				  </form>
-				 <!-- <input style= "color: white" class= "task_name" type="text" id ="projectName" placeholder="Title">
-				 <br>
-				 <div class = "col-sm-4"></div>
-	 			<br>
-	 		  <br>
-	 			<br>
-	 			<br>
-
-					<p>
-						Tag
-					</p>
-					<select style="color: black" id = "selectDropdown"></select>
-				<br>
-				<br>
-				<p>
-					Due
-				</p>
-				<input type="datetime-local" style="color: black; width:200px"id="projectDate">
-				<br>
-				<br>
-				<br>
-				<p>
-					Start working
-				</p>
-				<input class = "col-sm-1 start_working" type="number" style="color: white; width:80px" id="startWorking" value="0">
-				<p>Days Ahead</p>
-
-				<br>
-				<p>
-					Location
-				</p>
-					<input style= "color: white" class= "project_location" type="text" id ="projectLocation" placeholder="Event Location Here">
-					<br>
-					<br>
-				<p>
-					Notes
-				</p>
-					<input style= "color: white" class= "project_notes" type="text" id ="projectNotes" placeholder="Enter Event Notes Here">
-			 </p>
-
-				<button class="btn btn-lg btn-default" style="float:right;" onclick="addProjectToCalendar()">Save</button>
-
-				<br>
-				<br> -->
 			</div>
 		 </div>
 	 </div>
 </div>
 
-<div id="introModal" class="modal" style="display: block;">
+<div id="introModal" class="modal" style="display: none;">
 	<!--ONBOARDING MODAL -->
 	<!-- Modal content -->
 	<div class="modal-content">
 		<div class="modal-header" style="background-color: #4a4a4a;">
-			<span class="close" id="closeIntro">&times;</span>
+			<span class="close" id="closeIntro">&#10005;</span>
 				<div id="onboarding-modal-div" style="margin: auto 40px; font-family: Open Sans;">
 					<h2 style="margin: 0px; margin-top: 40px;">Hi! Help us make your calendar.</h2>
 					<h2 style="margin: 0px;">Search and add classes that you are currently enrolled in:</h2>
@@ -828,7 +762,7 @@
       <!-- Modal content -->
       <div class="modal-content">
 			<div class="modal-header" style="background-color: #4a4a4a;" >
-			<span class = "close" id = "closeSettings">&times;</span>
+			<span class = "close" id = "closeSettings">&#10005;</span>
 			  <h2>Settings</h2>
 				<div class = "container-fluid">
 					<div class = "row">

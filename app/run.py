@@ -3,7 +3,7 @@ import datetime
 import config
 import urllib2
 import json
-import mysql.connector
+import psycopg2
 from flask import Flask, render_template, url_for, redirect, request, session, jsonify, g
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user, UserMixin
@@ -22,7 +22,7 @@ test_acc = 'me382'
 
 
 class UserData(db.Model, UserMixin):
-    __tablename__ = 'samwisedb.UserData'
+    __tablename__ = 'UserData'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(255), unique=True, nullable=False)
     name = db.Column(db.String(255), nullable=True)
@@ -49,8 +49,8 @@ def google_auth(state=None, token=None):
 
 def get_db():
     if not hasattr(g, 'db'):
-        g.db = mysql.connector.connect(user=os.getenv('SAMWISE_USERNAME'), password=os.getenv('SAMWISE_PASSWORD'),
-                                       host=os.getenv('SAMWISE_DB'))
+        g.db = psycopg2.connect(dbname=os.getenv('SAMWISE_DBNAME'), host=os.getenv('SAMWISE_DB'), user=os.getenv('SAMWISE_USERNAME'), password=os.getenv('SAMWISE_PASSWORD'), sslmode='require')
+        print('Connected to database')
     return g.db
 
 
@@ -164,11 +164,11 @@ def getUserExams(netId):
     if current_user.netid == netId:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT tagId FROM samwisedb.Tag WHERE user = %s', (netId,))
+        cursor.execute('SELECT tagId FROM Tag WHERE user = %s', (netId,))
         courses = [item[0] for item in cursor.fetchall()]
         data = []
         for courseId in courses:
-            cursor.execute('SELECT sections, time FROM samwisedb.Exam WHERE courseId = %s', (courseId,))
+            cursor.execute('SELECT sections, time FROM Exam WHERE courseId = %s', (courseId,))
             exam = [{'courseId': courseId, 'section': item[0], 'start': item[1]} for item in cursor.fetchall()]
             data.append(exam)
         return jsonify(data)
@@ -181,7 +181,7 @@ def getAllCourses():
     # Open the connection to database
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT DISTINCT courseId FROM samwisedb.Course ORDER BY courseId')
+    cursor.execute('SELECT DISTINCT courseId FROM Course ORDER BY courseId')
     data = [item[0] for item in cursor.fetchall()]
     return jsonify(data)
 
@@ -193,7 +193,7 @@ def getUserCourses(netId):
         # Open the connection to database
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT DISTINCT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
+        cursor.execute('SELECT DISTINCT courseId FROM User WHERE netId = %s', (netId,))
         data = [item[0] for item in cursor.fetchall()]
         return jsonify(data)
     return access_denied()
@@ -208,9 +208,9 @@ def addCourse():
     if current_user.is_authenticated and current_user.netid == user:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT * from samwisedb.User WHERE (netId, courseId) = (%s, %s)', (user, courseId))
+        cursor.execute('SELECT * from User WHERE (netId, courseId) = (%s, %s)', (user, courseId))
         if len(cursor.fetchall()) == 0:
-            cursor.execute('INSERT INTO samwisedb.User(netId, courseId) VALUES (%s, %s)', (user, courseId))
+            cursor.execute('INSERT INTO User(netId, courseId) VALUES (%s, %s)', (user, courseId))
         connection.commit()
         return success()
     return access_denied()
@@ -224,7 +224,7 @@ def removeCourse():
     if current_user.is_authenticated and current_user.netid == userId:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('DELETE FROM samwisedb.User WHERE (netId, courseId) = (%s, %s)', (userId, courseId))
+        cursor.execute('DELETE FROM User WHERE (netId, courseId) = (%s, %s)', (userId, courseId))
         connection.commit()
         return success()
     return access_denied()
@@ -236,11 +236,11 @@ def getProjects(userId):
     if current_user.netid == userId:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT DISTINCT * FROM samwisedb.Project WHERE user = %s', (userId,))
+        cursor.execute('SELECT DISTINCT * FROM Project WHERE user = %s', (userId,))
         data = [{'projectId': item[1], 'projectName': item[2], 'date': item[3], 'courseId': item[4]} for item in
                 cursor.fetchall()]
         for d in data:
-            cursor.execute('SELECT subtaskName FROM samwisedb.Subtask WHERE projectId = %s', (d['projectId'],))
+            cursor.execute('SELECT subtaskName FROM Subtask WHERE projectId = %s', (d['projectId'],))
             subtasks = [item[0] for item in cursor.fetchall()]
             d['subtasks'] = subtasks
         return jsonify(data)
@@ -253,12 +253,12 @@ def removeProject():
     projectId = data['projectId']
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT user FROM samwisedb.Project WHERE projectId = %s', (projectId,))
+    cursor.execute('SELECT user FROM Project WHERE projectId = %s', (projectId,))
     user_rows = cursor.fetchall()
 
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
-        cursor.execute('DELETE FROM samwisedb.Project WHERE projectId = %s', (projectId,))
-        cursor.execute('DELETE FROM samwisedb.Subtask WHERE projectId = %s', (projectId,))
+        cursor.execute('DELETE FROM Project WHERE projectId = %s', (projectId,))
+        cursor.execute('DELETE FROM Subtask WHERE projectId = %s', (projectId,))
         connection.commit()
         return success()
     return access_denied()
@@ -274,12 +274,12 @@ def updateProject():
 
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT user FROM samwisedb.Project WHERE projectId = %s', (projectId,))
+    cursor.execute('SELECT user FROM Project WHERE projectId = %s', (projectId,))
     user_rows = cursor.fetchall()
 
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute('''
-           UPDATE samwisedb.Project
+           UPDATE Project
            SET projectName=%s, dueDate=%s, courseId=%s
            WHERE projectId=%s
         ''', (projectName, dueDate, courseId, projectId))
@@ -299,11 +299,11 @@ def addProject():
     if current_user.is_authenticated and current_user.netid == userId:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('INSERT INTO samwisedb.Project(user, projectName, dueDate, courseId) VALUES (%s, %s, %s, %s)',
+        cursor.execute('INSERT INTO Project(user, projectName, dueDate, courseId) VALUES (%s, %s, %s, %s)',
                        (userId, projectName, dueDate, courseId))
         projectId = cursor.lastrowid
         for subtask in subtasks:
-            cursor.execute('INSERT INTO samwisedb.Subtask(projectId, subtaskName) VALUES (%s, %s)',
+            cursor.execute('INSERT INTO Subtask(projectId, subtaskName) VALUES (%s, %s)',
                            (projectId, subtask))
         connection.commit()
         return jsonify([projectId])
@@ -316,26 +316,28 @@ def getEvents(userid):
     if current_user.netid == userid:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT DISTINCT * FROM samwisedb.Event WHERE user = %s', (userid,))
+        cursor.execute('SELECT DISTINCT * FROM Event WHERE user = %s', (userid,))
         data = [{'eventId': str(item[1]), 'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]),
                  'tagId': str(item[5]), 'notes': str(item[6]), 'location': str(item[7])} for
                 item in cursor.fetchall()]
+        print(data)
         return jsonify(data)
     return access_denied()
 
 
 @app.route('/removeEvent/', methods=['POST'])
 def removeEvent():
+    print(request)
     data = request.get_json(force=True)
     print(data)
     eventId = data['eventId']
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT user FROM samwisedb.Event WHERE eventId = %s', (eventId,))
+    cursor.execute('SELECT user FROM Event WHERE eventId = %s', (eventId,))
     user_rows = cursor.fetchall()
 
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
-        cursor.execute('DELETE FROM samwisedb.Event WHERE eventId = %s', (eventId,))
+        cursor.execute('DELETE FROM Event WHERE eventId = %s', (eventId,))
         connection.commit()
         return success()
     return access_denied()
@@ -348,11 +350,11 @@ def removeEvent():
 #
 #     connection = get_db()
 #     cursor = connection.cursor()
-#     cursor.execute('SELECT user FROM samwisedb.Tag WHERE user = %s AND tagId = %s', (user, tagId))
+#     cursor.execute('SELECT user FROM Tag WHERE user = %s AND tagId = %s', (user, tagId))
 #     user_rows = cursor.fetchall()
 #
 #     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
-#         cursor.execute('DELETE FROM samwisedb.Tag WHERE user = %s AND tagId = %s', (user, tagId))
+#         cursor.execute('DELETE FROM Tag WHERE user = %s AND tagId = %s', (user, tagId))
 #         connection.commit()
 #         return success()
 #     return access_denied()
@@ -372,7 +374,7 @@ def addEvent():
         connection = get_db()
         cursor = connection.cursor()
         cursor.execute(
-            'INSERT INTO samwisedb.Event(user, eventName, startTime, endTime, tagId, notes, location) values (%s, %s, %s, %s, %s, %s, %s)',
+            'INSERT INTO Event(user, eventName, startTime, endTime, tagId, notes, location) values (%s, %s, %s, %s, %s, %s, %s)',
             (user, eventName, startTime, endTime, tagId, notes, location))
         connection.commit()
         event_id = cursor.lastrowid
@@ -392,12 +394,12 @@ def updateEvent():
     location = data['location']
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT user FROM samwisedb.Event WHERE eventId = %s', (eventId,))
+    cursor.execute('SELECT user FROM Event WHERE eventId = %s', (eventId,))
     user_rows = cursor.fetchall()
 
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute(
-            'UPDATE samwisedb.Event SET eventName=%s, startTime=%s, endTime=%s, tagId=%s, notes=%s, location=%s WHERE eventId=%s',
+            'UPDATE Event SET eventName=%s, startTime=%s, endTime=%s, tagId=%s, notes=%s, location=%s WHERE eventId=%s',
             (eventName, startTime, endTime, tagId, notes, location, eventId))
         connection.commit()
         return success()
@@ -410,7 +412,7 @@ def getTasks(userId):
     if current_user.netid == userId:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT DISTINCT * FROM samwisedb.Task WHERE user = %s', (userId,))
+        cursor.execute('SELECT DISTINCT * FROM Task WHERE user = %s', (userId,))
         data = [{
             'user': item[0],
             'taskId': item[1],
@@ -432,11 +434,11 @@ def removeTask():
 
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT user FROM samwisedb.Task WHERE taskId = %s', (taskId,))
+    cursor.execute('SELECT user FROM Task WHERE taskId = %s', (taskId,))
     user_rows = cursor.fetchall()
 
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
-        cursor.execute('DELETE FROM samwisedb.Task WHERE taskId = %s', taskId)
+        cursor.execute('DELETE FROM Task WHERE taskId = %s', taskId)
         connection.commit()
         return success()
     return access_denied()
@@ -456,7 +458,7 @@ def addTask():
         connection = get_db()
         cursor = connection.cursor()
         cursor.execute(
-            '''INSERT INTO samwisedb.Task(user, taskName, courseId, tag, startDate, dueDate, details)
+            '''INSERT INTO Task(user, taskName, courseId, tag, startDate, dueDate, details)
             VALUES (%s, %s, %s, %s, %s, %s, %s)''',
             (userid, taskname, course, tag, startdate, duedate, details))
         connection.commit()
@@ -478,12 +480,12 @@ def updateTask():
 
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT user FROM samwisedb.Task WHERE taskId = %s', (taskid,))
+    cursor.execute('SELECT user FROM Task WHERE taskId = %s', (taskid,))
     user_rows = cursor.fetchall()
 
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute('''
-           UPDATE samwisedb.Task
+           UPDATE Task
            SET taskName=%s, dueDate=%s, courseId=%s, details=%s
            WHERE taskId=%s
         ''', (taskname, duedate, course, details, taskid))
@@ -498,7 +500,7 @@ def getExams(course_id):
     # Open the connection to database
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT time FROM samwisedb.Exam WHERE courseId = %s', (course_id,))
+    cursor.execute('SELECT time FROM Exam WHERE courseId = %s', (course_id,))
     data = [{'course_id': course_id, 'start': item[0]} for item in cursor.fetchall()]
     return jsonify(data)
 
@@ -509,7 +511,7 @@ def getClassInfo(courseId):
     connection = get_db()
 
     cursor = connection.cursor()
-    cursor.execute('SELECT startTime FROM samwisedb.Course WHERE courseId = %s', courseId)
+    cursor.execute('SELECT startTime FROM Course WHERE courseId = %s', courseId)
     data = [{'course': courseId + ' Class', 'start': str(item[0])} for item in cursor.fetchall()]
     return jsonify(data)
 
@@ -522,11 +524,11 @@ def addSubtask():
     connection = get_db()
     cursor = connection.cursor()
 
-    cursor.execute('SELECT user FROM samwisedb.Project WHERE projectId = %s', (projectId,))
+    cursor.execute('SELECT user FROM Project WHERE projectId = %s', (projectId,))
     user_rows = cursor.fetchall()
 
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
-        cursor.execute('INSERT INTO samwisedb.Subtask(projectId, subtask) VALUES (%s, %s)', (projectId, subtask))
+        cursor.execute('INSERT INTO Subtask(projectId, subtask) VALUES (%s, %s)', (projectId, subtask))
         connection.commit()
         subtaskId = cursor.lastrowid
         return jsonify([subtaskId])
@@ -542,7 +544,7 @@ def removeSubtask():
 
     user = get_user_from_subtask_id(subtaskId)
     if current_user.is_authenticated and user and current_user.netid == user:
-        cursor.execute('DELETE FROM samwisedb.Subtask WHERE subtaskId = %s', (subtaskId,))
+        cursor.execute('DELETE FROM Subtask WHERE subtaskId = %s', (subtaskId,))
         connection.commit()
         return jsonify([subtaskId])
     return access_denied()
@@ -557,7 +559,7 @@ def updateSubtask():
     cursor = connection.cursor()
     user = get_user_from_subtask_id(subtaskId)
     if current_user.is_authenticated and user and current_user.netid == user:
-        cursor.execute('UPDATE samwisedb.Subtask SET subtaskName = %s WHERE subtaskId = %s', (subtaskName, subtaskId))
+        cursor.execute('UPDATE Subtask SET subtaskName = %s WHERE subtaskId = %s', (subtaskName, subtaskId))
         connection.commit()
         return jsonify([subtaskName])
     return access_denied()
@@ -569,7 +571,7 @@ def getTags(user):
     if current_user.netid == user:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT DISTINCT tagId FROM samwisedb.Tag WHERE user = %s', (user,))
+        cursor.execute('SELECT DISTINCT tagId FROM Tag WHERE user = %s', (user,))
         data = [item[0] for item in cursor.fetchall()]
         return jsonify(data)
     return access_denied()
@@ -578,7 +580,7 @@ def getTags(user):
     #     # Open the connection to database
     #     connection = get_db()
     #     cursor = connection.cursor()
-    #     cursor.execute('SELECT DISTINCT courseId FROM samwisedb.User WHERE netId = %s', (netId,))
+    #     cursor.execute('SELECT DISTINCT courseId FROM User WHERE netId = %s', (netId,))
     #     data = [item[0] for item in cursor.fetchall()]
     #     return jsonify(data)
     # return access_denied()
@@ -594,9 +596,9 @@ def addTag():
     if current_user.is_authenticated and current_user.netid == user:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT * from samwisedb.Tag WHERE (user, tagId) = (%s, %s)', (user, tagId))
+        cursor.execute('SELECT * from Tag WHERE (user, tagId) = (%s, %s)', (user, tagId))
         if len(cursor.fetchall()) == 0:
-            cursor.execute('INSERT INTO samwisedb.Tag(user, tagId, color) VALUES (%s, %s, %s)', (user, tagId, color))
+            cursor.execute('INSERT INTO Tag(user, tagId, color) VALUES (%s, %s, %s)', (user, tagId, color))
         connection.commit()
         return success()
     return access_denied()
@@ -610,11 +612,11 @@ def removeTag():
 
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT user FROM samwisedb.Tag WHERE user = %s AND tagId = %s', (user, tagId))
+    cursor.execute('SELECT user FROM Tag WHERE user = %s AND tagId = %s', (user, tagId))
     user_rows = cursor.fetchall()
 
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
-        cursor.execute('DELETE FROM samwisedb.Tag WHERE user = %s AND tagId = %s', (user, tagId))
+        cursor.execute('DELETE FROM Tag WHERE user = %s AND tagId = %s', (user, tagId))
         connection.commit()
         return success()
     return access_denied()
@@ -629,7 +631,7 @@ def updateTagColor():
     connection = get_db()
     cursor = connection.cursor()
     if current_user.is_authenticated:
-        cursor.execute('UPDATE samwisedb.Tag SET color = %s WHERE user = %s AND tagId = %s', (color, user, tagId))
+        cursor.execute('UPDATE Tag SET color = %s WHERE user = %s AND tagId = %s', (color, user, tagId))
         connection.commit()
         return success()
     return access_denied()
@@ -644,7 +646,7 @@ def updateTagId():
     connection = get_db()
     cursor = connection.cursor()
     if current_user.is_authenticated and user and current_user.netid == user:
-        cursor.execute('UPDATE samwisedb.Tag SET tagId = %s WHERE user = %s AND tagId = %s', (newTagId, user, tagId))
+        cursor.execute('UPDATE Tag SET tagId = %s WHERE user = %s AND tagId = %s', (newTagId, user, tagId))
         connection.commit()
         return jsonify([subtaskName])
     return access_denied()
@@ -659,7 +661,7 @@ def updateCourseColor():
     connection = get_db()
     cursor = connection.cursor()
     if current_user.is_authenticated:
-        cursor.execute('UPDATE samwisedb.User SET color = %s WHERE netId = %s AND courseId = %s',
+        cursor.execute('UPDATE User SET color = %s WHERE netId = %s AND courseId = %s',
                        (color, netId, courseId))
         connection.commit()
         return success()
@@ -679,7 +681,7 @@ def getUserCourseColor(userId, courseId):
         # Open the connection to database
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT netId, courseId, color FROM samwisedb.User WHERE netId = %s AND courseId = %s',
+        cursor.execute('SELECT netId, courseId, color FROM User WHERE netId = %s AND courseId = %s',
                        (userId, courseId))
         data = [item[2] for item in cursor.fetchall()]
         return jsonify(data)
@@ -693,7 +695,7 @@ def getUserTagColor(userId, tagId):
         # Open the connection to database
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT user, tagId, color FROM samwisedb.Tag WHERE user = %s AND tagId = %s',
+        cursor.execute('SELECT user, tagId, color FROM Tag WHERE user = %s AND tagId = %s',
                        (userId, tagId))
         data = [item[2] for item in cursor.fetchall()]
         return jsonify(data)
@@ -713,10 +715,10 @@ def getCalendarData():
 def get_user_from_subtask_id(subtask_id):
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT projectId FROM samwisedb.Subtask WHERE subtaskId = %s', (subtask_id,))
+    cursor.execute('SELECT projectId FROM Subtask WHERE subtaskId = %s', (subtask_id,))
     rows = cursor.fetchall()
     projectId = -1 if len(rows) == 0 else rows[0][0]
-    cursor.execute('SELECT user FROM samwisedb.Project WHERE projectId = %s', (projectId,))
+    cursor.execute('SELECT user FROM Project WHERE projectId = %s', (projectId,))
     user_rows = cursor.fetchall()
     return None if len(user_rows) == 0 else user_rows[0][0]
 
@@ -724,9 +726,9 @@ def get_user_from_subtask_id(subtask_id):
 def clear_user(user_id):
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM samwisedb.Event where user = %s', (user_id,))
-    cursor.execute('DELETE FROM samwisedb.Tag where user = %s', (user_id,))
-    cursor.execute('DELETE FROM samwisedb.User where netId = %s', (user_id,))
+    cursor.execute('DELETE FROM Event where user = %s', (user_id,))
+    cursor.execute('DELETE FROM Tag where user = %s', (user_id,))
+    cursor.execute('DELETE FROM User where netId = %s', (user_id,))
     connection.commit()
 
 

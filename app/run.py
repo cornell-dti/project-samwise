@@ -193,7 +193,7 @@ def getUserCourses(netId):
         # Open the connection to database
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT DISTINCT courseId FROM User WHERE netId = %s', (netId,))
+        cursor.execute('SELECT DISTINCT courseId FROM UserCourses WHERE netId = %s', (netId,))
         data = [item[0] for item in cursor.fetchall()]
         return jsonify(data)
     return access_denied()
@@ -208,9 +208,9 @@ def addCourse():
     if current_user.is_authenticated and current_user.netid == user:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT * from User WHERE (netId, courseId) = (%s, %s)', (user, courseId))
+        cursor.execute('SELECT * from UserCourses WHERE (netId, courseId) = (%s, %s)', (user, courseId))
         if len(cursor.fetchall()) == 0:
-            cursor.execute('INSERT INTO User(netId, courseId) VALUES (%s, %s)', (user, courseId))
+            cursor.execute('INSERT INTO UserCourses(netId, courseId) VALUES (%s, %s)', (user, courseId))
         connection.commit()
         return success()
     return access_denied()
@@ -224,7 +224,7 @@ def removeCourse():
     if current_user.is_authenticated and current_user.netid == userId:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('DELETE FROM User WHERE (netId, courseId) = (%s, %s)', (userId, courseId))
+        cursor.execute('DELETE FROM UserCourses WHERE (netId, courseId) = (%s, %s)', (userId, courseId))
         connection.commit()
         return success()
     return access_denied()
@@ -316,7 +316,7 @@ def getEvents(userid):
     if current_user.netid == userid:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT DISTINCT * FROM Event WHERE user = %s', (userid,))
+        cursor.execute('SELECT DISTINCT * FROM Event WHERE netId = %s', (userid,))
         data = [{'eventId': str(item[1]), 'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]),
                  'tagId': str(item[5]), 'notes': str(item[6]), 'location': str(item[7])} for
                 item in cursor.fetchall()]
@@ -333,7 +333,7 @@ def removeEvent():
     eventId = data['eventId']
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT user FROM Event WHERE eventId = %s', (eventId,))
+    cursor.execute('SELECT netId FROM Event WHERE eventId = %s', (eventId,))
     user_rows = cursor.fetchall()
 
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
@@ -374,7 +374,7 @@ def addEvent():
         connection = get_db()
         cursor = connection.cursor()
         cursor.execute(
-            'INSERT INTO Event(user, eventName, startTime, endTime, tagId, notes, location) values (%s, %s, %s, %s, %s, %s, %s)',
+            'INSERT INTO Event(netId, eventName, startTime, endTime, tagId, notes, location) values (%s, %s, %s, %s, %s, %s, %s)',
             (user, eventName, startTime, endTime, tagId, notes, location))
         connection.commit()
         event_id = cursor.lastrowid
@@ -394,7 +394,7 @@ def updateEvent():
     location = data['location']
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT user FROM Event WHERE eventId = %s', (eventId,))
+    cursor.execute('SELECT netId FROM Event WHERE eventId = %s', (eventId,))
     user_rows = cursor.fetchall()
 
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
@@ -571,7 +571,7 @@ def getTags(user):
     if current_user.netid == user:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT DISTINCT tagId FROM Tag WHERE user = %s', (user,))
+        cursor.execute('SELECT DISTINCT tagId FROM Tag WHERE netId = %s', (user,))
         data = [item[0] for item in cursor.fetchall()]
         return jsonify(data)
     return access_denied()
@@ -596,9 +596,9 @@ def addTag():
     if current_user.is_authenticated and current_user.netid == user:
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT * from Tag WHERE (user, tagId) = (%s, %s)', (user, tagId))
+        cursor.execute('SELECT * from Tag WHERE (netId, tagId) = (%s, %s)', (user, tagId))
         if len(cursor.fetchall()) == 0:
-            cursor.execute('INSERT INTO Tag(user, tagId, color) VALUES (%s, %s, %s)', (user, tagId, color))
+            cursor.execute('INSERT INTO Tag(netId, tagId, color) VALUES (%s, %s, %s)', (user, tagId, color))
         connection.commit()
         return success()
     return access_denied()
@@ -612,11 +612,11 @@ def removeTag():
 
     connection = get_db()
     cursor = connection.cursor()
-    cursor.execute('SELECT user FROM Tag WHERE user = %s AND tagId = %s', (user, tagId))
+    cursor.execute('SELECT netId FROM Tag WHERE netId = %s AND tagId = %s', (user, tagId))
     user_rows = cursor.fetchall()
 
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
-        cursor.execute('DELETE FROM Tag WHERE user = %s AND tagId = %s', (user, tagId))
+        cursor.execute('DELETE FROM Tag WHERE netId = %s AND tagId = %s', (user, tagId))
         connection.commit()
         return success()
     return access_denied()
@@ -631,7 +631,7 @@ def updateTagColor():
     connection = get_db()
     cursor = connection.cursor()
     if current_user.is_authenticated:
-        cursor.execute('UPDATE Tag SET color = %s WHERE user = %s AND tagId = %s', (color, user, tagId))
+        cursor.execute('UPDATE Tag SET color = %s WHERE netId = %s AND tagId = %s', (color, user, tagId))
         connection.commit()
         return success()
     return access_denied()
@@ -646,7 +646,7 @@ def updateTagId():
     connection = get_db()
     cursor = connection.cursor()
     if current_user.is_authenticated and user and current_user.netid == user:
-        cursor.execute('UPDATE Tag SET tagId = %s WHERE user = %s AND tagId = %s', (newTagId, user, tagId))
+        cursor.execute('UPDATE Tag SET tagId = %s WHERE netId = %s AND tagId = %s', (newTagId, user, tagId))
         connection.commit()
         return jsonify([subtaskName])
     return access_denied()
@@ -661,7 +661,7 @@ def updateCourseColor():
     connection = get_db()
     cursor = connection.cursor()
     if current_user.is_authenticated:
-        cursor.execute('UPDATE User SET color = %s WHERE netId = %s AND courseId = %s',
+        cursor.execute('UPDATE UserCourses SET color = %s WHERE netId = %s AND courseId = %s',
                        (color, netId, courseId))
         connection.commit()
         return success()
@@ -695,7 +695,7 @@ def getUserTagColor(userId, tagId):
         # Open the connection to database
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT user, tagId, color FROM Tag WHERE user = %s AND tagId = %s',
+        cursor.execute('SELECT netId, tagId, color FROM Tag WHERE netId = %s AND tagId = %s',
                        (userId, tagId))
         data = [item[2] for item in cursor.fetchall()]
         return jsonify(data)

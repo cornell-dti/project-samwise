@@ -1,6 +1,5 @@
 import os
 import datetime
-import config
 import urllib.request
 import urllib.error
 import json
@@ -9,6 +8,13 @@ from flask import Flask, render_template, url_for, redirect, request, session, j
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user, UserMixin
 from requests_oauthlib import OAuth2Session
+
+
+# Importing config depends on how the app is run:
+if __name__ == '__main__':
+    import config
+else:
+    from app import config
 
 app = Flask(__name__)
 app.config.from_object(config)

@@ -23,7 +23,6 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.session_protection = 'strong'
-
 test_acc = 'me382'
 
 
@@ -120,6 +119,7 @@ def logout():
 def callback():
     print('Entering gauth callback')
     if current_user and current_user.is_authenticated:
+        print('Current user exists')
         session['next'] = url_for('index') if 'next' not in request.args else request.args['next']
         return redirect(session['next'])
     session['next'] = url_for('index') if 'next' not in session else session['next']
@@ -129,8 +129,10 @@ def callback():
     if 'code' not in request.args and 'state' not in request.args:
         print('error while logging in: %s' % request['error'])
         return redirect(url_for('login'))
+    print('Getting google auth object')
     google = google_auth(state=session['oauth_state'])
     try:
+        print('Getting google token')
         token = google.fetch_token(
             app.config['TOKEN_URI'],
             client_secret=app.config['GOOGLE_CLIENT_SECRET'],
@@ -139,19 +141,24 @@ def callback():
     except urllib.error.HTTPError:
         print('Encountered an HTTPError while logging in.')
         return redirect(url_for('index'))
+    print('Getting google auth object using token')
     google = google_auth(token=token)
     resp = google.get(app.config['USER_INFO'])
+    print('Got response, status code =', resp.status_code)
     if resp.status_code == 200:
         user_data = resp.json()
         email = user_data['email']
+        print('Querying db...')
         user = UserData.query.filter_by(email=email).first()
         if not user:
             user = UserData()
             user.email = email
         user.name = user_data['name']
         user.netid = email.split('@')[0]
+        print('Adding user to db now')
         db.session.add(user)
         db.session.commit()
+        print('Added user')
         login_user(user)
     return redirect(session['next'])
 

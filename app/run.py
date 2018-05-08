@@ -1,7 +1,8 @@
 import os
 import datetime
 import config
-import urllib2
+import urllib.request
+import urllib.error
 import json
 import psycopg2
 from flask import Flask, render_template, url_for, redirect, request, session, jsonify, g
@@ -83,9 +84,11 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    session['next'] = url_for('index') if 'next' not in request.args else request.args['next']
     if current_user.is_authenticated:
+        # We have to get session next again because flask-login clears the session (supposedly for security)
+        session['next'] = url_for('index') if 'next' not in request.args else request.args['next']
         return redirect(session['next'])
+    session['next'] = url_for('index') if 'next' not in request.args else request.args['next']
     google = google_auth()
     auth_url, state = google.authorization_url(
         app.config['AUTH_URI'],
@@ -107,9 +110,10 @@ def logout():
 
 @app.route('/gauth_callback')
 def callback():
-    session['next'] = url_for('index') if 'next' not in session else session['next']
     if current_user and current_user.is_authenticated:
+        session['next'] = url_for('index') if 'next' not in request.args else request.args['next']
         return redirect(session['next'])
+    session['next'] = url_for('index') if 'next' not in session else session['next']
     if 'error' in request.args:
         print('error while logging in: %s' % request['error'])
         return redirect(url_for('index'))
@@ -123,7 +127,7 @@ def callback():
             client_secret=app.config['GOOGLE_CLIENT_SECRET'],
             authorization_response=request.url
         )
-    except urllib2.HTTPError:
+    except urllib.error.HTTPError:
         print('Encountered an HTTPError while logging in.')
         return redirect(url_for('index'))
     google = google_auth(token=token)
@@ -707,8 +711,8 @@ def getUserTagColor(userId, tagId):
 def getCalendarData():
     url = 'https://www.googleapis.com/calendar/v3/calendars/primary/events'
     token = session['bearer_token']
-    req = urllib2.Request(url, None, {'Authorization': 'Bearer %s' % token})
-    res = urllib2.urlopen(req)
+    req = urllib.request.Request(url, None, {'Authorization': 'Bearer %s' % token})
+    res = urllib.request.urlopen(req)
     return jsonify(json.loads(res.read()))
 
 

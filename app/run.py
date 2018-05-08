@@ -584,7 +584,7 @@ def getTags(user):
     #     # Open the connection to database
     #     connection = get_db()
     #     cursor = connection.cursor()
-    #     cursor.execute('SELECT DISTINCT courseId FROM User WHERE netId = %s', (netId,))
+    #     cursor.execute('SELECT DISTINCT courseId FROM UserCourses WHERE netId = %s', (netId,))
     #     data = [item[0] for item in cursor.fetchall()]
     #     return jsonify(data)
     # return access_denied()
@@ -685,7 +685,7 @@ def getUserCourseColor(userId, courseId):
         # Open the connection to database
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT netId, courseId, color FROM User WHERE netId = %s AND courseId = %s',
+        cursor.execute('SELECT netId, courseId, color FROM UserCourses WHERE netId = %s AND courseId = %s',
                        (userId, courseId))
         data = [item[2] for item in cursor.fetchall()]
         return jsonify(data)
@@ -732,7 +732,7 @@ def clear_user(user_id):
     cursor = connection.cursor()
     cursor.execute('DELETE FROM Event where user = %s', (user_id,))
     cursor.execute('DELETE FROM Tag where user = %s', (user_id,))
-    cursor.execute('DELETE FROM User where netId = %s', (user_id,))
+    cursor.execute('DELETE FROM UserCourses where netId = %s', (user_id,))
     connection.commit()
 
 

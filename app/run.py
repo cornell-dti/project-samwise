@@ -9,7 +9,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user, UserMixin
 from requests_oauthlib import OAuth2Session
 
-
 # Importing config depends on how the app is run:
 if __name__ == '__main__':
     import config
@@ -73,7 +72,10 @@ def success():
 def load_user(id):
     if id is None:
         return None
-    return UserData.query.get(id)
+    print('Querying user...')
+    user = UserData.query.get(id)
+    print('Got user')
+    return user
 
 
 @app.teardown_appcontext
@@ -116,6 +118,7 @@ def logout():
 
 @app.route('/gauth_callback')
 def callback():
+    print('Entering gauth callback')
     if current_user and current_user.is_authenticated:
         session['next'] = url_for('index') if 'next' not in request.args else request.args['next']
         return redirect(session['next'])

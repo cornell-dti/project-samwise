@@ -1,13 +1,19 @@
 import os
 import datetime
-import config
-import urllib2
+import urllib.request
+import urllib.error
 import json
 import psycopg2
 from flask import Flask, render_template, url_for, redirect, request, session, jsonify, g
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user, UserMixin
 from requests_oauthlib import OAuth2Session
+
+# Importing config depends on how the app is run:
+if __name__ == '__main__':
+    import config
+else:
+    from app import config
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -17,7 +23,6 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.session_protection = 'strong'
-
 test_acc = 'me382'
 
 
@@ -66,7 +71,10 @@ def success():
 def load_user(id):
     if id is None:
         return None
-    return UserData.query.get(id)
+    print('Querying user...')
+    user = UserData.query.get(id)
+    print('Got user')
+    return user
 
 
 @app.teardown_appcontext
@@ -83,9 +91,11 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    session['next'] = url_for('index') if 'next' not in request.args else request.args['next']
     if current_user.is_authenticated:
+        # We have to get session next again because flask-login clears the session (supposedly for security)
+        session['next'] = url_for('index') if 'next' not in request.args else request.args['next']
         return redirect(session['next'])
+    session['next'] = url_for('index') if 'next' not in request.args else request.args['next']
     google = google_auth()
     auth_url, state = google.authorization_url(
         app.config['AUTH_URI'],
@@ -107,38 +117,48 @@ def logout():
 
 @app.route('/gauth_callback')
 def callback():
-    session['next'] = url_for('index') if 'next' not in session else session['next']
+    print('Entering gauth callback')
     if current_user and current_user.is_authenticated:
+        print('Current user exists')
+        session['next'] = url_for('index') if 'next' not in request.args else request.args['next']
         return redirect(session['next'])
+    session['next'] = url_for('index') if 'next' not in session else session['next']
     if 'error' in request.args:
         print('error while logging in: %s' % request['error'])
         return redirect(url_for('index'))
     if 'code' not in request.args and 'state' not in request.args:
         print('error while logging in: %s' % request['error'])
         return redirect(url_for('login'))
+    print('Getting google auth object')
     google = google_auth(state=session['oauth_state'])
     try:
+        print('Getting google token')
         token = google.fetch_token(
             app.config['TOKEN_URI'],
             client_secret=app.config['GOOGLE_CLIENT_SECRET'],
             authorization_response=request.url
         )
-    except urllib2.HTTPError:
+    except urllib.error.HTTPError:
         print('Encountered an HTTPError while logging in.')
         return redirect(url_for('index'))
+    print('Getting google auth object using token')
     google = google_auth(token=token)
     resp = google.get(app.config['USER_INFO'])
+    print('Got response, status code =', resp.status_code)
     if resp.status_code == 200:
         user_data = resp.json()
         email = user_data['email']
+        print('Querying db...')
         user = UserData.query.filter_by(email=email).first()
         if not user:
             user = UserData()
             user.email = email
         user.name = user_data['name']
         user.netid = email.split('@')[0]
+        print('Adding user to db now')
         db.session.add(user)
         db.session.commit()
+        print('Added user')
         login_user(user)
     return redirect(session['next'])
 
@@ -580,7 +600,7 @@ def getTags(user):
     #     # Open the connection to database
     #     connection = get_db()
     #     cursor = connection.cursor()
-    #     cursor.execute('SELECT DISTINCT courseId FROM User WHERE netId = %s', (netId,))
+    #     cursor.execute('SELECT DISTINCT courseId FROM UserCourses WHERE netId = %s', (netId,))
     #     data = [item[0] for item in cursor.fetchall()]
     #     return jsonify(data)
     # return access_denied()
@@ -681,7 +701,7 @@ def getUserCourseColor(userId, courseId):
         # Open the connection to database
         connection = get_db()
         cursor = connection.cursor()
-        cursor.execute('SELECT netId, courseId, color FROM User WHERE netId = %s AND courseId = %s',
+        cursor.execute('SELECT netId, courseId, color FROM UserCourses WHERE netId = %s AND courseId = %s',
                        (userId, courseId))
         data = [item[2] for item in cursor.fetchall()]
         return jsonify(data)
@@ -707,8 +727,8 @@ def getUserTagColor(userId, tagId):
 def getCalendarData():
     url = 'https://www.googleapis.com/calendar/v3/calendars/primary/events'
     token = session['bearer_token']
-    req = urllib2.Request(url, None, {'Authorization': 'Bearer %s' % token})
-    res = urllib2.urlopen(req)
+    req = urllib.request.Request(url, None, {'Authorization': 'Bearer %s' % token})
+    res = urllib.request.urlopen(req)
     return jsonify(json.loads(res.read()))
 
 
@@ -728,7 +748,7 @@ def clear_user(user_id):
     cursor = connection.cursor()
     cursor.execute('DELETE FROM Event where user = %s', (user_id,))
     cursor.execute('DELETE FROM Tag where user = %s', (user_id,))
-    cursor.execute('DELETE FROM User where netId = %s', (user_id,))
+    cursor.execute('DELETE FROM UserCourses where netId = %s', (user_id,))
     connection.commit()
 
 

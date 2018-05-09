@@ -3,16 +3,16 @@
 
 CREATE TABLE UserCourses(
   id SERIAL PRIMARY KEY,
-  netId INT NOT NULL,
+  netId TEXT NOT NULL,
   courseId TEXT NOT NULL,
-  color TEXT NOT NULL
+  color TEXT
 );
 
 CREATE TABLE Tag (
   id SERIAL PRIMARY KEY,
-  netId INT NOT NULL,
+  netId TEXT NOT NULL,
   tagId TEXT NOT NULL,
-  color TEXT NOT NULL
+  color TEXT
 );
 
 CREATE TABLE Exam (
@@ -29,7 +29,7 @@ CREATE TABLE Course (
 
 CREATE TABLE Event (
   eventId SERIAL PRIMARY KEY,
-  netId INT NOT NULL,
+  netId TEXT NOT NULL,
   eventName TEXT NOT NULL,
   startTime TEXT NOT NULL,
   endTime TEXT NOT NULL,

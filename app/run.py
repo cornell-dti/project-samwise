@@ -23,7 +23,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.session_protection = 'strong'
-test_acc = 'me382'
+test_acc = ''
 
 
 class UserData(db.Model, UserMixin):

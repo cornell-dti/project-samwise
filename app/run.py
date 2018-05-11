@@ -337,7 +337,7 @@ def getEvents(userid):
         connection = get_db()
         cursor = connection.cursor()
         cursor.execute('SELECT DISTINCT * FROM Event WHERE netId = %s', (userid,))
-        data = [{'eventId': str(item[1]), 'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]),
+        data = [{'eventId': str(item[0]), 'eventName': str(item[2]), 'startTime': str(item[3]), 'endTime': str(item[4]),
                  'tagId': str(item[5]), 'notes': str(item[6]), 'location': str(item[7])} for
                 item in cursor.fetchall()]
         print(data)
@@ -355,7 +355,6 @@ def removeEvent():
     cursor = connection.cursor()
     cursor.execute('SELECT netId FROM Event WHERE eventId = %s', (eventId,))
     user_rows = cursor.fetchall()
-
     if current_user.is_authenticated and len(user_rows) > 0 and current_user.netid == user_rows[0][0]:
         cursor.execute('DELETE FROM Event WHERE eventId = %s', (eventId,))
         connection.commit()

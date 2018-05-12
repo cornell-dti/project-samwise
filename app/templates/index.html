@@ -105,7 +105,7 @@
         $("#eventNotes").val(event.notes);
         $("#eventId").val(event.db_id);
         modal.css("display", "block");
-        
+
         $("#submitEditEvent").click(function() {
             var name = $("#eventName").val();
             var dueDate = $("#eventDate").val();
@@ -121,7 +121,7 @@
             var startDate_object = new Date();
             startDate_object.setTime(dueDate_object.getTime() - offset);
             // Update fullCalendar event
-            console.log(startDate_object.toISOString());
+
             event.title = name;
             event.start = startDate_object.toISOString();
             event.end = dueDate_object.toISOString();
@@ -134,7 +134,7 @@
             updateEvent(eventId, name, event.start, event.end, tag, notes, loc);
             $("#editEvent").css("display", "none");
         });
-        
+
         $("#submitRemoveEvent").click(function() {
             var eventId = parseInt($("#eventId").val());
             removeEvent(eventId);
@@ -164,7 +164,7 @@
       else {
         element.qtip({
           content: {
-            text: "<b>" + event.title + "</b>" 
+            text: "<b>" + event.title + "</b>"
           },
           trigger: 'hover'
         });
@@ -190,32 +190,32 @@
 	});
 
 	function syncGoogleToFullCalendar() {
-        var results = syncCalendar();
-        var events = results.items;
-        var eventSource = [];
-        if (events.length > 0) {
-            for (i = 0; i < events.length; i++) {
-                var event = events[i];
-								if (event.start === undefined){
-									continue;
-								}
-								else{
-									var start = event.start.dateTime;
-	                if (!start) {
-	                    start = event.start.date;
-	                }
-	                var end = event.end.dateTime;
-	                if (!end) {
-	                    end = event.end.date;
-	                }
-								}
-                var newEvent = {"title" : event.summary, "start" : start, "end" : end, "className" : "google", "editable": false};
-                eventSource.push(newEvent);
-            }
-        } else {
-            console.log('No upcoming events found.');
-        }
-        $("#calendar").fullCalendar('addEventSource', eventSource);
+        // var results = syncCalendar();
+        // var events = results.items;
+        // var eventSource = [];
+        // if (events.length > 0) {
+        //     for (i = 0; i < events.length; i++) {
+        //         var event = events[i];
+				// 				if (event.start === undefined){
+				// 					continue;
+				// 				}
+				// 				else{
+				// 					var start = event.start.dateTime;
+	      //           if (!start) {
+	      //               start = event.start.date;
+	      //           }
+	      //           var end = event.end.dateTime;
+	      //           if (!end) {
+	      //               end = event.end.date;
+	      //           }
+				// 				}
+        //         var newEvent = {"title" : event.summary, "start" : start, "end" : end, "className" : "google", "editable": false};
+        //         eventSource.push(newEvent);
+        //     }
+        // } else {
+        //     console.log('No upcoming events found.');
+        // }
+        // $("#calendar").fullCalendar('addEventSource', eventSource);
     }
 
 	var events = JSON.parse(localStorage.getItem("events")) == null ? [] : JSON.parse(localStorage.getItem("events"));

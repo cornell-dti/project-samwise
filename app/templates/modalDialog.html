@@ -185,17 +185,23 @@
 
 			var name = document.getElementById("projectName").value;
 			var dueDate = document.getElementById("projectDate").value;
-			console.log(dueDate);
+			console.log("due " + dueDate);
+
 			var course = $("input[name=tagSelect]:checked").val();
 			var start = parseInt(document.getElementById("startWorking").value);
 			var pLocation = document.getElementById("projectLocation").value;
 			var notes = document.getElementById("projectNotes").value;
 
 			var dueDate_object = new Date(dueDate);
+			console.log("object " + dueDate_object);
+			dueDate_object.setDate(dueDate_object.getDate() + 1);
 			dueDate_object.setTime(dueDate_object.getTime() + 1000);
+			console.log("update " + dueDate_object);
+
 			var offset = 24*60*60*1000*(start);
-			var startDate_object = new Date();
-			startDate_object.setTime(dueDate_object.getTime() - offset);
+			var startDate_object = new Date(dueDate);
+			startDate_object.setDate(startDate_object.getDate() - start);
+			// startDate_object.setTime(dueDate_object.getTime() - offset);
 			console.log(startDate_object);
 
 			var c = getUserCourseColor(userid, course);
@@ -207,11 +213,18 @@
 				color = "#" + colorsWithHex[c[0]];
 			}
 			console.log(color);
+
+			// console.log(dueDate_object);
+			// dueDate_object.setHours(1);
+			// console.log(dueDate_object);
+
 			console.log('Calling addEvent');
 			addEvent(userid, name, startDate_object.toISOString(), dueDate_object.toISOString(), course, pLocation, notes);
 			console.log('Finished addEvent');
 			var es = getEvents(userid);
 			var highest_id = es[es.length - 1].eventId;
+
+
 
 			var newEvent = {
 				allDay : true,

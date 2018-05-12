@@ -342,6 +342,7 @@ li a:focus {
 	background: url("../images/google_signin.png");
 	width: 191px;
 	height: 46px;
+    background-size: 191px 46px;
 	border:0 none;
 	/*border: 1px solid #ddd;*/
 }

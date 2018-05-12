@@ -1,7 +1,13 @@
+html {
+	font-family: "Open Sans", sans-serif !important;
+
+}
+/*
 body{
 	font-family: 'Roboto Condensed', sans-serif;
 	#font-family: 'Open Sans Condensed', sans-serif;
 }
+*/
 
 /* Style the input */
 input {
@@ -218,12 +224,13 @@ a:hover{
     animation-name: animatetop;
     animation-duration: 0.4s
 }
-
+/*
 body{
   font-family: 'Roboto Condensed', sans-serif;
   #font-family: 'Open Sans Condensed', sans-serif;
 
 }
+*/
 
 /* The Menu Toggle*/
 /* Important styles */
